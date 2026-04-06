@@ -23,7 +23,7 @@
 
   <!-- ADMIN SECTION -->
   <section class="admin-container">
-    <h1 class="admin-title">Panel de Administración - Pijamas</h1>
+    <h1 class="admin-title">Panel de Administración</h1>
 
     <!-- NAVIGATION BUTTONS -->
     <div class="admin-nav-buttons">
@@ -70,20 +70,47 @@
               </div>
             </div>
 
-            <!-- ADD MODE: Select Image -->
-            <div id="addMode">
-              <div class="form-group">
-                <label for="imageSelect">Seleccionar Imagen</label>
-                <select id="imageSelect" onchange="updateImagePreview()">
-                  <option value="">Cargando imágenes...</option>
-                </select>
-              </div>
-            </div>
-
             <!-- PRODUCT DETAILS -->
             <div class="form-group">
-              <label>Imagen Seleccionada</label>
-              <img id="previewImage" src="" alt="Preview" style="width: 100%; border-radius: 8px; margin-bottom: 1rem; max-height: 200px; object-fit: cover; display: none;">
+              <label for="category">Categoría</label>
+              <select id="category" required>
+                <option value="">Selecciona una categoría</option>
+                <option value="pijamas">Pijamas</option>
+                <option value="lenceria">Lencería</option>
+                <option value="casual">Ropa Casual</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="imageFilename">Nombre del Archivo de Imagen</label>
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <span style="color: #999;">assets/images/products/</span>
+                <select id="categoryPath" style="flex: 0 0 auto;">
+                  <option value="pijamas">pijamas</option>
+                  <option value="lenceria">lenceria</option>
+                  <option value="casual">casual</option>
+                </select>
+                <span style="color: #999;">/</span>
+                <input 
+                  type="text" 
+                  id="imageFilename" 
+                  placeholder="producto1.jpg" 
+                  style="flex: 1;"
+                  required
+                >
+              </div>
+              <small style="color: #999; display: block; margin-top: 0.5rem;">
+                Ejemplo: producto1.jpg, producto2.png, etc.
+              </small>
+            </div>
+
+            <!-- IMAGE PREVIEW -->
+            <div class="form-group">
+              <label>Vista Previa de Imagen</label>
+              <div style="background: #f5f5f5; padding: 1.5rem; border-radius: 8px; text-align: center;">
+                <img id="previewImage" src="" alt="Preview" style="max-width: 100%; max-height: 200px; display: none; border-radius: 4px;">
+                <p id="previewPlaceholder" style="color: #999; margin: 0;">La imagen se previsualiza aquí</p>
+              </div>
             </div>
 
             <div class="form-group">
@@ -176,17 +203,19 @@
 
     let editingProductId = null;
     let currentMode = 'add';
-    let availableImages = [];
-    let selectedImagePath = '';
 
     document.addEventListener('DOMContentLoaded', async () => {
       checkAdminAuth();
-      loadAvailableImages();
       await loadProductsToSelect();
       await loadAdminProducts();
       setupFormHandlers();
       await loadOrders();
       await updateStats();
+      
+      // Sincronizar categoría
+      document.getElementById('imageFilename').addEventListener('change', updateImagePreview);
+      document.getElementById('categoryPath').addEventListener('change', updateImagePreview);
+      document.getElementById('category').addEventListener('change', syncCategoryPath);
       
       // Recargar órdenes cada 10 segundos
       setInterval(async () => {
@@ -200,6 +229,14 @@
       const isAuthenticated = localStorage.getItem('emiluxe_admin_logged_in');
       if (!isAuthenticated) {
         window.location.href = 'login.html';
+      }
+    }
+
+    // Sincronizar categoría seleccionada con categoryPath
+    function syncCategoryPath() {
+      const category = document.getElementById('category').value;
+      if (category) {
+        document.getElementById('categoryPath').value = category;
       }
     }
 
@@ -227,69 +264,34 @@
     // Switch between add and edit mode
     window.switchMode = function(mode) {
       currentMode = mode;
-      const addModeDiv = document.getElementById('addMode');
       const editModeDiv = document.getElementById('editMode');
       
       if (mode === 'add') {
-        addModeDiv.style.display = 'block';
         editModeDiv.style.display = 'none';
         clearForm();
         document.getElementById('submitBtn').textContent = 'Agregar Producto';
       } else {
-        addModeDiv.style.display = 'none';
         editModeDiv.style.display = 'block';
         clearForm();
         document.getElementById('submitBtn').textContent = 'Guardar Cambios';
       }
     }
 
-    // Load available images from pijamas folder
-    function loadAvailableImages() {
-      const pijamasFolder = 'assets/images/products/pijamas/';
-      
-      const imageList = [
-        'producto1.jpg',
-        'producto2.jpg',
-        'producto3.jpg',
-        'producto4.jpg',
-        'producto5.jpg',
-        'producto6.jpg',
-        'producto7.jpg',
-        'producto8.jpg',
-        'producto9.jpg',
-        'producto10.jpg'
-      ];
-
-      availableImages = imageList.map(img => ({
-        name: img,
-        path: pijamasFolder + img
-      }));
-
-      updateImageSelect();
-    }
-
-    // Update image select dropdown
-    function updateImageSelect() {
-      const imageSelect = document.getElementById('imageSelect');
-      
-      imageSelect.innerHTML = '<option value="">Selecciona una imagen...</option>' +
-        availableImages.map(img => `
-          <option value="${img.path}">${img.name.replace('.jpg', '').replace('.png', '')}</option>
-        `).join('');
-    }
-
     // Update image preview
     window.updateImagePreview = function() {
-      const imageSelect = document.getElementById('imageSelect');
+      const filename = document.getElementById('imageFilename').value.trim();
+      const categoryPath = document.getElementById('categoryPath').value;
       const preview = document.getElementById('previewImage');
+      const placeholder = document.getElementById('previewPlaceholder');
       
-      selectedImagePath = imageSelect.value;
-      
-      if (selectedImagePath) {
-        preview.src = selectedImagePath;
+      if (filename && categoryPath) {
+        const imagePath = `assets/images/products/${categoryPath}/${filename}`;
+        preview.src = imagePath;
         preview.style.display = 'block';
+        placeholder.style.display = 'none';
       } else {
         preview.style.display = 'none';
+        placeholder.style.display = 'block';
       }
     }
 
@@ -324,14 +326,18 @@
 
         if (product) {
           editingProductId = productId;
+          document.getElementById('category').value = product.category;
+          document.getElementById('categoryPath').value = product.category;
+          
+          // Extraer nombre del archivo desde la ruta
+          const filename = product.image.split('/').pop();
+          document.getElementById('imageFilename').value = filename;
+          
           document.getElementById('name').value = product.name;
           document.getElementById('description').value = product.description;
           document.getElementById('price').value = product.price;
           
-          const preview = document.getElementById('previewImage');
-          preview.src = product.image;
-          preview.style.display = 'block';
-          selectedImagePath = product.image;
+          updateImagePreview();
         }
       } catch (error) {
         console.error('Error cargando producto:', error);
@@ -345,7 +351,6 @@
       if (!form) return;
 
       const submitBtn = form.querySelector('.btn-primary');
-
       submitBtn.addEventListener('click', handleFormSubmit);
     }
 
@@ -353,11 +358,13 @@
     async function handleFormSubmit(e) {
       e.preventDefault();
 
+      const category = document.getElementById('category').value.trim();
+      const filename = document.getElementById('imageFilename').value.trim();
       const name = document.getElementById('name').value.trim();
       const description = document.getElementById('description').value.trim();
       const price = parseInt(document.getElementById('price').value);
 
-      if (!name || !description || !price) {
+      if (!category || !filename || !name || !description || !price) {
         showNotification('Por favor completa todos los campos', 'error');
         return;
       }
@@ -368,18 +375,15 @@
       }
 
       try {
-        if (currentMode === 'add') {
-          if (!selectedImagePath) {
-            showNotification('Por favor selecciona una imagen', 'error');
-            return;
-          }
+        const imagePath = `assets/images/products/${category}/${filename}`;
 
+        if (currentMode === 'add') {
           const newProduct = {
             name,
             description,
             price,
-            image: selectedImagePath,
-            category: 'Pijamas'
+            image: imagePath,
+            category
           };
 
           await addProduct(newProduct);
@@ -393,12 +397,9 @@
           const productData = {
             name,
             description,
-            price
+            price,
+            image: imagePath
           };
-
-          if (selectedImagePath) {
-            productData.image = selectedImagePath;
-          }
 
           await updateProduct(editingProductId, productData);
           showNotification('Producto actualizado exitosamente', 'success');
@@ -420,16 +421,13 @@
         form.reset();
       }
       editingProductId = null;
-      selectedImagePath = '';
       
       const preview = document.getElementById('previewImage');
+      const placeholder = document.getElementById('previewPlaceholder');
       preview.style.display = 'none';
-      preview.src = '';
+      placeholder.style.display = 'block';
       
-      const imageSelect = document.getElementById('imageSelect');
-      if (imageSelect) {
-        imageSelect.value = '';
-      }
+      document.getElementById('categoryPath').value = 'pijamas';
     }
 
     // Load and display admin products
@@ -508,21 +506,15 @@
         ordersBody.innerHTML = orders.map(order => `
           <tr>
             <td><strong style="color: var(--dark-pink);">#${order.orderId || order.id}</strong></td>
-            <td>
-              <small>${order.date}</small>
-            </td>
+            <td><small>${order.date}</small></td>
             <td>
               <a href="https://wa.me/57${order.phoneNumber}" target="_blank" style="color: #25d366; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
                 ${order.phoneNumber}
                 <span style="font-size: 1.2rem;">💬</span>
               </a>
             </td>
-            <td>
-              <strong>${formatPrice(order.total)}</strong>
-            </td>
-            <td>
-              <small style="color: #666;">${order.items.map(i => `${i.name} (x${i.quantity})`).join(', ')}</small>
-            </td>
+            <td><strong>${formatPrice(order.total)}</strong></td>
+            <td><small style="color: #666;">${order.items.map(i => `${i.name} (x${i.quantity})`).join(', ')}</small></td>
             <td>
               <span style="background-color: ${order.status.includes('Confirmada') ? '#c8e6c9' : '#fff3cd'}; color: ${order.status.includes('Confirmada') ? '#2e7d32' : '#856404'}; padding: 0.5rem 0.8rem; border-radius: 4px; font-weight: 600; display: inline-block;">
                 ${order.status}
