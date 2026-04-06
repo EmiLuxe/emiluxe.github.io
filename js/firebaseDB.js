@@ -321,5 +321,201 @@ export function listenToOrders(callback) {
     return unsubscribe;
   } catch (error) {
     console.error('✗ Error configurando listener de órdenes:', error);
-  *
-
+  }
+}
+
+/**
+ * Crear orden
+ * @param {Object} order - Datos de la orden
+ * @returns {Promise<Object>} Orden creada con ID
+ */
+export async function createOrder(order) {
+  try {
+    console.log('📝 Creando orden:', order.orderId);
+    
+    const docRef = await addDoc(collection(db, 'orders'), {
+      orderId: order.orderId,
+      date: order.date,
+      phoneNumber: order.phoneNumber,
+      total: order.total,
+      items: order.items,
+      status: order.status || 'Pendiente de Confirmación',
+      createdAt: Timestamp.now()
+    });
+    
+    console.log('✓ Orden creada con ID:', docRef.id);
+    
+    return {
+      id: docRef.id,
+      ...order
+    };
+  } catch (error) {
+    console.error('✗ Error creando orden:', error);
+    throw error;
+  }
+}
+
+/**
+ * Actualizar estado de orden
+ * @param {string} orderId - ID de la orden
+ * @param {string} status - Nuevo estado
+ * @returns {Promise<boolean>} true si se actualizó correctamente
+ */
+export async function updateOrderStatus(orderId, status) {
+  try {
+    console.log('📝 Actualizando estado de orden:', orderId);
+    
+    const orderRef = doc(db, 'orders', orderId);
+    await updateDoc(orderRef, {
+      status: status,
+      updatedAt: Timestamp.now()
+    });
+    
+    console.log('✓ Estado de orden actualizado:', status);
+    return true;
+  } catch (error) {
+    console.error('✗ Error actualizando estado de orden:', error);
+    throw error;
+  }
+}
+
+/**
+ * Eliminar orden
+ * @param {string} orderId - ID de la orden a eliminar
+ * @returns {Promise<boolean>} true si se eliminó correctamente
+ */
+export async function deleteOrderDB(orderId) {
+  try {
+    console.log('🗑️ Eliminando orden:', orderId);
+    
+    await deleteDoc(doc(db, 'orders', orderId));
+    
+    console.log('✓ Orden eliminada:', orderId);
+    return true;
+  } catch (error) {
+    console.error('✗ Error eliminando orden:', error);
+    throw error;
+  }
+}
+
+/**
+ * Obtener órdenes por teléfono
+ * @param {string} phoneNumber - Número de teléfono
+ * @returns {Promise<Array>} Array de órdenes del cliente
+ */
+export async function getOrdersByPhone(phoneNumber) {
+  try {
+    const ordersRef = collection(db, 'orders');
+    const q = query(ordersRef, where('phoneNumber', '==', phoneNumber));
+    const snapshot = await getDocs(q);
+    const orders = [];
+    
+    snapshot.forEach(doc => {
+      orders.push({
+        id: doc.id,
+        ...doc.data()
+      });
+    });
+    
+    return orders.sort((a, b) => {
+      const dateA = new Date(a.date || 0);
+      const dateB = new Date(b.date || 0);
+      return dateB - dateA;
+    });
+  } catch (error) {
+    console.error('✗ Error obteniendo órdenes por teléfono:', error);
+    return [];
+  }
+}
+
+/**
+ * Obtener órdenes pendientes
+ * @returns {Promise<Array>} Array de órdenes pendientes
+ */
+export async function getPendingOrders() {
+  try {
+    const ordersRef = collection(db, 'orders');
+    const q = query(
+      ordersRef,
+      where('status', '!=', '✅ Confirmada')
+    );
+    
+    const snapshot = await getDocs(q);
+    const orders = [];
+    
+    snapshot.forEach(doc => {
+      orders.push({
+        id: doc.id,
+        ...doc.data()
+      });
+    });
+    
+    return orders.sort((a, b) => {
+      const dateA = new Date(a.date || 0);
+      const dateB = new Date(b.date || 0);
+      return dateB - dateA;
+    });
+  } catch (error) {
+    console.error('✗ Error obteniendo órdenes pendientes:', error);
+    return [];
+  }
+}
+
+/**
+ * Obtener órdenes confirmadas
+ * @returns {Promise<Array>} Array de órdenes confirmadas
+ */
+export async function getConfirmedOrders() {
+  try {
+    const ordersRef = collection(db, 'orders');
+    const q = query(
+      ordersRef,
+      where('status', '==', '✅ Confirmada')
+    );
+    
+    const snapshot = await getDocs(q);
+    const orders = [];
+    
+    snapshot.forEach(doc => {
+      orders.push({
+        id: doc.id,
+        ...doc.data()
+      });
+    });
+    
+    return orders.sort((a, b) => {
+      const dateA = new Date(a.date || 0);
+      const dateB = new Date(b.date || 0);
+      return dateB - dateA;
+    });
+  } catch (error) {
+    console.error('✗ Error obteniendo órdenes confirmadas:', error);
+    return [];
+  }
+}
+
+// ========================================
+// EXPORT DEFAULT
+// ========================================
+
+export default {
+  // Products
+  getAllProducts,
+  listenToProducts,
+  getProductsByCategory,
+  getProductById,
+  addProduct,
+  updateProduct,
+  deleteProduct,
+  getRecentProducts,
+  
+  // Orders
+  getAllOrders,
+  listenToOrders,
+  createOrder,
+  updateOrderStatus,
+  deleteOrderDB,
+  getOrdersByPhone,
+  getPendingOrders,
+  getConfirmedOrders
+};
