@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Órdenes - EmiLuxe Admin</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav>
+    <a href="index.html" class="navbar-logo">
+      <img src="assets/images/logo.png" alt="EmiLuxe Logo">
+      EmiLuxe Admin
+    </a>
+    <ul class="navbar-menu">
+      <li><a href="admin.html">Productos</a></li>
+      <li><a href="admin-orders.html">Órdenes</a></li>
+    </ul>
+    <div class="navbar-icons">
+      <button onclick="logoutAdmin()" style="background: none; border: none; cursor: pointer; font-size: 1.3rem;">🚪</button>
+    </div>
+  </nav>
+
+  <!-- ORDERS SECTION -->
+  <section class="admin-container">
+    <h1 class="admin-title">📦 Órdenes Pendientes</h1>
+
+    <div class="orders-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+      <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 10px; text-align: center;">
+        <p style="font-size: 2rem; margin: 0; font-weight: 700;" id="totalOrders">0</p>
+        <p style="margin: 0; font-size: 0.9rem; opacity: 0.9;">Total de Órdenes</p>
+      </div>
+      <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 1.5rem; border-radius: 10px; text-align: center;">
+        <p style="font-size: 2rem; margin: 0; font-weight: 700;" id="totalRevenue">$0</p>
+        <p style="margin: 0; font-size: 0.9rem; opacity: 0.9;">Ingresos Totales</p>
+      </div>
+      <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 1.5rem; border-radius: 10px; text-align: center;">
+        <p style="font-size: 2rem; margin: 0; font-weight: 700;" id="pendingOrders">0</p>
+        <p style="margin: 0; font-size: 0.9rem; opacity: 0.9;">Pendientes</p>
+      </div>
+      <div style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; padding: 1.5rem; border-radius: 10px; text-align: center;">
+        <p style="font-size: 2rem; margin: 0; font-weight: 700;" id="confirmedOrders">0</p>
+        <p style="margin: 0; font-size: 0.9rem; opacity: 0.9;">Confirmadas</p>
+      </div>
+    </div>
+
+    <div class="orders-table-container">
+      <table class="orders-table" id="ordersTable">
+        <thead>
+          <tr>
+            <th>ID Orden</th>
+            <th>Fecha</th>
+            <th>Teléfono</th>
+            <th>Total</th>
+            <th>Productos</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="ordersBody">
+          <!-- Orders will be loaded here -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; 2026 EmiLuxe. Todos los derechos reservados. | Hecho con ❤️ para ti</p>
+  </footer>
+
+  <script src="js/cart.js"></script>
+  <script src="js/main.js"></script>
+  <script type="module">
+    import { getAllOrders, updateOrderStatus, deleteOrderDB } from './js/firebaseDB.js';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      checkAdminAuth();
+      await loadOrders();
+      await updateStats();
+      
+      // Recargar órdenes cada 10 segundos
+      setInterval(async () => {
+        await loadOrders();
+        await updateStats();
+      }, 10000);
+    });
+
+    function checkAdminAuth() {
+      const isAuthenticated = localStorage.getItem('emiluxe_admin_logged_in');
+      if (!isAuthenticated) {
+        window.location.href = 'login.html';
+      }
+    }
+
+    async function loadOrders() {
+      try {
+        const orders = await getAllOrders();
+        const ordersBody = document.getElementById('ordersBody');
+
+        if (orders.length === 0) {
+          ordersBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem; color: #999;">No hay órdenes aún</td></tr>';
+          return;
+        }
+
+        ordersBody.innerHTML = orders.map(order => `
+          <tr>
+            <td><strong style="color: var(--dark-pink);">#${order.orderId || order.id}</strong></td>
+            <td>
+              <small>${order.date}</small>
+            </td>
+            <td>
+              <a href="https://wa.me/57${order.phoneNumber}" target="_blank" style="color: #25d366; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                ${order.phoneNumber}
+                <span style="font-size: 1.2rem;">💬</span>
+              </a>
+            </td>
+            <td>
+              <strong>${formatPrice(order.total)}</strong>
+            </td>
+            <td>
+              <small style="color: #666;">${order.items.map(i => `${i.name} (x${i.quantity})`).join(', ')}</small>
+            </td>
+            <td>
+              <span style="background-color: ${order.status.includes('Confirmada') ? '#c8e6c9' : '#fff3cd'}; color: ${order.status.includes('Confirmada') ? '#2e7d32' : '#856404'}; padding: 0.5rem 0.8rem; border-radius: 4px; font-weight: 600; display: inline-block;">
+                ${order.status}
+              </span>
+            </td>
+            <td>
+              <div style="display: flex; gap: 0.4rem;">
+                <button onclick="confirmOrder('${order.id}')" style="background: #4caf50; color: white; border: none; padding: 0.5rem 0.8rem; border-radius: 4px; cursor: pointer; font-weight: 600; transition: all 0.3s;" onmouseover="this.style.background='#45a049'" onmouseout="this.style.background='#4caf50';" title="Confirmar orden">✓</button>
+                <button onclick="deleteOrder('${order.id}')" style="background: #f44336; color: white; border: none; padding: 0.5rem 0.8rem; border-radius: 4px; cursor: pointer; font-weight: 600; transition: all 0.3s;" onmouseover="this.style.background='#da190b'" onmouseout="this.style.background='#f44336';" title="Eliminar orden">✕</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      } catch (error) {
+        console.error('Error cargando órdenes:', error);
+        document.getElementById('ordersBody').innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem; color: #999;">Error al cargar órdenes</td></tr>';
+      }
+    }
+
+    async function updateStats() {
+      try {
+        const orders = await getAllOrders();
+        
+        const totalOrders = orders.length;
+        const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
+        const pendingOrders = orders.filter(o => !o.status.includes('Confirmada')).length;
+        const confirmedOrders = orders.filter(o => o.status.includes('Confirmada')).length;
+
+        document.getElementById('totalOrders').textContent = totalOrders;
+        document.getElementById('totalRevenue').textContent = formatPrice(totalRevenue);
+        document.getElementById('pendingOrders').textContent = pendingOrders;
+        document.getElementById('confirmedOrders').textContent = confirmedOrders;
+      } catch (error) {
+        console.error('Error actualizando estadísticas:', error);
+      }
+    }
+
+    window.confirmOrder = async function(orderId) {
+      try {
+        await updateOrderStatus(orderId, '✅ Confirmada');
+        await loadOrders();
+        await updateStats();
+        showNotification('Orden confirmada exitosamente', 'success');
+      } catch (error) {
+        console.error('Error confirmando orden:', error);
+        showNotification('Error al confirmar la orden', 'error');
+      }
+    }
+
+    window.deleteOrder = async function(orderId) {
+      if (confirm('¿Estás seguro de que deseas eliminar esta orden? Esta acción no se puede deshacer.')) {
+        try {
+          await deleteOrderDB(orderId);
+          await loadOrders();
+          await updateStats();
+          showNotification('Orden eliminada exitosamente', 'success');
+        } catch (error) {
+          console.error('Error eliminando orden:', error);
+          showNotification('Error al eliminar la orden', 'error');
+        }
+      }
+    }
+
+    window.logoutAdmin = function() {
+      if (confirm('¿Deseas cerrar sesión?')) {
+        localStorage.removeItem('emiluxe_admin_logged_in');
+        window.location.href = 'login.html';
+      }
+    }
+  </script>
+</body>
+</html>

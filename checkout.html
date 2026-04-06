@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pagar - EmiLuxe</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav>
+    <a href="index.html" class="navbar-logo">
+      <img src="assets/images/logo.png" alt="EmiLuxe Logo">
+      EmiLuxe
+    </a>
+    <ul class="navbar-menu">
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="shop.html">Tienda</a></li>
+    </ul>
+    <div class="navbar-icons">
+      <a href="cart.html" style="position: relative;">
+        🛒
+        <span class="cart-badge">0</span>
+      </a>
+      <a href="login.html">👤</a>
+    </div>
+  </nav>
+
+  <!-- CHECKOUT SECTION -->
+  <section class="checkout-container">
+    <!-- LEFT COLUMN: PAYMENT INFO -->
+    <div class="checkout-column">
+      <h2 class="checkout-title">Información de Pago</h2>
+
+      <div class="payment-method">
+        <div class="payment-label">Método de Pago</div>
+        <div class="payment-value">💳 Nequi</div>
+      </div>
+
+      <div class="payment-method">
+        <div class="payment-label">Número de Cuenta</div>
+        <div class="payment-value">3245535644</div>
+      </div>
+
+      <div class="payment-method">
+        <div class="payment-label">A Nombre De</div>
+        <div class="payment-value name">INGRITH TATIANA HENAO VALENCIA</div>
+      </div>
+
+      <div class="payment-method" style="background-color: #e8f5e9; border: 2px solid #4caf50;">
+        <div class="payment-label" style="color: #2e7d32;">✅ Pasos para completar tu pago:</div>
+        <ol style="text-align: left; color: #2e7d32; margin-top: 1rem; padding-left: 1.5rem;">
+          <li>Realiza la transferencia a Nequi</li>
+          <li>Ingresa tu número de teléfono</li>
+          <li>Presiona "Enviar Comprobante por WhatsApp"</li>
+          <li>Envía tu comprobante al WhatsApp</li>
+        </ol>
+      </div>
+
+      <div class="form-group">
+        <label for="phoneNumber">📱 Tu Número de Teléfono</label>
+        <input type="tel" id="phoneNumber" placeholder="Ej: 3001234567" maxlength="10" required>
+        <small style="color: #999; display: block; margin-top: 0.3rem;">Usaremos este número para verificar tu comprobante en WhatsApp</small>
+      </div>
+
+      <button class="confirm-btn" onclick="sendWhatsAppMessage()" style="background-color: #25d366; margin-top: 1rem;">
+        📤 Enviar Comprobante por WhatsApp
+      </button>
+
+      <div class="success-message" id="successMessage">
+        ✅ ¡Perfecto! Se abrirá WhatsApp para que envíes tu comprobante. <br><br>
+        <strong>Recuerda:</strong> Envía una foto clara de tu comprobante de transferencia.
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: ORDER SUMMARY -->
+    <div class="checkout-column">
+      <h2 class="checkout-title">Resumen de Orden</h2>
+
+      <div id="orderIdDisplay" style="background-color: #f3e5f5; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: center;">
+        <p style="color: #999; margin: 0; font-size: 0.9rem;">ID de tu orden:</p>
+        <p style="color: var(--dark-pink); font-weight: 700; font-size: 1.2rem; margin: 0.3rem 0 0 0;" id="orderId">#0000000000000</p>
+      </div>
+
+      <div id="orderSummary" style="margin-bottom: 2rem;">
+        <!-- Order items will be loaded here -->
+      </div>
+
+      <div class="cart-summary">
+        <div class="summary-row">
+          <span>Subtotal:</span>
+          <span id="orderTotal">$0</span>
+        </div>
+        <div class="summary-row">
+          <span>Envío:</span>
+          <span>Gratis</span>
+        </div>
+        <div class="summary-row total">
+          <span>Total a Pagar:</span>
+          <span id="orderGrandTotal">$0</span>
+        </div>
+      </div>
+
+      <div style="background-color: #fff3e0; padding: 1.5rem; border-radius: 10px; margin-top: 1.5rem;">
+        <p style="font-size: 0.9rem; color: #e65100;">
+          <strong>⏱️ Tiempo de confirmación:</strong> <br>
+          Normalmente confirmamos tu pedido en menos de 1 hora durante horario laboral.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; 2026 EmiLuxe. Todos los derechos reservados. | Hecho con ❤️ para ti</p>
+  </footer>
+
+  <script src="js/cart.js"></script>
+  <script src="js/main.js"></script>
+  <script type="module">
+    import { createOrder } from './js/firebaseDB.js';
+
+    let currentOrderId = null;
+
+    // Load order summary on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      loadOrderSummary();
+    });
+
+    // Load order summary
+    function loadOrderSummary() {
+      const cart = getCart();
+      const orderSummary = document.getElementById('orderSummary');
+
+      if (cart.length === 0) {
+        window.location.href = 'cart.html';
+        return;
+      }
+
+      // Generar ID de orden único
+      currentOrderId = generateOrderId();
+      document.getElementById('orderId').textContent = `#${currentOrderId}`;
+
+      orderSummary.innerHTML = cart.map(item => `
+        <div class="cart-item">
+          <img src="${item.image}" alt="${item.name}" class="cart-item-image">
+          <div class="cart-item-details">
+            <h3 class="cart-item-name">${item.name}</h3>
+            <p class="cart-item-price">${formatPrice(item.price)}</p>
+            <p style="color: #999;">Cantidad: <strong>${item.quantity}</strong></p>
+            <p style="color: var(--dark-pink); font-weight: 600;">Subtotal: ${formatPrice(item.price * item.quantity)}</p>
+          </div>
+        </div>
+      `).join('');
+
+      const total = getCartTotal();
+      document.getElementById('orderTotal').textContent = formatPrice(total);
+      document.getElementById('orderGrandTotal').textContent = formatPrice(total);
+    }
+
+    // Generar ID único para la orden
+    function generateOrderId() {
+      return Math.floor(Math.random() * 10000000000000).toString().padStart(13, '0');
+    }
+
+    // Send to WhatsApp
+    window.sendWhatsAppMessage = async function() {
+      const phoneNumber = document.getElementById('phoneNumber').value.trim();
+      const successMessage = document.getElementById('successMessage');
+      
+      // Validar número telefónico
+      if (!phoneNumber) {
+        showNotification('Por favor ingresa tu número de teléfono', 'error');
+        return;
+      }
+
+      if (phoneNumber.length < 10) {
+        showNotification('Por favor ingresa un número válido', 'error');
+        return;
+      }
+
+      const cart = getCart();
+      const total = getCartTotal();
+
+      // Construir mensaje con ID de orden
+      let cartItems = cart.map(item => 
+        `• ${item.name} (x${item.quantity}): ${formatPrice(item.price * item.quantity)}`
+      ).join('\n');
+
+      const message = `🛍️ *COMPRA REALIZADA EN EMILUXE* 🛍️
+
+*ID de Orden: #${currentOrderId}*
+
+*Detalles del Pedido:*
+${cartItems}
+
+*Total: ${formatPrice(total)}*
+
+📋 *Instrucciones de pago:*
+Realiza una transferencia a:
+📱 Nequi: 3245535644
+👤 A nombre de: INGRITH TATIANA HENAO VALENCIA
+
+💰 *Monto: ${formatPrice(total)}*
+
+📸 Por favor envía una foto clara de tu comprobante de transferencia.
+
+Gracias por tu compra ❤️`;
+
+      // Número WhatsApp (con código de país)
+      const whatsappNumber = '573245535644'; // Colombia +57
+
+      // Crear enlace de WhatsApp
+      const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+
+      // Mostrar mensaje de éxito
+      successMessage.classList.add('show');
+
+      // Esperar un poco y abrir WhatsApp
+      setTimeout(() => {
+        window.open(whatsappURL, '_blank');
+
+        // Guardar la orden en Firebase
+        saveOrderToFirebase(phoneNumber, total, cart, currentOrderId);
+
+        // Redirigir después de un tiempo
+        setTimeout(() => {
+          clearCart();
+          window.location.href = 'shop.html';
+        }, 3000);
+      }, 1500);
+    }
+
+    // Guardar orden en Firebase
+    async function saveOrderToFirebase(phoneNumber, total, cart, orderId) {
+      try {
+        const order = {
+          orderId: orderId,
+          date: new Date().toLocaleString('es-CO'),
+          phoneNumber: phoneNumber,
+          total: total,
+          items: cart,
+          status: 'Pendiente de Confirmación'
+        };
+
+        await createOrder(order);
+        showNotification('Orden guardada correctamente', 'success');
+      } catch (error) {
+        console.error('Error guardando orden:', error);
+        showNotification('Error al guardar la orden', 'error');
+        // Guardar en localStorage como respaldo
+        let orders = JSON.parse(localStorage.getItem('emiluxe_orders')) || [];
+        orders.push(order);
+        localStorage.setItem('emiluxe_orders', JSON.stringify(orders));
+      }
+    }
+  </script>
+</body>
+</html>

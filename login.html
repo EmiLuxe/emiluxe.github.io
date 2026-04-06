@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ingresar - EmiLuxe Admin</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav>
+    <a href="index.html" class="navbar-logo">
+      <img src="assets/images/logo.png" alt="EmiLuxe Logo">
+      EmiLuxe
+    </a>
+    <ul class="navbar-menu">
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="shop.html">Tienda</a></li>
+    </ul>
+    <div class="navbar-icons">
+      <a href="cart.html" style="position: relative;">
+        🛒
+        <span class="cart-badge">0</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- LOGIN SECTION -->
+  <section>
+    <div class="login-container">
+      <h1 class="login-title">🔐 Admin Panel</h1>
+
+      <div class="error-message" id="errorMessage"></div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="username">Usuario</label>
+          <input type="text" id="username" placeholder="Ingresa tu usuario" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <input type="password" id="password" placeholder="Ingresa tu contraseña" required>
+        </div>
+
+        <button type="submit" class="login-btn">Ingresar</button>
+      </form>
+
+      <p style="text-align: center; margin-top: 1.5rem; color: #999; font-size: 0.9rem;">
+        Datos de prueba: <br>
+        Usuario: <strong>admintatiana</strong> <br>
+        Contraseña: <strong>100IngirthValencia</strong>
+      </p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; 2026 EmiLuxe. Todos los derechos reservados. | Hecho con ❤️ para ti</p>
+  </footer>
+
+  <script src="js/cart.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    // Credentials
+    const ADMIN_USERNAME = 'admintatiana';
+    const ADMIN_PASSWORD = '100IngirthValencia';
+
+    // Check if already logged in
+    document.addEventListener('DOMContentLoaded', () => {
+      const isAuthenticated = localStorage.getItem('emiluxe_admin_logged_in');
+      if (isAuthenticated) {
+        window.location.href = 'admin.html';
+      }
+
+      // Setup form submission
+      document.getElementById('loginForm').addEventListener('submit', handleLogin);
+    });
+
+    // Handle login
+    function handleLogin(e) {
+      e.preventDefault();
+
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const errorMessage = document.getElementById('errorMessage');
+
+      // Validate credentials
+      if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+        // Set authentication
+        localStorage.setItem('emiluxe_admin_logged_in', 'true');
+        showNotification('¡Bienvenido al panel de administración!', 'success');
+
+        // Redirect to admin
+        setTimeout(() => {
+          window.location.href = 'admin.html';
+        }, 1000);
+      } else {
+        // Show error
+        errorMessage.textContent = '❌ Usuario o contraseña incorrectos';
+        errorMessage.classList.add('show');
+        document.getElementById('password').value = '';
+
+        setTimeout(() => {
+          errorMessage.classList.remove('show');
+        }, 3000);
+      }
+    }
+  </script>
+</body>
+</html>

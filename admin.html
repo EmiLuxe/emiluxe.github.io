@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Admin - EmiLuxe</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav>
+    <a href="index.html" class="navbar-logo">
+      <img src="assets/images/logo.png" alt="EmiLuxe Logo">
+      EmiLuxe Admin
+    </a>
+    <ul class="navbar-menu">
+      <li><a href="index.html">Volver a Tienda</a></li>
+    </ul>
+    <div class="navbar-icons">
+      <button onclick="logoutAdmin()" style="background: none; border: none; cursor: pointer; font-size: 1.3rem;">🚪</button>
+    </div>
+  </nav>
+
+  <!-- ADMIN SECTION -->
+  <section class="admin-container">
+    <h1 class="admin-title">Panel de Administración - Pijamas</h1>
+
+    <!-- NAVIGATION BUTTONS -->
+    <div class="admin-nav-buttons">
+      <button class="admin-nav-btn active" onclick="switchPanel('products', this)">
+        <span style="font-size: 1.5rem;">📦</span>
+        <span>Gestionar Productos</span>
+      </button>
+      <button class="admin-nav-btn" onclick="switchPanel('orders', this)">
+        <span style="font-size: 1.5rem;">📋</span>
+        <span>Ver Órdenes</span>
+      </button>
+    </div>
+
+    <!-- PRODUCTS PANEL -->
+    <div id="productsPanel" class="admin-panel">
+      <div class="admin-layout">
+        <!-- FORM COLUMN -->
+        <div class="admin-form">
+          <h3 class="form-title">Agregar/Editar Producto</h3>
+
+          <form id="productForm">
+            <!-- MODE: ADD or EDIT -->
+            <div class="form-group">
+              <label>Modo</label>
+              <div style="display: flex; gap: 1rem;">
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: normal;">
+                  <input type="radio" name="mode" value="add" checked onchange="switchMode('add')">
+                  Agregar Nuevo
+                </label>
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: normal;">
+                  <input type="radio" name="mode" value="edit" onchange="switchMode('edit')">
+                  Editar Existente
+                </label>
+              </div>
+            </div>
+
+            <!-- EDIT MODE: Select Product -->
+            <div id="editMode" style="display: none;">
+              <div class="form-group">
+                <label for="productSelect">Seleccionar Producto</label>
+                <select id="productSelect" onchange="loadProductData()">
+                  <option value="">Elige un producto...</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- ADD MODE: Select Image -->
+            <div id="addMode">
+              <div class="form-group">
+                <label for="imageSelect">Seleccionar Imagen</label>
+                <select id="imageSelect" onchange="updateImagePreview()">
+                  <option value="">Cargando imágenes...</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- PRODUCT DETAILS -->
+            <div class="form-group">
+              <label>Imagen Seleccionada</label>
+              <img id="previewImage" src="" alt="Preview" style="width: 100%; border-radius: 8px; margin-bottom: 1rem; max-height: 200px; object-fit: cover; display: none;">
+            </div>
+
+            <div class="form-group">
+              <label for="name">Nombre del Producto</label>
+              <input type="text" id="name" placeholder="Ej: Pijama Elegante Rosa" required>
+            </div>
+
+            <div class="form-group">
+              <label for="description">Descripción</label>
+              <textarea id="description" placeholder="Describe el producto" required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="price">Precio (COP)</label>
+              <input type="number" id="price" placeholder="89990" step="1" required>
+            </div>
+
+            <div class="admin-buttons">
+              <button type="button" class="admin-btn btn-primary" id="submitBtn">Guardar Producto</button>
+              <button type="button" class="admin-btn btn-secondary" onclick="clearForm()">Limpiar Formulario</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- PRODUCTS LIST COLUMN -->
+        <div class="admin-products">
+          <h3 class="admin-products-title">Productos Disponibles</h3>
+          <div id="loadingProducts" style="text-align: center; padding: 2rem; color: #999;">
+            Cargando productos...
+          </div>
+          <div class="admin-products-list" id="productsList" style="display: none;">
+            <!-- Products will be loaded here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ORDERS PANEL -->
+    <div id="ordersPanel" class="admin-panel" style="display: none;">
+      <div class="orders-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 10px; text-align: center;">
+          <p style="font-size: 2rem; margin: 0; font-weight: 700;" id="totalOrders">0</p>
+          <p style="margin: 0; font-size: 0.9rem; opacity: 0.9;">Total de Órdenes</p>
+        </div>
+        <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 1.5rem; border-radius: 10px; text-align: center;">
+          <p style="font-size: 2rem; margin: 0; font-weight: 700;" id="totalRevenue">$0</p>
+          <p style="margin: 0; font-size: 0.9rem; opacity: 0.9;">Ingresos Totales</p>
+        </div>
+        <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 1.5rem; border-radius: 10px; text-align: center;">
+          <p style="font-size: 2rem; margin: 0; font-weight: 700;" id="pendingOrders">0</p>
+          <p style="margin: 0; font-size: 0.9rem; opacity: 0.9;">Pendientes</p>
+        </div>
+        <div style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; padding: 1.5rem; border-radius: 10px; text-align: center;">
+          <p style="font-size: 2rem; margin: 0; font-weight: 700;" id="confirmedOrders">0</p>
+          <p style="margin: 0; font-size: 0.9rem; opacity: 0.9;">Confirmadas</p>
+        </div>
+      </div>
+
+      <div class="orders-table-container">
+        <table class="orders-table" id="ordersTable">
+          <thead>
+            <tr>
+              <th>ID Orden</th>
+              <th>Fecha</th>
+              <th>Teléfono</th>
+              <th>Total</th>
+              <th>Productos</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="ordersBody">
+            <!-- Orders will be loaded here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; 2026 EmiLuxe. Todos los derechos reservados. | Hecho con ❤️ para ti</p>
+  </footer>
+
+  <script src="js/cart.js"></script>
+  <script src="js/main.js"></script>
+  <script type="module">
+    import { getAllProducts, addProduct, updateProduct, deleteProduct } from './js/products.js';
+    import { getAllOrders, updateOrderStatus, deleteOrderDB } from './js/firebaseDB.js';
+
+    let editingProductId = null;
+    let currentMode = 'add';
+    let availableImages = [];
+    let selectedImagePath = '';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      checkAdminAuth();
+      loadAvailableImages();
+      await loadProductsToSelect();
+      await loadAdminProducts();
+      setupFormHandlers();
+      await loadOrders();
+      await updateStats();
+      
+      // Recargar órdenes cada 10 segundos
+      setInterval(async () => {
+        await loadOrders();
+        await updateStats();
+      }, 10000);
+    });
+
+    // Check if user is authenticated
+    function checkAdminAuth() {
+      const isAuthenticated = localStorage.getItem('emiluxe_admin_logged_in');
+      if (!isAuthenticated) {
+        window.location.href = 'login.html';
+      }
+    }
+
+    // Switch between panels
+    window.switchPanel = function(panel, button) {
+      const productsPanel = document.getElementById('productsPanel');
+      const ordersPanel = document.getElementById('ordersPanel');
+      const buttons = document.querySelectorAll('.admin-nav-btn');
+
+      buttons.forEach(btn => {
+        btn.classList.remove('active');
+      });
+
+      button.classList.add('active');
+
+      if (panel === 'products') {
+        productsPanel.style.display = 'block';
+        ordersPanel.style.display = 'none';
+      } else {
+        productsPanel.style.display = 'none';
+        ordersPanel.style.display = 'block';
+      }
+    }
+
+    // Switch between add and edit mode
+    window.switchMode = function(mode) {
+      currentMode = mode;
+      const addModeDiv = document.getElementById('addMode');
+      const editModeDiv = document.getElementById('editMode');
+      
+      if (mode === 'add') {
+        addModeDiv.style.display = 'block';
+        editModeDiv.style.display = 'none';
+        clearForm();
+        document.getElementById('submitBtn').textContent = 'Agregar Producto';
+      } else {
+        addModeDiv.style.display = 'none';
+        editModeDiv.style.display = 'block';
+        clearForm();
+        document.getElementById('submitBtn').textContent = 'Guardar Cambios';
+      }
+    }
+
+    // Load available images from pijamas folder
+    function loadAvailableImages() {
+      const pijamasFolder = 'assets/images/products/pijamas/';
+      
+      const imageList = [
+        'producto1.jpg',
+        'producto2.jpg',
+        'producto3.jpg',
+        'producto4.jpg',
+        'producto5.jpg',
+        'producto6.jpg',
+        'producto7.jpg',
+        'producto8.jpg',
+        'producto9.jpg',
+        'producto10.jpg'
+      ];
+
+      availableImages = imageList.map(img => ({
+        name: img,
+        path: pijamasFolder + img
+      }));
+
+      updateImageSelect();
+    }
+
+    // Update image select dropdown
+    function updateImageSelect() {
+      const imageSelect = document.getElementById('imageSelect');
+      
+      imageSelect.innerHTML = '<option value="">Selecciona una imagen...</option>' +
+        availableImages.map(img => `
+          <option value="${img.path}">${img.name.replace('.jpg', '').replace('.png', '')}</option>
+        `).join('');
+    }
+
+    // Update image preview
+    window.updateImagePreview = function() {
+      const imageSelect = document.getElementById('imageSelect');
+      const preview = document.getElementById('previewImage');
+      
+      selectedImagePath = imageSelect.value;
+      
+      if (selectedImagePath) {
+        preview.src = selectedImagePath;
+        preview.style.display = 'block';
+      } else {
+        preview.style.display = 'none';
+      }
+    }
+
+    // Load products into select dropdown for edit mode
+    async function loadProductsToSelect() {
+      try {
+        const allProducts = await getAllProducts();
+        const productSelect = document.getElementById('productSelect');
+
+        productSelect.innerHTML = '<option value="">Elige un producto...</option>' + 
+          allProducts.map(product => `
+            <option value="${product.id}">${product.name}</option>
+          `).join('');
+      } catch (error) {
+        console.error('Error cargando productos:', error);
+      }
+    }
+
+    // Load product data into form for editing
+    window.loadProductData = async function() {
+      try {
+        const productSelect = document.getElementById('productSelect');
+        const productId = productSelect.value;
+
+        if (!productId) {
+          clearForm();
+          return;
+        }
+
+        const allProducts = await getAllProducts();
+        const product = allProducts.find(p => p.id == productId);
+
+        if (product) {
+          editingProductId = productId;
+          document.getElementById('name').value = product.name;
+          document.getElementById('description').value = product.description;
+          document.getElementById('price').value = product.price;
+          
+          const preview = document.getElementById('previewImage');
+          preview.src = product.image;
+          preview.style.display = 'block';
+          selectedImagePath = product.image;
+        }
+      } catch (error) {
+        console.error('Error cargando producto:', error);
+        showNotification('Error al cargar el producto', 'error');
+      }
+    }
+
+    // Setup form event handlers
+    function setupFormHandlers() {
+      const form = document.getElementById('productForm');
+      if (!form) return;
+
+      const submitBtn = form.querySelector('.btn-primary');
+
+      submitBtn.addEventListener('click', handleFormSubmit);
+    }
+
+    // Handle form submission
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value.trim();
+      const description = document.getElementById('description').value.trim();
+      const price = parseInt(document.getElementById('price').value);
+
+      if (!name || !description || !price) {
+        showNotification('Por favor completa todos los campos', 'error');
+        return;
+      }
+
+      if (price <= 0) {
+        showNotification('El precio debe ser mayor a 0', 'error');
+        return;
+      }
+
+      try {
+        if (currentMode === 'add') {
+          if (!selectedImagePath) {
+            showNotification('Por favor selecciona una imagen', 'error');
+            return;
+          }
+
+          const newProduct = {
+            name,
+            description,
+            price,
+            image: selectedImagePath,
+            category: 'Pijamas'
+          };
+
+          await addProduct(newProduct);
+          showNotification('Producto agregado exitosamente', 'success');
+        } else {
+          if (!editingProductId) {
+            showNotification('Por favor selecciona un producto', 'error');
+            return;
+          }
+
+          const productData = {
+            name,
+            description,
+            price
+          };
+
+          if (selectedImagePath) {
+            productData.image = selectedImagePath;
+          }
+
+          await updateProduct(editingProductId, productData);
+          showNotification('Producto actualizado exitosamente', 'success');
+        }
+
+        clearForm();
+        await loadProductsToSelect();
+        await loadAdminProducts();
+      } catch (error) {
+        console.error('Error:', error);
+        showNotification('Error al guardar el producto', 'error');
+      }
+    }
+
+    // Clear form
+    window.clearForm = function() {
+      const form = document.getElementById('productForm');
+      if (form) {
+        form.reset();
+      }
+      editingProductId = null;
+      selectedImagePath = '';
+      
+      const preview = document.getElementById('previewImage');
+      preview.style.display = 'none';
+      preview.src = '';
+      
+      const imageSelect = document.getElementById('imageSelect');
+      if (imageSelect) {
+        imageSelect.value = '';
+      }
+    }
+
+    // Load and display admin products
+    async function loadAdminProducts() {
+      try {
+        const productsList = document.getElementById('productsList');
+        const loadingProducts = document.getElementById('loadingProducts');
+        
+        if (!productsList) return;
+
+        const allProducts = await getAllProducts();
+
+        loadingProducts.style.display = 'none';
+        productsList.style.display = 'block';
+
+        if (allProducts.length === 0) {
+          productsList.innerHTML = '<p style="text-align: center; color: #999;">No hay productos aún. ¡Agrega uno!</p>';
+          return;
+        }
+
+        productsList.innerHTML = allProducts.map(product => `
+          <div class="admin-product-item">
+            <img src="${product.image}" alt="${product.name}" style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover;" onerror="this.src='assets/images/placeholder.png'">
+            <div class="admin-product-info">
+              <div class="admin-product-name">${product.name}</div>
+              <div class="admin-product-price">${formatPrice(product.price)}</div>
+            </div>
+            <div class="admin-product-actions">
+              <button class="btn-edit" onclick="selectProductToEdit('${product.id}')">Editar</button>
+              <button class="btn-delete" onclick="deleteProductConfirm('${product.id}')">Eliminar</button>
+            </div>
+          </div>
+        `).join('');
+      } catch (error) {
+        console.error('Error cargando productos:', error);
+      }
+    }
+
+    // Select product to edit
+    window.selectProductToEdit = async function(id) {
+      document.querySelector('input[name="mode"][value="edit"]').checked = true;
+      switchMode('edit');
+      
+      const productSelect = document.getElementById('productSelect');
+      productSelect.value = id;
+      await loadProductData();
+      document.getElementById('productForm').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Delete product with confirmation
+    window.deleteProductConfirm = async function(id) {
+      if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
+        try {
+          await deleteProduct(id);
+          await loadProductsToSelect();
+          await loadAdminProducts();
+          showNotification('Producto eliminado exitosamente', 'success');
+        } catch (error) {
+          console.error('Error:', error);
+          showNotification('Error al eliminar el producto', 'error');
+        }
+      }
+    }
+
+    // ORDERS FUNCTIONS
+    async function loadOrders() {
+      try {
+        const orders = await getAllOrders();
+        const ordersBody = document.getElementById('ordersBody');
+
+        if (orders.length === 0) {
+          ordersBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem; color: #999;">No hay órdenes aún</td></tr>';
+          return;
+        }
+
+        ordersBody.innerHTML = orders.map(order => `
+          <tr>
+            <td><strong style="color: var(--dark-pink);">#${order.orderId || order.id}</strong></td>
+            <td>
+              <small>${order.date}</small>
+            </td>
+            <td>
+              <a href="https://wa.me/57${order.phoneNumber}" target="_blank" style="color: #25d366; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                ${order.phoneNumber}
+                <span style="font-size: 1.2rem;">💬</span>
+              </a>
+            </td>
+            <td>
+              <strong>${formatPrice(order.total)}</strong>
+            </td>
+            <td>
+              <small style="color: #666;">${order.items.map(i => `${i.name} (x${i.quantity})`).join(', ')}</small>
+            </td>
+            <td>
+              <span style="background-color: ${order.status.includes('Confirmada') ? '#c8e6c9' : '#fff3cd'}; color: ${order.status.includes('Confirmada') ? '#2e7d32' : '#856404'}; padding: 0.5rem 0.8rem; border-radius: 4px; font-weight: 600; display: inline-block;">
+                ${order.status}
+              </span>
+            </td>
+            <td>
+              <div style="display: flex; gap: 0.4rem;">
+                <button onclick="confirmOrder('${order.id}')" style="background: #4caf50; color: white; border: none; padding: 0.5rem 0.8rem; border-radius: 4px; cursor: pointer; font-weight: 600; transition: all 0.3s;" onmouseover="this.style.background='#45a049'" onmouseout="this.style.background='#4caf50';" title="Confirmar orden">✓</button>
+                <button onclick="deleteOrder('${order.id}')" style="background: #f44336; color: white; border: none; padding: 0.5rem 0.8rem; border-radius: 4px; cursor: pointer; font-weight: 600; transition: all 0.3s;" onmouseover="this.style.background='#da190b'" onmouseout="this.style.background='#f44336';" title="Eliminar orden">✕</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      } catch (error) {
+        console.error('Error cargando órdenes:', error);
+      }
+    }
+
+    async function updateStats() {
+      try {
+        const orders = await getAllOrders();
+        
+        const totalOrders = orders.length;
+        const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
+        const pendingOrders = orders.filter(o => !o.status.includes('Confirmada')).length;
+        const confirmedOrders = orders.filter(o => o.status.includes('Confirmada')).length;
+
+        document.getElementById('totalOrders').textContent = totalOrders;
+        document.getElementById('totalRevenue').textContent = formatPrice(totalRevenue);
+        document.getElementById('pendingOrders').textContent = pendingOrders;
+        document.getElementById('confirmedOrders').textContent = confirmedOrders;
+      } catch (error) {
+        console.error('Error actualizando estadísticas:', error);
+      }
+    }
+
+    window.confirmOrder = async function(orderId) {
+      try {
+        await updateOrderStatus(orderId, '✅ Confirmada');
+        await loadOrders();
+        await updateStats();
+        showNotification('Orden confirmada exitosamente', 'success');
+      } catch (error) {
+        console.error('Error confirmando orden:', error);
+        showNotification('Error al confirmar la orden', 'error');
+      }
+    }
+
+    window.deleteOrder = async function(orderId) {
+      if (confirm('¿Estás seguro de que deseas eliminar esta orden?')) {
+        try {
+          await deleteOrderDB(orderId);
+          await loadOrders();
+          await updateStats();
+          showNotification('Orden eliminada exitosamente', 'success');
+        } catch (error) {
+          console.error('Error eliminando orden:', error);
+          showNotification('Error al eliminar la orden', 'error');
+        }
+      }
+    }
+
+    window.logoutAdmin = function() {
+      if (confirm('¿Deseas cerrar sesión?')) {
+        localStorage.removeItem('emiluxe_admin_logged_in');
+        window.location.href = 'login.html';
+      }
+    }
+  </script>
+</body>
+</html>

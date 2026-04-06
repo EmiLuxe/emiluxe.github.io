@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carrito - EmiLuxe</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav>
+    <a href="index.html" class="navbar-logo">
+      <img src="assets/images/logo.png" alt="EmiLuxe Logo">
+      EmiLuxe
+    </a>
+    <ul class="navbar-menu">
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="shop.html">Tienda</a></li>
+    </ul>
+    <div class="navbar-icons">
+      <a href="cart.html" style="position: relative;">
+        🛒
+        <span class="cart-badge">0</span>
+      </a>
+      <a href="login.html">👤</a>
+    </div>
+  </nav>
+
+  <!-- CART SECTION -->
+  <section class="cart-container">
+    <h1 class="cart-title">Mi Carrito</h1>
+
+    <div class="cart-items" id="cartItems">
+      <!-- Cart items will be loaded here -->
+    </div>
+
+    <div class="cart-summary">
+      <div class="summary-row">
+        <span>Subtotal:</span>
+        <span id="subtotal">$0</span>
+      </div>
+      <div class="summary-row">
+        <span>Envío:</span>
+        <span>Gratis</span>
+      </div>
+      <div class="summary-row total">
+        <span>Total:</span>
+        <span id="total">$0</span>
+      </div>
+      <button class="checkout-btn" onclick="proceedToCheckout()">Ir a Pagar</button>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; 2026 EmiLuxe. Todos los derechos reservados. | Hecho con ❤️ para ti</p>
+  </footer>
+
+  <script src="js/cart.js"></script>
+  <script src="js/products.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    // Load cart on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      renderCart();
+    });
+
+    // Render cart items
+    function renderCart() {
+      const cart = getCart();
+      const cartItems = document.getElementById('cartItems');
+
+      if (cart.length === 0) {
+        cartItems.innerHTML = `
+          <div class="cart-empty">
+            <p>Tu carrito está vacío</p>
+            <p><a href="shop.html" style="color: var(--dark-pink); text-decoration: none; font-weight: 600;">Continuar comprando</a></p>
+          </div>
+        `;
+        updateCartTotals();
+        return;
+      }
+
+      cartItems.innerHTML = cart.map(item => `
+        <div class="cart-item">
+          <img src="${item.image}" alt="${item.name}" class="cart-item-image">
+          <div class="cart-item-details">
+            <h3 class="cart-item-name">${item.name}</h3>
+            <p class="cart-item-price">${formatPrice(item.price)}</p>
+            <div class="quantity-control">
+              <button onclick="decreaseQuantity(${item.id})">−</button>
+              <input type="number" value="${item.quantity}" min="1" onchange="updateCart(${item.id}, this.value)">
+              <button onclick="increaseQuantity(${item.id})">+</button>
+            </div>
+            <button class="remove-btn" onclick="removeItem(${item.id})">Eliminar</button>
+          </div>
+        </div>
+      `).join('');
+
+      updateCartTotals();
+    }
+
+    // Update cart totals
+    function updateCartTotals() {
+      const total = getCartTotal();
+      document.getElementById('subtotal').textContent = formatPrice(total);
+      document.getElementById('total').textContent = formatPrice(total);
+    }
+
+    // Increase quantity
+    function increaseQuantity(productId) {
+      const cart = getCart();
+      const item = cart.find(i => i.id === productId);
+      if (item) {
+        updateQuantity(productId, item.quantity + 1);
+        renderCart();
+      }
+    }
+
+    // Decrease quantity
+    function decreaseQuantity(productId) {
+      const cart = getCart();
+      const item = cart.find(i => i.id === productId);
+      if (item && item.quantity > 1) {
+        updateQuantity(productId, item.quantity - 1);
+        renderCart();
+      }
+    }
+
+    // Update cart
+    function updateCart(productId, quantity) {
+      const qty = parseInt(quantity);
+      if (qty > 0) {
+        updateQuantity(productId, qty);
+        renderCart();
+      }
+    }
+
+    // Remove item
+    function removeItem(productId) {
+      removeFromCart(productId);
+      renderCart();
+      showNotification('Producto eliminado del carrito', 'success');
+    }
+
+    // Proceed to checkout
+    function proceedToCheckout() {
+      const cart = getCart();
+      if (cart.length === 0) {
+        showNotification('Tu carrito está vacío', 'error');
+        return;
+      }
+      window.location.href = 'checkout.html';
+    }
+  </script>
+</body>
+</html>

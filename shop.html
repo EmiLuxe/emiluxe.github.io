@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tienda - EmiLuxe</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav>
+    <a href="index.html" class="navbar-logo">
+      <img src="assets/images/logo.png" alt="EmiLuxe Logo">
+      EmiLuxe
+    </a>
+    <ul class="navbar-menu">
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="shop.html">Tienda</a></li>
+    </ul>
+    <div class="navbar-icons">
+      <a href="cart.html" style="position: relative;">
+        🛒
+        <span class="cart-badge">0</span>
+      </a>
+      <a href="login.html">👤</a>
+    </div>
+  </nav>
+
+  <!-- PRODUCTS SECTION -->
+  <section class="products-section">
+    <h1>Nuestra Tienda</h1>
+
+    <!-- FILTER CONTROLS -->
+    <div class="filter-controls">
+      <button class="filter-btn active" onclick="filterProducts('Pijamas')">Pijamas</button>
+      <button class="filter-btn" onclick="filterProducts('Lencería')">Lencería</button>
+      <button class="filter-btn" onclick="filterProducts('Ropa casual')">Ropa casual</button>
+    </div>
+
+    <!-- LOADING INDICATOR -->
+    <div id="loadingSpinner" style="text-align: center; padding: 2rem; display: none;">
+      <p style="color: #999;">Cargando productos...</p>
+    </div>
+
+    <!-- PRODUCTS GRID -->
+    <div class="products-grid" id="productsGrid">
+      <!-- Products will be loaded here by JavaScript -->
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; 2026 EmiLuxe. Todos los derechos reservados. | Hecho con ❤️ para ti</p>
+  </footer>
+
+  <script src="js/cart.js"></script>
+  <script src="js/main.js"></script>
+  <script type="module">
+    import { getAllProducts, loadProductsFromFirebase } from './js/products.js';
+
+    let currentFilter = 'Pijamas';
+
+    // Render products on page load
+    document.addEventListener('DOMContentLoaded', async () => {
+      const selectedCategory = localStorage.getItem('selectedCategory');
+      if (selectedCategory) {
+        currentFilter = selectedCategory;
+        localStorage.removeItem('selectedCategory');
+        updateActiveFilter();
+      }
+      
+      await renderProducts();
+    });
+
+    // Render products grid
+    window.renderProducts = async function() {
+      const productsGrid = document.getElementById('productsGrid');
+      const loadingSpinner = document.getElementById('loadingSpinner');
+      let productsToDisplay;
+
+      loadingSpinner.style.display = 'block';
+
+      try {
+        const allProducts = await getAllProducts();
+
+        if (currentFilter === 'Pijamas') {
+          productsToDisplay = allProducts;
+        } else {
+          // Empty categories
+          productsToDisplay = [];
+        }
+
+        loadingSpinner.style.display = 'none';
+
+        if (productsToDisplay.length === 0) {
+          productsGrid.innerHTML = '<div class="no-products"><p>No hay productos disponibles aún</p></div>';
+          return;
+        }
+
+        productsGrid.innerHTML = productsToDisplay.map(product => `
+          <div class="product-card">
+            <img src="${product.image}" alt="${product.name}" class="product-image" onerror="this.src='assets/images/placeholder.png'">
+            <div class="product-info">
+              <p class="product-category">${product.category}</p>
+              <h3 class="product-name">${product.name}</h3>
+              <p class="product-description">${product.description}</p>
+              <div class="product-footer">
+                <span class="product-price">${formatPrice(product.price)}</span>
+                <button class="add-to-cart-btn" onclick="addProductToCart('${product.id}')">
+                  Agregar
+                </button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } catch (error) {
+        console.error('Error renderizando productos:', error);
+        loadingSpinner.style.display = 'none';
+        productsGrid.innerHTML = '<div class="no-products"><p>Error al cargar productos. Intenta nuevamente.</p></div>';
+      }
+    }
+
+    // Filter products
+    window.filterProducts = async function(category) {
+      currentFilter = category;
+      updateActiveFilter();
+      await renderProducts();
+    }
+
+    // Update active filter button
+    function updateActiveFilter() {
+      const buttons = document.querySelectorAll('.filter-btn');
+      buttons.forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.textContent === currentFilter) {
+          btn.classList.add('active');
+        }
+      });
+    }
+
+    // Add product to cart
+    window.addProductToCart = async function(productId) {
+      try {
+        const allProducts = await getAllProducts();
+        const product = allProducts.find(p => p.id === productId);
+
+        if (product) {
+          addToCart(product, 1);
+          showNotification(`${product.name} agregado al carrito`, 'success');
+        } else {
+          showNotification('Producto no encontrado', 'error');
+        }
+      } catch (error) {
+        console.error('Error agregando producto:', error);
+        showNotification('Error al agregar producto', 'error');
+      }
+    }
+  </script>
+</body>
+</html>

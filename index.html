@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EmiLuxe - Boutique Femenina Premium</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav>
+    <a href="index.html" class="navbar-logo">
+      <img src="assets/images/logo.png" alt="EmiLuxe Logo">
+      EmiLuxe
+    </a>
+    <ul class="navbar-menu">
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="shop.html">Tienda</a></li>
+    </ul>
+    <div class="navbar-icons">
+      <a href="cart.html" style="position: relative;">
+        🛒
+        <span class="cart-badge">0</span>
+      </a>
+      <a href="login.html">👤</a>
+    </div>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>✨ EmiLuxe ✨</h1>
+      <p>Descubre la elegancia y feminidad en cada prenda. Lujo accesible para la mujer moderna.</p>
+      <a href="shop.html" class="cta-button">Comprar Ahora</a>
+    </div>
+  </section>
+
+  <!-- CATEGORIES SECTION -->
+  <section class="categories">
+    <h2>Nuestras Colecciones</h2>
+    <div class="category-grid">
+      <div class="category-card" onclick="navigateToCategory('Pijamas')">
+        <div class="category-image">
+          <img src="assets/images/categories/pijama.jpg" alt="Pijamas" onerror="this.src='assets/images/placeholder.png'">
+        </div>
+        <h3>Pijamas</h3>
+        <p>Comodidad y estilo para dormir</p>
+      </div>
+      <div class="category-card" onclick="navigateToCategory('Lencería')">
+        <div class="category-image">
+          <img src="assets/images/categories/lenceria.webp" alt="Lencería" onerror="this.src='assets/images/placeholder.png'">
+        </div>
+        <h3>Lencería</h3>
+        <p>Elegancia y sensualidad</p>
+      </div>
+      <div class="category-card" onclick="navigateToCategory('Ropa casual')">
+        <div class="category-image">
+          <img src="assets/images/categories/casual.jpg" alt="Ropa casual" onerror="this.src='assets/images/placeholder.png'">
+        </div>
+        <h3>Ropa casual</h3>
+        <p>Para el día a día</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; 2026 EmiLuxe. Todos los derechos reservados. | Hecho con ❤️ para ti</p>
+  </footer>
+
+  <script src="js/cart.js"></script>
+  <script src="js/main.js"></script>
+  <script type="module">
+    import { loadProductsFromFirebase } from './js/products.js';
+
+    // Precargar productos al abrir la app
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        console.log('Cargando productos de Firebase...');
+        await loadProductsFromFirebase();
+        console.log('Productos cargados exitosamente');
+      } catch (error) {
+        console.error('Error cargando productos:', error);
+      }
+    });
+
+    // Navegar a categoría
+    window.navigateToCategory = function(category) {
+      localStorage.setItem('selectedCategory', category);
+      window.location.href = 'shop.html';
+    }
+  </script>
+</body>
+</html>
