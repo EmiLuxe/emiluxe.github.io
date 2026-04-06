@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tienda - EmiLuxe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -26,7 +29,7 @@
     </div>
   </nav>
 
-  <!-- PRODUCTS SECTION -->
+  <!-- PRODUCTOS SECTION -->
   <section class="products-section">
     <h1>Nuestra Tienda</h1>
 
@@ -47,6 +50,12 @@
       <!-- Products will be loaded here by JavaScript -->
     </div>
   </section>
+
+  <!-- BOTÓN WHATSAPP FLOTANTE -->
+  <div class="whatsapp-button" onclick="openWhatsApp()">
+    <span class="whatsapp-icon">💬</span>
+    <div class="whatsapp-tooltip">Escríbenos 💕</div>
+  </div>
 
   <!-- FOOTER -->
   <footer>
@@ -151,7 +160,7 @@
 
         if (product) {
           addToCart(product, 1);
-          showNotification(`${product.name} agregado al carrito`, 'success');
+          showNotification(`${product.name} agregado al carrito 🛒`, 'success');
         } else {
           showNotification('Producto no encontrado', 'error');
         }
@@ -159,6 +168,13 @@
         console.error('Error agregando producto:', error);
         showNotification('Error al agregar producto', 'error');
       }
+    }
+
+    // Abrir WhatsApp
+    window.openWhatsApp = function() {
+      const phoneNumber = '573164321234'; // ⚠️ REEMPLAZA CON TU NÚMERO
+      const message = encodeURIComponent('Hola EmiLuxe, tengo una consulta 💕');
+      window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
     }
   </script>
 </body>
