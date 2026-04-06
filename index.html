@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>EmiLuxe - Boutique Femenina Premium</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -26,13 +29,21 @@
     </div>
   </nav>
 
-  <!-- HERO SECTION -->
+  <!-- HERO SECTION CON TEXTURA NUBE -->
   <section class="hero">
     <div class="hero-content">
       <h1>✨ EmiLuxe ✨</h1>
       <p>Descubre la elegancia y feminidad en cada prenda. Lujo accesible para la mujer moderna.</p>
       <a href="shop.html" class="cta-button">Comprar Ahora</a>
     </div>
+  </section>
+
+  <!-- BANNER PROMOCIONAL -->
+  <section class="promo-banner">
+    <h3>💝 Ofertas Especiales</h3>
+    <p>Envío gratis desde $80.000</p>
+    <p>10% OFF en tu primera compra</p>
+    <div class="promo-badge">🎀 Hoy es tu día</div>
   </section>
 
   <!-- CATEGORIES SECTION -->
@@ -43,25 +54,47 @@
         <div class="category-image">
           <img src="assets/images/categories/pijama.jpg" alt="Pijamas" onerror="this.src='assets/images/placeholder.png'">
         </div>
-        <h3>Pijamas</h3>
-        <p>Comodidad y estilo para dormir</p>
+        <div>
+          <h3>Pijamas</h3>
+          <p>Comodidad y estilo para dormir</p>
+        </div>
       </div>
       <div class="category-card" onclick="navigateToCategory('lenceria')">
         <div class="category-image">
           <img src="assets/images/categories/lenceria.webp" alt="Lencería" onerror="this.src='assets/images/placeholder.png'">
         </div>
-        <h3>Lencería</h3>
-        <p>Elegancia y sensualidad</p>
+        <div>
+          <h3>Lencería</h3>
+          <p>Elegancia y sensualidad</p>
+        </div>
       </div>
       <div class="category-card" onclick="navigateToCategory('casual')">
         <div class="category-image">
           <img src="assets/images/categories/casual.jpg" alt="Ropa casual" onerror="this.src='assets/images/placeholder.png'">
         </div>
-        <h3>Ropa casual</h3>
-        <p>Para el día a día</p>
+        <div>
+          <h3>Ropa casual</h3>
+          <p>Para el día a día</p>
+        </div>
       </div>
     </div>
   </section>
+
+  <!-- SECCIÓN MÁS VENDIDOS -->
+  <section class="bestsellers-section">
+    <h2>🔥 Más Vendidos</h2>
+    <div id="bestsellersContainer" class="bestsellers-grid">
+      <div class="bestsellers-loading">
+        <p>Cargando productos...</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOTÓN WHATSAPP FLOTANTE -->
+  <div class="whatsapp-button" onclick="openWhatsApp()">
+    <span class="whatsapp-icon">💬</span>
+    <div class="whatsapp-tooltip">Escríbenos 💕</div>
+  </div>
 
   <!-- FOOTER -->
   <footer>
@@ -71,7 +104,7 @@
   <script src="js/cart.js"></script>
   <script src="js/main.js"></script>
   <script type="module">
-    import { loadProductsFromFirebase } from './js/products.js';
+    import { loadProductsFromFirebase, getAllProducts } from './js/products.js';
 
     // Precargar productos al abrir la app
     document.addEventListener('DOMContentLoaded', async () => {
@@ -79,10 +112,65 @@
         console.log('🔥 Cargando productos de Firebase...');
         await loadProductsFromFirebase();
         console.log('✓ Productos cargados exitosamente');
+        await loadBestsellers();
       } catch (error) {
         console.error('✗ Error cargando productos:', error);
       }
     });
+
+    // Cargar más vendidos
+    window.loadBestsellers = async function() {
+      try {
+        const allProducts = await getAllProducts();
+        const container = document.getElementById('bestsellersContainer');
+
+        if (allProducts.length === 0) {
+          container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: #999;">No hay productos disponibles</div>';
+          return;
+        }
+
+        // Obtener los primeros 6 productos como más vendidos
+        const bestsellers = allProducts.slice(0, Math.min(6, allProducts.length));
+
+        container.innerHTML = bestsellers.map((product, index) => `
+          <div class="bestseller-card">
+            <div class="bestseller-badge">🔥 #${index + 1}</div>
+            <img src="${product.image}" alt="${product.name}" class="bestseller-image" onerror="this.src='assets/images/placeholder.png'">
+            <div class="bestseller-info">
+              <div class="bestseller-name">${product.name}</div>
+              <div class="bestseller-price">${formatPrice(product.price)}</div>
+              <button class="bestseller-btn" onclick="addProductToCart('${product.id}')">
+                Agregar al carrito
+              </button>
+            </div>
+          </div>
+        `).join('');
+      } catch (error) {
+        console.error('Error cargando más vendidos:', error);
+      }
+    }
+
+    // Agregar producto al carrito desde más vendidos
+    window.addProductToCart = async function(productId) {
+      try {
+        const allProducts = await getAllProducts();
+        const product = allProducts.find(p => p.id === productId);
+
+        if (product) {
+          addToCart(product, 1);
+          showNotification(`${product.name} agregado al carrito 🛒`, 'success');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+    // Abrir WhatsApp
+    window.openWhatsApp = function() {
+      const phoneNumber = '573164321234'; // ⚠️ REEMPLAZA CON TU NÚMERO
+      const message = encodeURIComponent('Hola EmiLuxe, me gustaría consultar sobre tus productos 💕');
+      window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
+    }
 
     // Navegar a categoría
     window.navigateToCategory = function(category) {
