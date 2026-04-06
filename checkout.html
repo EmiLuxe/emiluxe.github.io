@@ -49,7 +49,7 @@
 
       <div class="payment-method" style="background-color: #e8f5e9; border: 2px solid #4caf50;">
         <div class="payment-label" style="color: #2e7d32;">✅ Pasos para completar tu pago:</div>
-        <ol style="text-align: left; color: #2e7d32; margin-top: 1rem; padding-left: 1.5rem;">
+        <ol style="text-align: left; color: #2e7d32; margin-top: 1rem; padding-left: 1.5rem; font-size: 0.9rem; line-height: 1.6;">
           <li>Realiza la transferencia a Nequi</li>
           <li>Ingresa tu número de teléfono</li>
           <li>Presiona "Enviar Comprobante por WhatsApp"</li>
@@ -60,15 +60,15 @@
       <div class="form-group">
         <label for="phoneNumber">📱 Tu Número de Teléfono</label>
         <input type="tel" id="phoneNumber" placeholder="Ej: 3001234567" maxlength="10" required>
-        <small style="color: #999; display: block; margin-top: 0.3rem;">Usaremos este número para verificar tu comprobante en WhatsApp</small>
+        <small style="color: #999; display: block; margin-top: 0.3rem; font-size: 0.8rem;">Usaremos este número para verificar tu comprobante en WhatsApp</small>
       </div>
 
-      <button class="confirm-btn" onclick="sendWhatsAppMessage()" style="background-color: #25d366; margin-top: 1rem;">
+      <button class="confirm-btn" id="whatsappBtn" style="background-color: #25d366; margin-top: 1rem;">
         📤 Enviar Comprobante por WhatsApp
       </button>
 
       <div class="success-message" id="successMessage">
-        ✅ ¡Perfecto! Se abrirá WhatsApp para que envíes tu comprobante. <br><br>
+        ✅ ¡Perfecto! Se está abriendo WhatsApp para que envíes tu comprobante. <br><br>
         <strong>Recuerda:</strong> Envía una foto clara de tu comprobante de transferencia.
       </div>
     </div>
@@ -102,7 +102,7 @@
       </div>
 
       <div style="background-color: #fff3e0; padding: 1.5rem; border-radius: 10px; margin-top: 1.5rem;">
-        <p style="font-size: 0.9rem; color: #e65100;">
+        <p style="font-size: 0.85rem; color: #e65100; line-height: 1.4;">
           <strong>⏱️ Tiempo de confirmación:</strong> <br>
           Normalmente confirmamos tu pedido en menos de 1 hora durante horario laboral.
         </p>
@@ -125,6 +125,7 @@
     // Load order summary on page load
     document.addEventListener('DOMContentLoaded', () => {
       loadOrderSummary();
+      setupWhatsAppButton();
     });
 
     // Load order summary
@@ -147,8 +148,8 @@
           <div class="cart-item-details">
             <h3 class="cart-item-name">${item.name}</h3>
             <p class="cart-item-price">${formatPrice(item.price)}</p>
-            <p style="color: #999;">Cantidad: <strong>${item.quantity}</strong></p>
-            <p style="color: var(--dark-pink); font-weight: 600;">Subtotal: ${formatPrice(item.price * item.quantity)}</p>
+            <p style="color: #999; font-size: 0.85rem;">Cantidad: <strong>${item.quantity}</strong></p>
+            <p style="color: var(--dark-pink); font-weight: 600; font-size: 0.9rem;">Subtotal: ${formatPrice(item.price * item.quantity)}</p>
           </div>
         </div>
       `).join('');
@@ -163,8 +164,16 @@
       return Math.floor(Math.random() * 10000000000000).toString().padStart(13, '0');
     }
 
-    // Send to WhatsApp
-    window.sendWhatsAppMessage = async function() {
+    // Setup WhatsApp button
+    function setupWhatsAppButton() {
+      const btn = document.getElementById('whatsappBtn');
+      btn.addEventListener('click', sendToWhatsApp);
+    }
+
+    // Enviar a WhatsApp (sin window.open, usando location.href)
+    async function sendToWhatsApp(e) {
+      e.preventDefault();
+
       const phoneNumber = document.getElementById('phoneNumber').value.trim();
       const successMessage = document.getElementById('successMessage');
       
@@ -182,12 +191,13 @@
       const cart = getCart();
       const total = getCartTotal();
 
-      // Construir mensaje con ID de orden
-      let cartItems = cart.map(item => 
-        `• ${item.name} (x${item.quantity}): ${formatPrice(item.price * item.quantity)}`
-      ).join('\n');
+      try {
+        // Construir mensaje con ID de orden
+        let cartItems = cart.map(item => 
+          `• ${item.name} (x${item.quantity}): ${formatPrice(item.price * item.quantity)}`
+        ).join('\n');
 
-      const message = `🛍️ *COMPRA REALIZADA EN EMILUXE* 🛍️
+        const message = `🛍️ *COMPRA REALIZADA EN EMILUXE* 🛍️
 
 *ID de Orden: #${currentOrderId}*
 
@@ -207,28 +217,34 @@ Realiza una transferencia a:
 
 Gracias por tu compra ❤️`;
 
-      // Número WhatsApp (con código de país)
-      const whatsappNumber = '573245535644'; // Colombia +57
+        // Número WhatsApp (con código de país)
+        const whatsappNumber = '573245535644'; // Colombia +57
 
-      // Crear enlace de WhatsApp
-      const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+        // Crear URL de WhatsApp
+        const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
-      // Mostrar mensaje de éxito
-      successMessage.classList.add('show');
+        // Mostrar mensaje de éxito
+        successMessage.classList.add('show');
 
-      // Esperar un poco y abrir WhatsApp
-      setTimeout(() => {
-        window.open(whatsappURL, '_blank');
+        // Guardar la orden en Firebase PRIMERO
+        await saveOrderToFirebase(phoneNumber, total, cart, currentOrderId);
 
-        // Guardar la orden en Firebase
-        saveOrderToFirebase(phoneNumber, total, cart, currentOrderId);
-
-        // Redirigir después de un tiempo
+        // Esperar un poco y luego abrir WhatsApp usando location.href (más confiable en celular)
         setTimeout(() => {
-          clearCart();
-          window.location.href = 'shop.html';
-        }, 3000);
-      }, 1500);
+          // Usar location.href en lugar de window.open para celular
+          window.location.href = whatsappURL;
+
+          // Redirigir después de 3 segundos
+          setTimeout(() => {
+            clearCart();
+            window.location.href = 'shop.html';
+          }, 3000);
+        }, 1000);
+
+      } catch (error) {
+        console.error('Error:', error);
+        showNotification('Error al procesar la orden', 'error');
+      }
     }
 
     // Guardar orden en Firebase
@@ -244,14 +260,14 @@ Gracias por tu compra ❤️`;
         };
 
         await createOrder(order);
-        showNotification('Orden guardada correctamente', 'success');
+        console.log('✓ Orden guardada en Firebase');
       } catch (error) {
         console.error('Error guardando orden:', error);
-        showNotification('Error al guardar la orden', 'error');
         // Guardar en localStorage como respaldo
         let orders = JSON.parse(localStorage.getItem('emiluxe_orders')) || [];
         orders.push(order);
         localStorage.setItem('emiluxe_orders', JSON.stringify(orders));
+        console.log('✓ Orden guardada en localStorage (respaldo)');
       }
     }
   </script>
