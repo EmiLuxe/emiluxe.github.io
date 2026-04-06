@@ -1,40 +1,68 @@
-// ========================================
-// DYNAMIC IMAGE LOADER
-// ========================================
+// js/imageLoader.js
+// Sistema dinámico para cargar imágenes desde GitHub
 
-let availableImages = [];
+const GITHUB_API = 'https://api.github.com/repos/EmiLuxe/emiluxe.github.io/contents/assets/images/products';
 
-export async function loadAvailableImages() {
+/**
+ * Obtener lista de imágenes de una carpeta en GitHub
+ * @param {string} category - Categoría (pijamas, lenceria, casual)
+ * @returns {Promise<Array>} Array de nombres de archivos
+ */
+export async function getImagesFromCategory(category) {
   try {
-    // Obtenemos la lista de imágenes del repositorio
-    const response = await fetch('https://api.github.com/repos/EmiLuxe/emiluxe.github.io/contents/assets/images/products/pijamas');
-    const files = await response.json();
+    const response = await fetch(`${GITHUB_API}/${category.toLowerCase()}`);
+    
+    if (!response.ok) {
+      console.warn(`Carpeta ${category} no encontrada o vacía`);
+      return [];
+    }
 
-    availableImages = files
+    const data = await response.json();
+    
+    // Filtrar solo archivos de imagen (JPG, JPEG, PNG, GIF)
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+    const images = data
       .filter(file => {
-        const ext = file.name.toLowerCase();
-        return ext.endsWith('.jpg') || ext.endsWith('.jpeg') || ext.endsWith('.png') || ext.endsWith('.webp');
+        const ext = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));
+        return imageExtensions.includes(ext);
       })
-      .map(file => ({
-        name: file.name,
-        path: `assets/images/products/pijamas/${file.name}`
-      }));
+      .map(file => file.name)
+      .sort(); // Ordenar alfabéticamente
 
-    console.log('Imágenes cargadas dinámicamente:', availableImages);
-    return availableImages;
+    console.log(`✓ ${images.length} imágenes encontradas en ${category}:`, images);
+    return images;
   } catch (error) {
-    console.error('Error cargando imágenes:', error);
+    console.error(`Error cargando imágenes de ${category}:`, error);
     return [];
   }
 }
 
-export function getAvailableImages() {
-  return availableImages;
+/**
+ * Cargar imágenes para todas las categorías
+ * @returns {Promise<Object>} Objeto con im��genes por categoría
+ */
+export async function getAllCategoryImages() {
+  try {
+    const categories = ['pijamas', 'lenceria', 'casual'];
+    const imagesByCategory = {};
+
+    for (const category of categories) {
+      imagesByCategory[category] = await getImagesFromCategory(category);
+    }
+
+    return imagesByCategory;
+  } catch (error) {
+    console.error('Error cargando imágenes:', error);
+    return {};
+  }
 }
 
-export async function ensureImagesLoaded() {
-  if (availableImages.length === 0) {
-    await loadAvailableImages();
-  }
-  return availableImages;
+/**
+ * Generar ruta completa de imagen
+ * @param {string} category - Categoría
+ * @param {string} filename - Nombre del archivo
+ * @returns {string} Ruta completa
+ */
+export function getImagePath(category, filename) {
+  return `assets/images/products/${category.toLowerCase()}/${filename}`;
 }
