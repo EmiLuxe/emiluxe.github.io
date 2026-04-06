@@ -19,10 +19,6 @@ import {
 // PRODUCTS - FUNCIONES DE FIRESTORE
 // ========================================
 
-/**
- * Obtener todos los productos (una sola vez)
- * @returns {Promise<Array>} Array de productos
- */
 export async function getAllProducts() {
   try {
     const productsRef = collection(db, 'products');
@@ -44,11 +40,6 @@ export async function getAllProducts() {
   }
 }
 
-/**
- * Escuchar cambios en REAL-TIME (para admin)
- * @param {Function} callback - Función que recibe el array de productos
- * @returns {Function} Función para dejar de escuchar
- */
 export function listenToProducts(callback) {
   try {
     const productsRef = collection(db, 'products');
@@ -74,14 +65,10 @@ export function listenToProducts(callback) {
     return unsubscribe;
   } catch (error) {
     console.error('✗ Error configurando listener de productos:', error);
+    return null;
   }
 }
 
-/**
- * Obtener productos por categoría
- * @param {string} category - Categoría (pijamas, lenceria, casual)
- * @returns {Promise<Array>} Array de productos filtrados
- */
 export async function getProductsByCategory(category) {
   try {
     const productsRef = collection(db, 'products');
@@ -108,11 +95,6 @@ export async function getProductsByCategory(category) {
   }
 }
 
-/**
- * Obtener producto por ID
- * @param {string} productId - ID del producto
- * @returns {Promise<Object|null>} Producto encontrado o null
- */
 export async function getProductById(productId) {
   try {
     const docRef = doc(db, 'products', productId);
@@ -135,11 +117,6 @@ export async function getProductById(productId) {
   }
 }
 
-/**
- * Agregar nuevo producto
- * @param {Object} product - Datos del producto
- * @returns {Promise<Object>} Producto creado con ID
- */
 export async function addProduct(product) {
   try {
     console.log('📝 Agregando producto:', product.name);
@@ -168,12 +145,6 @@ export async function addProduct(product) {
   }
 }
 
-/**
- * Actualizar producto
- * @param {string} productId - ID del producto
- * @param {Object} updatedData - Datos a actualizar
- * @returns {Promise<boolean>} true si se actualizó correctamente
- */
 export async function updateProduct(productId, updatedData) {
   try {
     console.log('📝 Actualizando producto:', productId);
@@ -200,11 +171,6 @@ export async function updateProduct(productId, updatedData) {
   }
 }
 
-/**
- * Eliminar producto
- * @param {string} productId - ID del producto a eliminar
- * @returns {Promise<boolean>} true si se eliminó correctamente
- */
 export async function deleteProduct(productId) {
   try {
     console.log('🗑️ Eliminando producto:', productId);
@@ -219,11 +185,6 @@ export async function deleteProduct(productId) {
   }
 }
 
-/**
- * Obtener productos más recientes
- * @param {number} limitCount - Cantidad de productos
- * @returns {Promise<Array>} Array de productos recientes
- */
 export async function getRecentProducts(limitCount = 6) {
   try {
     const productsRef = collection(db, 'products');
@@ -254,10 +215,6 @@ export async function getRecentProducts(limitCount = 6) {
 // ORDERS - FUNCIONES
 // ========================================
 
-/**
- * Obtener todas las órdenes
- * @returns {Promise<Array>} Array de órdenes
- */
 export async function getAllOrders() {
   try {
     const ordersRef = collection(db, 'orders');
@@ -271,7 +228,6 @@ export async function getAllOrders() {
       });
     });
     
-    // Ordenar por fecha descendente
     return orders.sort((a, b) => {
       const dateA = new Date(a.date || 0);
       const dateB = new Date(b.date || 0);
@@ -283,11 +239,6 @@ export async function getAllOrders() {
   }
 }
 
-/**
- * Escuchar cambios en órdenes en REAL-TIME
- * @param {Function} callback - Función que recibe el array de órdenes
- * @returns {Function} Función para dejar de escuchar
- */
 export function listenToOrders(callback) {
   try {
     const ordersRef = collection(db, 'orders');
@@ -303,7 +254,6 @@ export function listenToOrders(callback) {
           });
         });
         
-        // Ordenar por fecha descendente
         orders.sort((a, b) => {
           const dateA = new Date(a.date || 0);
           const dateB = new Date(b.date || 0);
@@ -321,14 +271,10 @@ export function listenToOrders(callback) {
     return unsubscribe;
   } catch (error) {
     console.error('✗ Error configurando listener de órdenes:', error);
+    return null;
   }
 }
 
-/**
- * Crear orden
- * @param {Object} order - Datos de la orden
- * @returns {Promise<Object>} Orden creada con ID
- */
 export async function createOrder(order) {
   try {
     console.log('📝 Creando orden:', order.orderId);
@@ -355,12 +301,6 @@ export async function createOrder(order) {
   }
 }
 
-/**
- * Actualizar estado de orden
- * @param {string} orderId - ID de la orden
- * @param {string} status - Nuevo estado
- * @returns {Promise<boolean>} true si se actualizó correctamente
- */
 export async function updateOrderStatus(orderId, status) {
   try {
     console.log('📝 Actualizando estado de orden:', orderId);
@@ -379,11 +319,6 @@ export async function updateOrderStatus(orderId, status) {
   }
 }
 
-/**
- * Eliminar orden
- * @param {string} orderId - ID de la orden a eliminar
- * @returns {Promise<boolean>} true si se eliminó correctamente
- */
 export async function deleteOrderDB(orderId) {
   try {
     console.log('🗑️ Eliminando orden:', orderId);
@@ -398,11 +333,6 @@ export async function deleteOrderDB(orderId) {
   }
 }
 
-/**
- * Obtener órdenes por teléfono
- * @param {string} phoneNumber - Número de teléfono
- * @returns {Promise<Array>} Array de órdenes del cliente
- */
 export async function getOrdersByPhone(phoneNumber) {
   try {
     const ordersRef = collection(db, 'orders');
@@ -428,26 +358,20 @@ export async function getOrdersByPhone(phoneNumber) {
   }
 }
 
-/**
- * Obtener órdenes pendientes
- * @returns {Promise<Array>} Array de órdenes pendientes
- */
 export async function getPendingOrders() {
   try {
     const ordersRef = collection(db, 'orders');
-    const q = query(
-      ordersRef,
-      where('status', '!=', '✅ Confirmada')
-    );
-    
-    const snapshot = await getDocs(q);
+    const snapshot = await getDocs(ordersRef);
     const orders = [];
     
     snapshot.forEach(doc => {
-      orders.push({
-        id: doc.id,
-        ...doc.data()
-      });
+      const order = doc.data();
+      if (!order.status || !order.status.includes('Confirmada')) {
+        orders.push({
+          id: doc.id,
+          ...order
+        });
+      }
     });
     
     return orders.sort((a, b) => {
@@ -461,26 +385,20 @@ export async function getPendingOrders() {
   }
 }
 
-/**
- * Obtener órdenes confirmadas
- * @returns {Promise<Array>} Array de órdenes confirmadas
- */
 export async function getConfirmedOrders() {
   try {
     const ordersRef = collection(db, 'orders');
-    const q = query(
-      ordersRef,
-      where('status', '==', '✅ Confirmada')
-    );
-    
-    const snapshot = await getDocs(q);
+    const snapshot = await getDocs(ordersRef);
     const orders = [];
     
     snapshot.forEach(doc => {
-      orders.push({
-        id: doc.id,
-        ...doc.data()
-      });
+      const order = doc.data();
+      if (order.status && order.status.includes('Confirmada')) {
+        orders.push({
+          id: doc.id,
+          ...order
+        });
+      }
     });
     
     return orders.sort((a, b) => {
@@ -499,7 +417,6 @@ export async function getConfirmedOrders() {
 // ========================================
 
 export default {
-  // Products
   getAllProducts,
   listenToProducts,
   getProductsByCategory,
@@ -508,8 +425,6 @@ export default {
   updateProduct,
   deleteProduct,
   getRecentProducts,
-  
-  // Orders
   getAllOrders,
   listenToOrders,
   createOrder,
