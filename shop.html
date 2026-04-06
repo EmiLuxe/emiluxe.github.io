@@ -32,9 +32,9 @@
 
     <!-- FILTER CONTROLS -->
     <div class="filter-controls">
-      <button class="filter-btn active" onclick="filterProducts('Pijamas')">Pijamas</button>
-      <button class="filter-btn" onclick="filterProducts('Lencería')">Lencería</button>
-      <button class="filter-btn" onclick="filterProducts('Ropa casual')">Ropa casual</button>
+      <button class="filter-btn active" onclick="filterProducts('pijamas')">Pijamas</button>
+      <button class="filter-btn" onclick="filterProducts('lenceria')">Lencería</button>
+      <button class="filter-btn" onclick="filterProducts('casual')">Ropa casual</button>
     </div>
 
     <!-- LOADING INDICATOR -->
@@ -56,15 +56,15 @@
   <script src="js/cart.js"></script>
   <script src="js/main.js"></script>
   <script type="module">
-    import { getAllProducts, loadProductsFromFirebase } from './js/products.js';
+    import { getAllProducts } from './js/products.js';
 
-    let currentFilter = 'Pijamas';
+    let currentFilter = 'pijamas';
 
     // Render products on page load
     document.addEventListener('DOMContentLoaded', async () => {
       const selectedCategory = localStorage.getItem('selectedCategory');
       if (selectedCategory) {
-        currentFilter = selectedCategory;
+        currentFilter = selectedCategory.toLowerCase();
         localStorage.removeItem('selectedCategory');
         updateActiveFilter();
       }
@@ -83,17 +83,15 @@
       try {
         const allProducts = await getAllProducts();
 
-        if (currentFilter === 'Pijamas') {
-          productsToDisplay = allProducts;
-        } else {
-          // Empty categories
-          productsToDisplay = [];
-        }
+        // Filtrar por categoría actual
+        productsToDisplay = allProducts.filter(p => 
+          p.category.toLowerCase() === currentFilter.toLowerCase()
+        );
 
         loadingSpinner.style.display = 'none';
 
         if (productsToDisplay.length === 0) {
-          productsGrid.innerHTML = '<div class="no-products"><p>No hay productos disponibles aún</p></div>';
+          productsGrid.innerHTML = '<div class="no-products"><p>No hay productos disponibles en esta categoría</p></div>';
           return;
         }
 
@@ -132,7 +130,14 @@
       const buttons = document.querySelectorAll('.filter-btn');
       buttons.forEach(btn => {
         btn.classList.remove('active');
-        if (btn.textContent === currentFilter) {
+        const btnCategory = btn.textContent.toLowerCase();
+        const currentCategory = currentFilter.toLowerCase();
+        
+        if (
+          (btnCategory.includes('pijamas') && currentCategory === 'pijamas') ||
+          (btnCategory.includes('lencería') && currentCategory === 'lenceria') ||
+          (btnCategory.includes('casual') && currentCategory === 'casual')
+        ) {
           btn.classList.add('active');
         }
       });
