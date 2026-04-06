@@ -697,7 +697,7 @@ nav {
 .admin-title {
   font-size: 1.4rem;
   color: var(--dark-pink);
-  margin-bottom: 1.2rem;
+  margin-bottom: 1.5rem;
   text-align: center;
   font-weight: 700;
 }
@@ -705,7 +705,7 @@ nav {
 .admin-nav-buttons {
   display: flex;
   gap: 0.8rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
   flex-wrap: wrap;
   justify-content: center;
 }
@@ -742,54 +742,240 @@ nav {
 .admin-layout {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.2rem;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
 }
+
+/* ========================================
+   ADMIN FORM - AGREGAR/EDITAR PRODUCTO
+   ======================================== */
 
 .admin-form {
   background-color: var(--white);
-  padding: 1rem;
+  padding: 1.5rem;
   border-radius: 12px;
   box-shadow: var(--shadow);
+  width: 100%;
+}
+
+.admin-form-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--light-pink);
 }
 
 .form-title {
-  font-size: 1rem;
+  font-size: 1.2rem;
   color: var(--dark-pink);
-  margin-bottom: 1rem;
   text-align: center;
-  font-weight: 600;
+  font-weight: 700;
+  margin: 0;
 }
 
-.admin-form .form-group {
+/* MODO: Agregar/Editar */
+.admin-form-mode {
+  margin-bottom: 1.5rem;
+}
+
+.admin-form-mode-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--dark-gray);
+  display: block;
   margin-bottom: 0.8rem;
 }
 
-.admin-form label {
-  font-size: 0.8rem !important;
-  margin-bottom: 0.3rem !important;
+.admin-mode-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
 }
 
-.admin-form input,
-.admin-form select,
-.admin-form textarea {
-  font-size: 0.9rem !important;
-  padding: 0.6rem !important;
+.admin-mode-btn {
+  flex: 1;
+  padding: 0.7rem 1rem;
+  border: 2px solid var(--primary-pink);
+  background-color: var(--white);
+  color: var(--dark-gray);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: var(--transition);
 }
 
+.admin-mode-btn.active {
+  background-color: var(--primary-pink);
+  color: var(--white);
+}
+
+/* SECCIÓN: Seleccionar Producto (solo en modo Editar) */
+.admin-form-section {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: var(--beige);
+  border-radius: 10px;
+  border-left: 4px solid var(--primary-pink);
+}
+
+.admin-form-section.hidden {
+  display: none;
+}
+
+.admin-form-section-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--dark-gray);
+  margin-bottom: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-form-section-title::before {
+  content: '📋';
+  font-size: 1rem;
+}
+
+/* Campos del formulario */
+.form-fields-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.admin-form .form-group {
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-form .form-group label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--dark-gray);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.admin-form .form-group input,
+.admin-form .form-group select,
+.admin-form .form-group textarea {
+  font-size: 0.9rem;
+  padding: 0.7rem;
+  border: 1px solid var(--light-gray);
+  border-radius: 8px;
+  font-family: inherit;
+}
+
+.admin-form .form-group input:focus,
+.admin-form .form-group select:focus,
+.admin-form .form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary-pink);
+  box-shadow: 0 0 0 3px rgba(255, 192, 217, 0.1);
+}
+
+.admin-form .form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* SECCIÓN: Imagen */
+.admin-image-section {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: var(--light-pink);
+  border-radius: 10px;
+}
+
+.admin-image-section-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--dark-gray);
+  margin-bottom: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-image-section-title::before {
+  content: '🖼️';
+  font-size: 1rem;
+}
+
+.admin-image-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.admin-image-inputs input {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid var(--light-gray);
+  border-radius: 8px;
+  font-size: 0.8rem;
+}
+
+.admin-image-note {
+  font-size: 0.75rem;
+  color: #666;
+  font-style: italic;
+  margin-top: 0.5rem;
+}
+
+.admin-image-preview {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.admin-image-preview-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--dark-gray);
+  margin-bottom: 0.8rem;
+}
+
+.admin-image-preview img {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  background-color: var(--white);
+  padding: 0.5rem;
+}
+
+.admin-image-preview-empty {
+  padding: 2rem 1rem;
+  background-color: var(--white);
+  border-radius: 10px;
+  border: 2px dashed var(--light-gray);
+  color: #999;
+  font-size: 0.9rem;
+}
+
+/* BOTONES: Enviar/Actualizar */
 .admin-buttons {
   display: flex;
-  gap: 0.6rem;
-  margin-top: 1rem;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid var(--light-gray);
 }
 
 .admin-btn {
   flex: 1;
-  padding: 0.65rem;
+  padding: 0.8rem;
   border: none;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
+  transition: var(--transition);
 }
 
 .btn-primary {
@@ -799,6 +985,7 @@ nav {
 
 .btn-primary:active {
   background-color: var(--dark-pink);
+  transform: scale(0.98);
 }
 
 .btn-secondary {
@@ -806,19 +993,30 @@ nav {
   color: var(--dark-gray);
 }
 
+.btn-secondary:active {
+  background-color: #d0d0d0;
+}
+
+/* ========================================
+   ADMIN PRODUCTOS - LISTA
+   ======================================== */
+
 .admin-products {
   background-color: var(--white);
-  padding: 1rem;
+  padding: 1.5rem;
   border-radius: 12px;
   box-shadow: var(--shadow);
+  margin-bottom: 2rem;
 }
 
 .admin-products-title {
-  font-size: 1rem;
+  font-size: 1.2rem;
   color: var(--dark-pink);
-  margin-bottom: 1rem;
+  margin-bottom: 1.2rem;
   text-align: center;
-  font-weight: 600;
+  font-weight: 700;
+  padding-bottom: 0.8rem;
+  border-bottom: 2px solid var(--light-pink);
 }
 
 .admin-products-list {
@@ -828,31 +1026,42 @@ nav {
 
 .admin-product-item {
   background-color: var(--beige);
-  padding: 0.8rem;
+  padding: 1rem;
   border-radius: 10px;
   display: grid;
-  grid-template-columns: 55px 1fr 70px;
+  grid-template-columns: 60px 1fr 80px;
   gap: 0.8rem;
   align-items: center;
+  transition: var(--transition);
+  border-left: 4px solid transparent;
+}
+
+.admin-product-item:hover {
+  background-color: #f0ebe8;
+  border-left-color: var(--primary-pink);
 }
 
 .admin-product-item img {
-  width: 55px;
-  height: 55px;
+  width: 60px;
+  height: 60px;
   border-radius: 8px;
   object-fit: contain;
   background: white;
-  padding: 3px;
+  padding: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
 .admin-product-info {
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
 }
 
 .admin-product-name {
-  font-weight: 600;
+  font-weight: 700;
   color: var(--dark-gray);
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -861,23 +1070,25 @@ nav {
 .admin-product-price {
   color: var(--dark-pink);
   font-weight: 600;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
 }
 
 .admin-product-actions {
   display: flex;
-  gap: 0.2rem;
+  gap: 0.4rem;
 }
 
 .btn-edit,
 .btn-delete {
-  padding: 0.3rem 0.4rem;
+  padding: 0.5rem 0.6rem;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 0.65rem;
+  font-size: 0.7rem;
+  transition: var(--transition);
   flex: 1;
+  text-align: center;
 }
 
 .btn-edit {
@@ -885,9 +1096,17 @@ nav {
   color: #f57f17;
 }
 
+.btn-edit:active {
+  background-color: #ffe082;
+}
+
 .btn-delete {
   background-color: #ffcccc;
   color: #cc0000;
+}
+
+.btn-delete:active {
+  background-color: #ff9999;
 }
 
 /* ========================================
@@ -898,27 +1117,32 @@ nav {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.8rem;
-  margin-bottom: 1.2rem;
+  margin-bottom: 1.5rem;
 }
 
 .orders-stats > div {
-  padding: 0.8rem !important;
-  border-radius: 8px !important;
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: var(--white);
+  box-shadow: var(--shadow);
 }
 
 .orders-stats p:first-child {
-  font-size: 1.2rem !important;
-  margin: 0 !important;
+  font-size: 1.3rem;
+  margin: 0;
+  font-weight: 700;
+  color: var(--dark-pink);
 }
 
 .orders-stats p:last-child {
-  font-size: 0.7rem !important;
-  margin-top: 0.2rem !important;
+  font-size: 0.75rem;
+  margin-top: 0.3rem;
+  color: #666;
 }
 
 .orders-table-container {
   background-color: var(--white);
-  padding: 0.8rem;
+  padding: 1rem;
   border-radius: 12px;
   box-shadow: var(--shadow);
   overflow-x: auto;
@@ -927,20 +1151,26 @@ nav {
 .orders-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
 }
 
 .orders-table th,
 .orders-table td {
-  padding: 0.5rem 0.3rem;
+  padding: 0.7rem 0.5rem;
   text-align: left;
   border-bottom: 1px solid var(--light-gray);
 }
 
 .orders-table th {
   background-color: var(--light-pink);
-  font-weight: 600;
+  font-weight: 700;
   color: var(--dark-gray);
+  position: sticky;
+  top: 0;
+}
+
+.orders-table tbody tr:hover {
+  background-color: #fafafa;
 }
 
 /* ========================================
@@ -1058,12 +1288,46 @@ footer {
   }
 
   .admin-layout {
-    grid-template-columns: 1fr 2fr;
+    grid-template-columns: 1fr;
     gap: 2rem;
+  }
+
+  .admin-form {
+    grid-column: 1 / -1;
+  }
+
+  .admin-products {
+    grid-column: 1 / -1;
+  }
+
+  .admin-mode-buttons {
+    justify-content: flex-start;
+  }
+
+  .admin-mode-btn {
+    flex: 0 1 150px;
+  }
+
+  .admin-image-inputs {
+    grid-template-columns: 1fr 1fr;
   }
 
   .orders-stats {
     grid-template-columns: repeat(4, 1fr);
+  }
+
+  .orders-table {
+    font-size: 0.8rem;
+  }
+
+  .admin-product-item {
+    grid-template-columns: 70px 1fr 100px;
+  }
+
+  .btn-edit,
+  .btn-delete {
+    font-size: 0.75rem;
+    padding: 0.6rem 0.7rem;
   }
 }
 
@@ -1072,8 +1336,22 @@ footer {
    ======================================== */
 
 @media (min-width: 1024px) {
+  .admin-container {
+    max-width: 1400px;
+    margin: 2rem auto;
+  }
+
   .admin-layout {
-    grid-template-columns: 1fr 2.5fr;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .admin-form {
+    max-width: 100%;
+  }
+
+  .admin-products {
+    max-width: 100%;
   }
 
   .category-grid {
@@ -1082,5 +1360,46 @@ footer {
 
   .products-grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  .form-fields-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+  }
+
+  .admin-form-section {
+    grid-column: 1 / -1;
+  }
+
+  .admin-image-section {
+    grid-column: 1 / -1;
+  }
+
+  .admin-buttons {
+    grid-column: 1 / -1;
+  }
+
+  .admin-product-item {
+    grid-template-columns: 80px 1fr 120px;
+  }
+
+  .btn-edit,
+  .btn-delete {
+    font-size: 0.8rem;
+    padding: 0.7rem 0.8rem;
+  }
+
+  .admin-image-inputs {
+    grid-template-columns: 2fr 1fr;
+  }
+
+  .orders-table {
+    font-size: 0.85rem;
+  }
+
+  .orders-table th,
+  .orders-table td {
+    padding: 0.8rem 0.6rem;
   }
 }
