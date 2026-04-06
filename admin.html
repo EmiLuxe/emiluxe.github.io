@@ -70,10 +70,10 @@
               </div>
             </div>
 
-            <!-- PRODUCT DETAILS -->
+            <!-- CATEGORY SELECT -->
             <div class="form-group">
-              <label for="category">Categoría</label>
-              <select id="category" required>
+              <label for="category">📁 Categoría (Carpeta)</label>
+              <select id="category" required onchange="loadImagesForCategory()">
                 <option value="">Selecciona una categoría</option>
                 <option value="pijamas">Pijamas</option>
                 <option value="lenceria">Lencería</option>
@@ -81,38 +81,36 @@
               </select>
             </div>
 
+            <!-- IMAGE SELECT (DYNAMIC) -->
             <div class="form-group">
-              <label for="imageFilename">Nombre del Archivo de Imagen</label>
-              <div style="display: flex; gap: 0.5rem; align-items: center;">
-                <span style="color: #999;">assets/images/products/</span>
-                <select id="categoryPath" style="flex: 0 0 auto;">
-                  <option value="pijamas">pijamas</option>
-                  <option value="lenceria">lenceria</option>
-                  <option value="casual">casual</option>
+              <label for="imageSelect">🖼️ Selecciona o Escribe la Imagen</label>
+              <div style="display: flex; gap: 0.5rem;">
+                <select id="imageSelect" onchange="updateImagePreview()" style="flex: 1;">
+                  <option value="">Elige una imagen de la carpeta...</option>
                 </select>
-                <span style="color: #999;">/</span>
                 <input 
                   type="text" 
-                  id="imageFilename" 
-                  placeholder="producto1.jpg" 
-                  style="flex: 1;"
-                  required
+                  id="customImageName" 
+                  placeholder="O escribe: producto.jpg"
+                  style="flex: 1; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;"
+                  onchange="updateImagePreviewFromInput()"
                 >
               </div>
               <small style="color: #999; display: block; margin-top: 0.5rem;">
-                Ejemplo: producto1.jpg, producto2.png, etc.
+                ✓ Selecciona del desplegable O escribe manualmente
               </small>
             </div>
 
             <!-- IMAGE PREVIEW -->
             <div class="form-group">
               <label>Vista Previa de Imagen</label>
-              <div style="background: #f5f5f5; padding: 1.5rem; border-radius: 8px; text-align: center;">
+              <div style="background: #f5f5f5; padding: 1.5rem; border-radius: 8px; text-align: center; min-height: 150px; display: flex; align-items: center; justify-content: center;">
                 <img id="previewImage" src="" alt="Preview" style="max-width: 100%; max-height: 200px; display: none; border-radius: 4px;">
                 <p id="previewPlaceholder" style="color: #999; margin: 0;">La imagen se previsualiza aquí</p>
               </div>
             </div>
 
+            <!-- PRODUCT DETAILS -->
             <div class="form-group">
               <label for="name">Nombre del Producto</label>
               <input type="text" id="name" placeholder="Ej: Pijama Elegante Rosa" required>
@@ -203,6 +201,14 @@
 
     let editingProductId = null;
     let currentMode = 'add';
+    let selectedImagePath = '';
+
+    // IMAGEN MAPPING - Lista de imágenes por categoría
+    const imagesByCategory = {
+      pijamas: ['producto1.jpg', 'producto2.jpg', 'producto3.jpg', 'producto4.jpg', 'producto5.jpg', 'producto6.jpg', 'producto7.jpg', 'producto8.jpg', 'producto9.jpg'],
+      lenceria: ['producto1.jpg', 'producto2.jpg', 'producto3.jpg', 'producto4.jpg', 'producto5.jpg'],
+      casual: ['producto1.jpg', 'producto2.jpg', 'producto3.jpg', 'producto4.jpg', 'producto5.jpg']
+    };
 
     document.addEventListener('DOMContentLoaded', async () => {
       checkAdminAuth();
@@ -212,12 +218,6 @@
       await loadOrders();
       await updateStats();
       
-      // Sincronizar categoría
-      document.getElementById('imageFilename').addEventListener('change', updateImagePreview);
-      document.getElementById('categoryPath').addEventListener('change', updateImagePreview);
-      document.getElementById('category').addEventListener('change', syncCategoryPath);
-      
-      // Recargar órdenes cada 10 segundos
       setInterval(async () => {
         await loadOrders();
         await updateStats();
@@ -229,14 +229,6 @@
       const isAuthenticated = localStorage.getItem('emiluxe_admin_logged_in');
       if (!isAuthenticated) {
         window.location.href = 'login.html';
-      }
-    }
-
-    // Sincronizar categoría seleccionada con categoryPath
-    function syncCategoryPath() {
-      const category = document.getElementById('category').value;
-      if (category) {
-        document.getElementById('categoryPath').value = category;
       }
     }
 
@@ -277,16 +269,70 @@
       }
     }
 
-    // Update image preview
+    // Load images for selected category
+    window.loadImagesForCategory = function() {
+      const category = document.getElementById('category').value;
+      const imageSelect = document.getElementById('imageSelect');
+      const customImageName = document.getElementById('customImageName');
+      
+      // Limpiar selects
+      imageSelect.innerHTML = '<option value="">Elige una imagen de la carpeta...</option>';
+      customImageName.value = '';
+      selectedImagePath = '';
+      updateImagePreview();
+
+      if (!category) return;
+
+      // Obtener imágenes de la categoría
+      const images = imagesByCategory[category] || [];
+      
+      if (images.length === 0) {
+        imageSelect.innerHTML = '<option value="">No hay imágenes en esta carpeta</option>';
+        return;
+      }
+
+      // Llenar el desplegable con las imágenes
+      images.forEach(img => {
+        const option = document.createElement('option');
+        option.value = `assets/images/products/${category}/${img}`;
+        option.textContent = img;
+        imageSelect.appendChild(option);
+      });
+    }
+
+    // Update image preview from select
     window.updateImagePreview = function() {
-      const filename = document.getElementById('imageFilename').value.trim();
-      const categoryPath = document.getElementById('categoryPath').value;
+      const imageSelect = document.getElementById('imageSelect');
+      const customImageName = document.getElementById('customImageName');
       const preview = document.getElementById('previewImage');
       const placeholder = document.getElementById('previewPlaceholder');
       
-      if (filename && categoryPath) {
-        const imagePath = `assets/images/products/${categoryPath}/${filename}`;
-        preview.src = imagePath;
+      selectedImagePath = imageSelect.value;
+      customImageName.value = '';
+
+      if (selectedImagePath) {
+        preview.src = selectedImagePath;
+        preview.style.display = 'block';
+        placeholder.style.display = 'none';
+      } else {
+        preview.style.display = 'none';
+        placeholder.style.display = 'block';
+      }
+    }
+
+    // Update image preview from manual input
+    window.updateImagePreviewFromInput = function() {
+      const category = document.getElementById('category').value;
+      const customImageName = document.getElementById('customImageName').value.trim();
+      const imageSelect = document.getElementById('imageSelect');
+      const preview = document.getElementById('previewImage');
+      const placeholder = document.getElementById('previewPlaceholder');
+
+      imageSelect.value = '';
+
+      if (customImageName && category) {
+        selectedImagePath = `assets/images/products/${category}/${customImageName}`;
+        preview.src = selectedImagePath;
         preview.style.display = 'block';
         placeholder.style.display = 'none';
       } else {
@@ -327,17 +373,18 @@
         if (product) {
           editingProductId = productId;
           document.getElementById('category').value = product.category;
-          document.getElementById('categoryPath').value = product.category;
           
-          // Extraer nombre del archivo desde la ruta
+          await loadImagesForCategory();
+          
+          // Extraer nombre del archivo
           const filename = product.image.split('/').pop();
-          document.getElementById('imageFilename').value = filename;
+          document.getElementById('customImageName').value = filename;
           
           document.getElementById('name').value = product.name;
           document.getElementById('description').value = product.description;
           document.getElementById('price').value = product.price;
           
-          updateImagePreview();
+          updateImagePreviewFromInput();
         }
       } catch (error) {
         console.error('Error cargando producto:', error);
@@ -359,12 +406,12 @@
       e.preventDefault();
 
       const category = document.getElementById('category').value.trim();
-      const filename = document.getElementById('imageFilename').value.trim();
+      const customImageName = document.getElementById('customImageName').value.trim();
       const name = document.getElementById('name').value.trim();
       const description = document.getElementById('description').value.trim();
       const price = parseInt(document.getElementById('price').value);
 
-      if (!category || !filename || !name || !description || !price) {
+      if (!category || (!selectedImagePath && !customImageName) || !name || !description || !price) {
         showNotification('Por favor completa todos los campos', 'error');
         return;
       }
@@ -375,7 +422,9 @@
       }
 
       try {
-        const imagePath = `assets/images/products/${category}/${filename}`;
+        // Generar ruta de imagen
+        const imageName = customImageName || selectedImagePath.split('/').pop();
+        const imagePath = `assets/images/products/${category}/${imageName}`;
 
         if (currentMode === 'add') {
           const newProduct = {
@@ -421,13 +470,15 @@
         form.reset();
       }
       editingProductId = null;
+      selectedImagePath = '';
       
       const preview = document.getElementById('previewImage');
       const placeholder = document.getElementById('previewPlaceholder');
       preview.style.display = 'none';
       placeholder.style.display = 'block';
       
-      document.getElementById('categoryPath').value = 'pijamas';
+      document.getElementById('imageSelect').innerHTML = '<option value="">Elige una imagen de la carpeta...</option>';
+      document.getElementById('customImageName').value = '';
     }
 
     // Load and display admin products
