@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Carrito - EmiLuxe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -28,28 +31,18 @@
 
   <!-- CART SECTION -->
   <section class="cart-container">
-    <h1 class="cart-title">Mi Carrito</h1>
+    <h1 class="cart-title">🛒 Tu Carrito</h1>
 
-    <div class="cart-items" id="cartItems">
+    <div id="cartContent">
       <!-- Cart items will be loaded here -->
     </div>
-
-    <div class="cart-summary">
-      <div class="summary-row">
-        <span>Subtotal:</span>
-        <span id="subtotal">$0</span>
-      </div>
-      <div class="summary-row">
-        <span>Envío:</span>
-        <span>Gratis</span>
-      </div>
-      <div class="summary-row total">
-        <span>Total:</span>
-        <span id="total">$0</span>
-      </div>
-      <button class="checkout-btn" onclick="proceedToCheckout()">Ir a Pagar</button>
-    </div>
   </section>
+
+  <!-- BOTÓN WHATSAPP FLOTANTE -->
+  <div class="whatsapp-button" onclick="openWhatsApp()">
+    <span class="whatsapp-icon">💬</span>
+    <div class="whatsapp-tooltip">Escríbenos 💕</div>
+  </div>
 
   <!-- FOOTER -->
   <footer>
@@ -57,101 +50,115 @@
   </footer>
 
   <script src="js/cart.js"></script>
-  <script src="js/products.js"></script>
   <script src="js/main.js"></script>
   <script>
-    // Load cart on page load
-    document.addEventListener('DOMContentLoaded', () => {
-      renderCart();
-    });
-
-    // Render cart items
+    // Renderizar carrito
     function renderCart() {
+      const cartContent = document.getElementById('cartContent');
       const cart = getCart();
-      const cartItems = document.getElementById('cartItems');
 
       if (cart.length === 0) {
-        cartItems.innerHTML = `
+        cartContent.innerHTML = `
           <div class="cart-empty">
-            <p>Tu carrito está vacío</p>
-            <p><a href="shop.html" style="color: var(--dark-pink); text-decoration: none; font-weight: 600;">Continuar comprando</a></p>
+            <p>Tu carrito está vacío 😢</p>
+            <p style="margin-top: 1rem;">
+              <a href="shop.html" style="color: var(--dark-pink); text-decoration: none; font-weight: 600;">Continuar comprando →</a>
+            </p>
           </div>
         `;
-        updateCartTotals();
         return;
       }
 
-      cartItems.innerHTML = cart.map(item => `
-        <div class="cart-item">
-          <img src="${item.image}" alt="${item.name}" class="cart-item-image">
-          <div class="cart-item-details">
-            <h3 class="cart-item-name">${item.name}</h3>
-            <p class="cart-item-price">${formatPrice(item.price)}</p>
-            <div class="quantity-control">
-              <button onclick="decreaseQuantity(${item.id})">−</button>
-              <input type="number" value="${item.quantity}" min="1" onchange="updateCart(${item.id}, this.value)">
-              <button onclick="increaseQuantity(${item.id})">+</button>
+      let cartHTML = '<div class="cart-items">';
+      
+      cart.forEach(item => {
+        cartHTML += `
+          <div class="cart-item">
+            <img src="${item.image}" alt="${item.name}" class="cart-item-image" onerror="this.src='assets/images/placeholder.png'">
+            <div class="cart-item-details">
+              <h3 class="cart-item-name">${item.name}</h3>
+              <p class="cart-item-price">${formatPrice(item.price)}</p>
+              <div class="quantity-control">
+                <button onclick="decreaseQuantity('${item.id}')">−</button>
+                <input type="number" value="${item.quantity}" readonly>
+                <button onclick="increaseQuantity('${item.id}')">+</button>
+              </div>
+              <button class="remove-btn" onclick="removeProductFromCart('${item.id}')">Eliminar</button>
             </div>
-            <button class="remove-btn" onclick="removeItem(${item.id})">Eliminar</button>
           </div>
-        </div>
-      `).join('');
+        `;
+      });
 
-      updateCartTotals();
-    }
+      cartHTML += '</div>';
 
-    // Update cart totals
-    function updateCartTotals() {
+      // Cart Summary
       const total = getCartTotal();
-      document.getElementById('subtotal').textContent = formatPrice(total);
-      document.getElementById('total').textContent = formatPrice(total);
+      cartHTML += `
+        <div class="cart-summary">
+          <div class="summary-row">
+            <span>Subtotal:</span>
+            <span>${formatPrice(total)}</span>
+          </div>
+          <div class="summary-row">
+            <span>Envío:</span>
+            <span>${total >= 80000 ? 'Gratis ✓' : 'Calculado en checkout'}</span>
+          </div>
+          <div class="summary-row total">
+            <span>Total:</span>
+            <span>${formatPrice(total)}</span>
+          </div>
+          <a href="checkout.html" class="checkout-btn" style="text-decoration: none; display: block; text-align: center;">
+            Ir a Checkout
+          </a>
+          <a href="shop.html" style="display: block; text-align: center; margin-top: 0.8rem; color: var(--dark-pink); text-decoration: none; font-weight: 600;">
+            Continuar comprando
+          </a>
+        </div>
+      `;
+
+      cartContent.innerHTML = cartHTML;
     }
 
-    // Increase quantity
-    function increaseQuantity(productId) {
+    // Aumentar cantidad
+    window.increaseQuantity = function(productId) {
       const cart = getCart();
-      const item = cart.find(i => i.id === productId);
+      const item = cart.find(p => p.id === productId);
       if (item) {
         updateQuantity(productId, item.quantity + 1);
         renderCart();
       }
     }
 
-    // Decrease quantity
-    function decreaseQuantity(productId) {
+    // Disminuir cantidad
+    window.decreaseQuantity = function(productId) {
       const cart = getCart();
-      const item = cart.find(i => i.id === productId);
+      const item = cart.find(p => p.id === productId);
       if (item && item.quantity > 1) {
         updateQuantity(productId, item.quantity - 1);
         renderCart();
       }
     }
 
-    // Update cart
-    function updateCart(productId, quantity) {
-      const qty = parseInt(quantity);
-      if (qty > 0) {
-        updateQuantity(productId, qty);
+    // Eliminar del carrito
+    window.removeProductFromCart = function(productId) {
+      if (confirm('¿Deseas eliminar este producto del carrito?')) {
+        removeFromCart(productId);
         renderCart();
+        showNotification('Producto eliminado del carrito', 'success');
       }
     }
 
-    // Remove item
-    function removeItem(productId) {
-      removeFromCart(productId);
+    // Abrir WhatsApp
+    window.openWhatsApp = function() {
+      const phoneNumber = '573164321234'; // ⚠️ REEMPLAZA CON TU NÚMERO
+      const message = encodeURIComponent('Hola EmiLuxe, tengo una consulta 💕');
+      window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
+    }
+
+    // Cargar carrito al abrir página
+    document.addEventListener('DOMContentLoaded', () => {
       renderCart();
-      showNotification('Producto eliminado del carrito', 'success');
-    }
-
-    // Proceed to checkout
-    function proceedToCheckout() {
-      const cart = getCart();
-      if (cart.length === 0) {
-        showNotification('Tu carrito está vacío', 'error');
-        return;
-      }
-      window.location.href = 'checkout.html';
-    }
+    });
   </script>
 </body>
 </html>
