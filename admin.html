@@ -46,86 +46,97 @@
 
           <form id="productForm">
             <!-- MODE: ADD or EDIT -->
-            <div class="form-group">
-              <label>Modo</label>
-              <div style="display: flex; gap: 1rem;">
-                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: normal;">
-                  <input type="radio" name="mode" value="add" checked onchange="switchMode('add')">
-                  Agregar Nuevo
-                </label>
-                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: normal;">
-                  <input type="radio" name="mode" value="edit" onchange="switchMode('edit')">
-                  Editar Existente
-                </label>
+            <div class="admin-form-mode">
+              <label class="admin-form-mode-label">Modo</label>
+              <div class="admin-mode-buttons">
+                <button type="button" class="admin-mode-btn active" data-mode="add" onclick="switchMode('add')">
+                  ➕ Agregar Nuevo
+                </button>
+                <button type="button" class="admin-mode-btn" data-mode="edit" onclick="switchMode('edit')">
+                  ✏️ Editar Existente
+                </button>
               </div>
             </div>
 
             <!-- EDIT MODE: Select Product -->
-            <div id="editMode" style="display: none;">
-              <div class="form-group">
-                <label for="productSelect">Seleccionar Producto</label>
-                <select id="productSelect" onchange="loadProductData()">
-                  <option value="">Elige un producto...</option>
-                </select>
+            <div id="editModeSection" class="admin-form-section hidden">
+              <div class="admin-form-section-title">Seleccionar Producto</div>
+              <div class="form-fields-container">
+                <div class="form-group">
+                  <label for="productSelect">Elige un producto para editar</label>
+                  <select id="productSelect" onchange="loadProductData()">
+                    <option value="">Elige un producto...</option>
+                  </select>
+                </div>
               </div>
             </div>
 
-            <!-- CATEGORY SELECT -->
-            <div class="form-group">
-              <label for="category">📁 Categoría (Carpeta)</label>
-              <select id="category" required onchange="loadImagesForCategory()">
-                <option value="">Selecciona una categoría</option>
-                <option value="pijamas">Pijamas</option>
-                <option value="lenceria">Lencería</option>
-                <option value="casual">Ropa Casual</option>
-              </select>
+            <!-- PRODUCT DETAILS SECTION -->
+            <div class="admin-form-section">
+              <div class="admin-form-section-title">Detalles del Producto</div>
+              <div class="form-fields-container">
+                <!-- CATEGORY SELECT -->
+                <div class="form-group">
+                  <label for="category">📁 Categoría (Carpeta)</label>
+                  <select id="category" required onchange="loadImagesForCategory()">
+                    <option value="">Selecciona una categoría</option>
+                    <option value="pijamas">Pijamas</option>
+                    <option value="lenceria">Lencería</option>
+                    <option value="casual">Ropa Casual</option>
+                  </select>
+                </div>
+
+                <!-- PRODUCT NAME -->
+                <div class="form-group">
+                  <label for="name">Nombre del Producto</label>
+                  <input type="text" id="name" placeholder="Ej: Pijama Elegante Rosa" required>
+                </div>
+
+                <!-- PRICE -->
+                <div class="form-group">
+                  <label for="price">Precio (COP)</label>
+                  <input type="number" id="price" placeholder="89990" step="1" required>
+                </div>
+
+                <!-- DESCRIPTION (Full width) -->
+                <div class="form-group" style="grid-column: 1 / -1;">
+                  <label for="description">Descripción</label>
+                  <textarea id="description" placeholder="Describe el producto" required></textarea>
+                </div>
+              </div>
             </div>
 
-            <!-- IMAGE SELECT (DYNAMIC) -->
-            <div class="form-group">
-              <label for="imageSelect">🖼️ Selecciona o Escribe la Imagen</label>
-              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                <select id="imageSelect" onchange="updateImagePreview()" style="flex: 1; min-width: 150px;">
+            <!-- IMAGE SECTION -->
+            <div class="admin-image-section">
+              <div class="admin-image-section-title">Selecciona o Escribe la Imagen</div>
+              
+              <div class="admin-image-inputs">
+                <select id="imageSelect" onchange="updateImagePreview()">
                   <option value="">Cargando imágenes...</option>
                 </select>
                 <input 
                   type="text" 
                   id="customImageName" 
                   placeholder="O escribe: foto.jpg"
-                  style="flex: 1; min-width: 150px; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;"
                   onchange="updateImagePreviewFromInput()"
                 >
               </div>
-              <small style="color: #999; display: block; margin-top: 0.5rem;">
+              
+              <div class="admin-image-note">
                 ✓ Selecciona del desplegable O escribe manualmente
-              </small>
-            </div>
+              </div>
 
-            <!-- IMAGE PREVIEW -->
-            <div class="form-group">
-              <label>Vista Previa de Imagen</label>
-              <div style="background: #f5f5f5; padding: 1.5rem; border-radius: 8px; text-align: center; min-height: 150px; display: flex; align-items: center; justify-content: center;">
-                <img id="previewImage" src="" alt="Preview" style="max-width: 100%; max-height: 200px; display: none; border-radius: 4px;">
-                <p id="previewPlaceholder" style="color: #999; margin: 0;">La imagen se previsualiza aquí</p>
+              <!-- IMAGE PREVIEW -->
+              <div class="admin-image-preview">
+                <div class="admin-image-preview-title">Vista Previa</div>
+                <img id="previewImage" src="" alt="Preview" style="display: none;">
+                <div id="previewPlaceholder" class="admin-image-preview-empty">
+                  La imagen se previsualiza aquí
+                </div>
               </div>
             </div>
 
-            <!-- PRODUCT DETAILS -->
-            <div class="form-group">
-              <label for="name">Nombre del Producto</label>
-              <input type="text" id="name" placeholder="Ej: Pijama Elegante Rosa" required>
-            </div>
-
-            <div class="form-group">
-              <label for="description">Descripción</label>
-              <textarea id="description" placeholder="Describe el producto" required></textarea>
-            </div>
-
-            <div class="form-group">
-              <label for="price">Precio (COP)</label>
-              <input type="number" id="price" placeholder="89990" step="1" required>
-            </div>
-
+            <!-- BUTTONS -->
             <div class="admin-buttons">
               <button type="button" class="admin-btn btn-primary" id="submitBtn">Guardar Producto</button>
               <button type="button" class="admin-btn btn-secondary" onclick="clearForm()">Limpiar Formulario</button>
@@ -248,16 +259,23 @@
 
     window.switchMode = function(mode) {
       currentMode = mode;
-      const editModeDiv = document.getElementById('editMode');
+      const editModeSection = document.getElementById('editModeSection');
+      const modeButtons = document.querySelectorAll('.admin-mode-btn');
+      
+      // Actualizar botones activos
+      modeButtons.forEach(btn => {
+        btn.classList.remove('active');
+      });
+      document.querySelector(`.admin-mode-btn[data-mode="${mode}"]`).classList.add('active');
       
       if (mode === 'add') {
-        editModeDiv.style.display = 'none';
+        editModeSection.classList.add('hidden');
         clearForm();
-        document.getElementById('submitBtn').textContent = 'Agregar Producto';
+        document.getElementById('submitBtn').textContent = '➕ Agregar Producto';
       } else {
-        editModeDiv.style.display = 'block';
+        editModeSection.classList.remove('hidden');
         clearForm();
-        document.getElementById('submitBtn').textContent = 'Guardar Cambios';
+        document.getElementById('submitBtn').textContent = '✏️ Guardar Cambios';
       }
     }
 
@@ -394,7 +412,7 @@
       const form = document.getElementById('productForm');
       if (!form) return;
 
-      const submitBtn = form.querySelector('.btn-primary');
+      const submitBtn = form.querySelector('#submitBtn');
       submitBtn.addEventListener('click', handleFormSubmit);
     }
 
@@ -463,6 +481,7 @@
       if (form) {
         form.reset();
       }
+      
       editingProductId = null;
       selectedImagePath = '';
       
@@ -473,6 +492,7 @@
       
       document.getElementById('imageSelect').innerHTML = '<option value="">Elige una imagen de la carpeta...</option>';
       document.getElementById('customImageName').value = '';
+      document.getElementById('productSelect').value = '';
     }
 
     async function loadAdminProducts() {
@@ -511,12 +531,14 @@
     }
 
     window.selectProductToEdit = async function(id) {
-      document.querySelector('input[name="mode"][value="edit"]').checked = true;
-      switchMode('edit');
+      // Cambiar a modo editar
+      document.querySelector('.admin-mode-btn[data-mode="edit"]').click();
       
       const productSelect = document.getElementById('productSelect');
       productSelect.value = id;
       await loadProductData();
+      
+      // Scroll suave hacia el formulario
       document.getElementById('productForm').scrollIntoView({ behavior: 'smooth' });
     }
 
