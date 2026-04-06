@@ -1,3 +1,4 @@
+// js/firebaseDB.js
 import { db } from './firebase-config.js';
 import {
   collection,
@@ -7,14 +8,15 @@ import {
   deleteDoc,
   doc,
   query,
-  where
+  where,
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 // ========================================
-// PRODUCTS - FUNCIONES
+// PRODUCTS - FUNCIONES DE FIRESTORE
 // ========================================
 
-// Obtener todos los productos
+// Obtener todos los productos (una sola vez)
 export async function getAllProducts() {
   try {
     const productsRef = collection(db, 'products');
@@ -26,10 +28,35 @@ export async function getAllProducts() {
         ...doc.data()
       });
     });
+    console.log('✓ Productos cargados:', products.length);
     return products;
   } catch (error) {
-    console.error('Error obteniendo productos:', error);
+    console.error('✗ Error obteniendo productos:', error);
     return [];
+  }
+}
+
+// Escuchar cambios en REAL-TIME (para admin)
+export function listenToProducts(callback) {
+  try {
+    const productsRef = collection(db, 'products');
+    
+    const unsubscribe = onSnapshot(productsRef, (snapshot) => {
+      const products = [];
+      snapshot.forEach(doc => {
+        products.push({
+          id: doc.id,
+          ...doc.data()
+        });
+      });
+      callback(products);
+    }, (error) => {
+      console.error('Error en listener:', error);
+    });
+    
+    return unsubscribe;
+  } catch (error) {
+    console.error('Error configurando listener:', error);
   }
 }
 
@@ -59,46 +86,58 @@ export async function addProduct(product) {
     const docRef = await addDoc(collection(db, 'products'), {
       name: product.name,
       description: product.description,
-      price: product.price,
+      price: parseInt(product.price),
       image: product.image,
-      category: product.category,
-      createdAt: new Date()
+      category: product.category.toLowerCase(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     });
+    
+    console.log('✓ Producto agregado con ID:', docRef.id);
     return {
       id: docRef.id,
       ...product
     };
   } catch (error) {
-    console.error('Error agregando producto:', error);
+    console.error('✗ Error agregando producto:', error);
     throw error;
   }
 }
 
 // Actualizar producto
-export async function updateProductDB(productId, updatedData) {
+export async function updateProduct(productId, updatedData) {
   try {
     const productRef = doc(db, 'products', productId);
-    await updateDoc(productRef, {
+    
+    const dataToUpdate = {
       name: updatedData.name,
       description: updatedData.description,
-      price: updatedData.price,
-      image: updatedData.image || undefined,
-      updatedAt: new Date()
-    });
+      price: parseInt(updatedData.price),
+      updatedAt: new Date().toISOString()
+    };
+
+    // Solo actualizar imagen si se proporciona
+    if (updatedData.image) {
+      dataToUpdate.image = updatedData.image;
+    }
+
+    await updateDoc(productRef, dataToUpdate);
+    console.log('✓ Producto actualizado:', productId);
     return true;
   } catch (error) {
-    console.error('Error actualizando producto:', error);
+    console.error('✗ Error actualizando producto:', error);
     throw error;
   }
 }
 
 // Eliminar producto
-export async function deleteProductDB(productId) {
+export async function deleteProduct(productId) {
   try {
     await deleteDoc(doc(db, 'products', productId));
+    console.log('✓ Producto eliminado:', productId);
     return true;
   } catch (error) {
-    console.error('Error eliminando producto:', error);
+    console.error('✗ Error eliminando producto:', error);
     throw error;
   }
 }
@@ -137,7 +176,7 @@ export async function createOrder(order) {
       total: order.total,
       items: order.items,
       status: 'Pendiente de Confirmación',
-      createdAt: new Date()
+      createdAt: new Date().toISOString()
     });
     return {
       id: docRef.id,
@@ -155,7 +194,7 @@ export async function updateOrderStatus(orderId, status) {
     const orderRef = doc(db, 'orders', orderId);
     await updateDoc(orderRef, {
       status: status,
-      updatedAt: new Date()
+      updatedAt: new Date().toISOString()
     });
     return true;
   } catch (error) {
