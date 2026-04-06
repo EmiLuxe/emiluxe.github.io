@@ -557,43 +557,53 @@
     }
 
     async function loadOrders() {
-      try {
-        const orders = await getAllOrders();
-        const ordersBody = document.getElementById('ordersBody');
+  try {
+    const orders = await getAllOrders();
+    const ordersBody = document.getElementById('ordersBody');
 
-        if (orders.length === 0) {
-          ordersBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem; color: #999;">No hay órdenes aún</td></tr>';
-          return;
-        }
-
-        ordersBody.innerHTML = orders.map(order => `
-          <tr>
-            <td><strong style="color: var(--dark-pink);">#${order.orderId || order.id}</strong></td>
-            <td><small>${order.date}</small></td>
-            <td>
-              <a href="https://wa.me/57${order.phoneNumber}" target="_blank" style="color: #25d366; text-decoration: none; font-weight: 600;">
-                ${order.phoneNumber}
-              </a>
-            </td>
-            <td><strong>${formatPrice(order.total)}</strong></td>
-            <td><small style="color: #666;">${order.items.map(i => `${i.name} (x${i.quantity})`).join(', ')}</small></td>
-            <td>
-              <span style="background-color: ${order.status.includes('Confirmada') ? '#c8e6c9' : '#fff3cd'}; color: ${order.status.includes('Confirmada') ? '#2e7d32' : '#856404'}; padding: 0.5rem 0.8rem; border-radius: 4px; font-weight: 600; display: inline-block;">
-                ${order.status}
-              </span>
-            </td>
-            <td>
-              <div style="display: flex; gap: 0.4rem;">
-                <button onclick="confirmOrder('${order.id}')" style="background: #4caf50; color: white; border: none; padding: 0.5rem 0.8rem; border-radius: 4px; cursor: pointer; font-weight: 600;">✓</button>
-                <button onclick="deleteOrder('${order.id}')" style="background: #f44336; color: white; border: none; padding: 0.5rem 0.8rem; border-radius: 4px; cursor: pointer; font-weight: 600;">✕</button>
-              </div>
-            </td>
-          </tr>
-        `).join('');
-      } catch (error) {
-        console.error('Error cargando órdenes:', error);
-      }
+    if (orders.length === 0) {
+      ordersBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem; color: #999;">No hay órdenes aún</td></tr>';
+      return;
     }
+
+    ordersBody.innerHTML = orders.map(order => {
+      // Agregar 57 si no lo tiene el número
+      let phoneNumber = order.phoneNumber;
+      if (!phoneNumber.startsWith('57')) {
+        phoneNumber = '57' + phoneNumber;
+      }
+      
+      const message = encodeURIComponent(`📱 *COMPRA REALIZADA EN EMILUXE*\n\n🛍️ ID de Orden: #${order.orderId || order.id}\n\n📦 Detalles del Pedido:\n${order.items.map(i => `• ${i.name} (x${i.quantity})`).join('\n')}\n\n💰 Total: ${formatPrice(order.total)}`);
+      
+      return `
+        <tr>
+          <td><strong style="color: var(--dark-pink);">#${order.orderId || order.id}</strong></td>
+          <td><small>${order.date}</small></td>
+          <td>
+            <a href="https://wa.me/${phoneNumber}?text=${message}" target="_blank" style="color: #25d366; text-decoration: none; font-weight: 600;">
+              📱 ${order.phoneNumber}
+            </a>
+          </td>
+          <td><strong>${formatPrice(order.total)}</strong></td>
+          <td><small style="color: #666;">${order.items.map(i => `${i.name} (x${i.quantity})`).join(', ')}</small></td>
+          <td>
+            <span style="background-color: ${order.status.includes('Confirmada') ? '#c8e6c9' : '#fff3cd'}; color: ${order.status.includes('Confirmada') ? '#2e7d32' : '#856404'}; padding: 0.5rem 0.8rem; border-radius: 4px; font-weight: 600; display: inline-block;">
+              ${order.status}
+            </span>
+          </td>
+          <td>
+            <div style="display: flex; gap: 0.4rem;">
+              <button type="button" onclick="confirmOrder('${order.id}')" style="background: #4caf50; color: white; border: none; padding: 0.5rem 0.8rem; border-radius: 4px; cursor: pointer; font-weight: 600;">✅</button>
+              <button type="button" onclick="deleteOrder('${order.id}')" style="background: #f44336; color: white; border: none; padding: 0.5rem 0.8rem; border-radius: 4px; cursor: pointer; font-weight: 600;">❌</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  } catch (error) {
+    console.error('Error cargando órdenes:', error);
+  }
+}
 
     async function updateStats() {
       try {
