@@ -39,21 +39,21 @@
   <section class="categories">
     <h2>Nuestras Colecciones</h2>
     <div class="category-grid">
-      <div class="category-card" onclick="navigateToCategory('Pijamas')">
+      <div class="category-card" onclick="navigateToCategory('pijamas')">
         <div class="category-image">
           <img src="assets/images/categories/pijama.jpg" alt="Pijamas" onerror="this.src='assets/images/placeholder.png'">
         </div>
         <h3>Pijamas</h3>
         <p>Comodidad y estilo para dormir</p>
       </div>
-      <div class="category-card" onclick="navigateToCategory('Lencería')">
+      <div class="category-card" onclick="navigateToCategory('lenceria')">
         <div class="category-image">
           <img src="assets/images/categories/lenceria.webp" alt="Lencería" onerror="this.src='assets/images/placeholder.png'">
         </div>
         <h3>Lencería</h3>
         <p>Elegancia y sensualidad</p>
       </div>
-      <div class="category-card" onclick="navigateToCategory('Ropa casual')">
+      <div class="category-card" onclick="navigateToCategory('casual')">
         <div class="category-image">
           <img src="assets/images/categories/casual.jpg" alt="Ropa casual" onerror="this.src='assets/images/placeholder.png'">
         </div>
@@ -76,11 +76,11 @@
     // Precargar productos al abrir la app
     document.addEventListener('DOMContentLoaded', async () => {
       try {
-        console.log('Cargando productos de Firebase...');
+        console.log('🔥 Cargando productos de Firebase...');
         await loadProductsFromFirebase();
-        console.log('Productos cargados exitosamente');
+        console.log('✓ Productos cargados exitosamente');
       } catch (error) {
-        console.error('Error cargando productos:', error);
+        console.error('✗ Error cargando productos:', error);
       }
     });
 
