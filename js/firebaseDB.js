@@ -275,14 +275,32 @@ export function listenToOrders(callback) {
   }
 }
 
+/**
+ * Crear orden en Firebase
+ * @param {Object} order - Objeto de orden
+ * @param {string} order.orderId - ID único de la orden
+ * @param {string} order.date - Fecha de la orden
+ * @param {string} order.phoneNumber - Número de teléfono del cliente
+ * @param {string} order.customerName - Nombre del cliente (IMPORTANTE: debe venir del cuestionario)
+ * @param {number} order.total - Total de la orden
+ * @param {Array} order.items - Items de la orden
+ * @param {string} order.status - Estado de la orden
+ * @returns {Promise<Object>} Orden creada
+ */
 export async function createOrder(order) {
   try {
     console.log('📝 Creando orden:', order.orderId);
+    
+    // Validar que customerName existe, sino usar "Cliente"
+    const customerName = order.customerName && order.customerName.trim() !== '' 
+      ? order.customerName 
+      : 'Cliente';
     
     const docRef = await addDoc(collection(db, 'orders'), {
       orderId: order.orderId,
       date: order.date,
       phoneNumber: order.phoneNumber,
+      customerName: customerName, // ✅ AGREGADO: Guardar nombre del cliente
       total: order.total,
       items: order.items,
       status: order.status || 'Pendiente de Confirmación',
@@ -290,10 +308,12 @@ export async function createOrder(order) {
     });
     
     console.log('✓ Orden creada con ID:', docRef.id);
+    console.log('✓ Cliente registrado como:', customerName);
     
     return {
       id: docRef.id,
-      ...order
+      ...order,
+      customerName: customerName // Retornar con el nombre garantizado
     };
   } catch (error) {
     console.error('✗ Error creando orden:', error);
@@ -315,6 +335,37 @@ export async function updateOrderStatus(orderId, status) {
     return true;
   } catch (error) {
     console.error('✗ Error actualizando estado de orden:', error);
+    throw error;
+  }
+}
+
+/**
+ * Actualizar información de la orden (incluyendo nombre del cliente)
+ * @param {string} orderId - ID de la orden
+ * @param {Object} updatedData - Datos a actualizar
+ * @returns {Promise<boolean>} true si se actualizó
+ */
+export async function updateOrderInfo(orderId, updatedData) {
+  try {
+    console.log('📝 Actualizando información de orden:', orderId);
+    
+    const orderRef = doc(db, 'orders', orderId);
+    
+    const dataToUpdate = {
+      updatedAt: Timestamp.now()
+    };
+
+    if (updatedData.customerName) dataToUpdate.customerName = updatedData.customerName;
+    if (updatedData.status) dataToUpdate.status = updatedData.status;
+    if (updatedData.phoneNumber) dataToUpdate.phoneNumber = updatedData.phoneNumber;
+    if (updatedData.total) dataToUpdate.total = updatedData.total;
+
+    await updateDoc(orderRef, dataToUpdate);
+    
+    console.log('✓ Información de orden actualizada:', orderId);
+    return true;
+  } catch (error) {
+    console.error('✗ Error actualizando información de orden:', error);
     throw error;
   }
 }
@@ -429,6 +480,7 @@ export default {
   listenToOrders,
   createOrder,
   updateOrderStatus,
+  updateOrderInfo,
   deleteOrderDB,
   getOrdersByPhone,
   getPendingOrders,
