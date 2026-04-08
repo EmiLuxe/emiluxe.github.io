@@ -3,199 +3,258 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel Admin - EmiLuxe</title>
+  <title>Admin - EmiLuxe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
+  <!-- Para generar PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
   <!-- NAVBAR -->
   <nav>
     <a href="index.html" class="navbar-logo">
       <img src="assets/images/logo.png" alt="EmiLuxe Logo">
-      EmiLuxe Admin
+      EmiLuxe
     </a>
     <ul class="navbar-menu">
-      <li><a href="index.html">Volver a Tienda</a></li>
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="shop.html">Tienda</a></li>
     </ul>
     <div class="navbar-icons">
-      <button onclick="logoutAdmin()" style="background: none; border: none; cursor: pointer; font-size: 1.3rem;">🚪</button>
+      <a href="cart.html" style="position: relative;">
+        🛒
+        <span class="cart-badge">0</span>
+      </a>
+      <button onclick="logoutAdmin()" style="background: #ff7fa0; color: white; border: none; padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; font-weight: 600;">Cerrar Sesión</button>
     </div>
   </nav>
 
-  <!-- ADMIN SECTION -->
+  <!-- ADMIN CONTAINER -->
   <section class="admin-container">
-    <h1 class="admin-title">Panel de Administración</h1>
+    <h1 class="admin-title">🎀 Panel de Administración - EmiLuxe</h1>
 
     <!-- NAVIGATION BUTTONS -->
     <div class="admin-nav-buttons">
-      <button class="admin-nav-btn active" onclick="switchPanel('products', this)">
-        <span style="font-size: 1.5rem;">📦</span>
-        <span>Gestionar Productos</span>
+      <button class="admin-nav-btn active" onclick="switchPanel('products')">
+        <span>📦</span>
+        <span>Productos</span>
       </button>
-      <button class="admin-nav-btn" onclick="switchPanel('orders', this)">
-        <span style="font-size: 1.5rem;">📋</span>
-        <span>Ver Órdenes</span>
+      <button class="admin-nav-btn" onclick="switchPanel('orders')">
+        <span>📋</span>
+        <span>Órdenes</span>
       </button>
     </div>
 
-    <!-- PRODUCTS PANEL -->
-    <div id="productsPanel" class="admin-panel">
-      <div class="admin-layout">
-        <!-- FORM COLUMN -->
+    <!-- ADMIN LAYOUT -->
+    <div class="admin-layout">
+
+      <!-- PRODUCTS PANEL -->
+      <div id="productsPanel" class="admin-panel">
         <div class="admin-form">
-          <h3 class="form-title">Agregar/Editar Producto</h3>
+          <h2 class="form-title">Gestionar Productos</h2>
+
+          <!-- MODE SELECTOR -->
+          <div class="admin-form-mode-label">Selecciona una opción:</div>
+          <div class="admin-mode-buttons">
+            <button type="button" class="admin-mode-btn active" onclick="switchMode('add')">➕ Agregar</button>
+            <button type="button" class="admin-mode-btn" onclick="switchMode('edit')">✏️ Editar</button>
+            <button type="button" class="admin-mode-btn" onclick="switchMode('delete')">🗑️ Eliminar</button>
+          </div>
 
           <form id="productForm">
-            <!-- MODE: ADD or EDIT -->
-            <div class="admin-form-mode">
-              <label class="admin-form-mode-label">Modo</label>
-              <div class="admin-mode-buttons">
-                <button type="button" class="admin-mode-btn active" data-mode="add" onclick="switchMode('add')">
-                  ➕ Agregar Nuevo
-                </button>
-                <button type="button" class="admin-mode-btn" data-mode="edit" onclick="switchMode('edit')">
-                  ✏️ Editar Existente
-                </button>
-              </div>
-            </div>
+            <div class="form-fields-container">
+              <!-- ADD MODE -->
+              <div class="admin-form-section" id="addSection">
+                <div class="admin-form-section-title">📝 Agregar Nuevo Producto</div>
 
-            <!-- EDIT MODE: Select Product -->
-            <div id="editModeSection" class="admin-form-section hidden">
-              <div class="admin-form-section-title">Seleccionar Producto</div>
-              <div class="form-fields-container">
                 <div class="form-group">
-                  <label for="productSelect">Elige un producto para editar</label>
-                  <select id="productSelect" onchange="loadProductData()">
-                    <option value="">Elige un producto...</option>
-                  </select>
+                  <label for="productName">📌 Nombre del Producto</label>
+                  <input type="text" id="productName" placeholder="Ej: Pijama Cómoda">
+                  <small>Máximo 100 caracteres</small>
                 </div>
-              </div>
-            </div>
 
-            <!-- PRODUCT DETAILS SECTION -->
-            <div class="admin-form-section">
-              <div class="admin-form-section-title">Detalles del Producto</div>
-              <div class="form-fields-container">
-                <!-- CATEGORY SELECT -->
                 <div class="form-group">
-                  <label for="category">📁 Categoría (Carpeta)</label>
-                  <select id="category" required onchange="loadImagesForCategory()">
+                  <label for="productDescription">📝 Descripción</label>
+                  <textarea id="productDescription" placeholder="Describe el producto..."></textarea>
+                  <small>Máximo 500 caracteres</small>
+                </div>
+
+                <div class="form-group">
+                  <label for="productPrice">💰 Precio (COP)</label>
+                  <input type="number" id="productPrice" placeholder="50000" min="1000">
+                  <small>Precio en pesos colombianos</small>
+                </div>
+
+                <div class="form-group">
+                  <label for="productCategory">🏷️ Categoría</label>
+                  <select id="productCategory" required>
                     <option value="">Selecciona una categoría</option>
                     <option value="pijamas">Pijamas</option>
                     <option value="lenceria">Lencería</option>
-                    <option value="casual">Ropa Casual</option>
+                    <option value="casual">Ropa casual</option>
+                    <option value="perfumeria">Perfumería</option>
                   </select>
                 </div>
 
-                <!-- PRODUCT NAME -->
+                <div class="admin-image-section">
+                  <div class="admin-image-section-title">🖼️ Imagen del Producto</div>
+                  <div class="admin-image-inputs">
+                    <input type="text" id="productImageURL" placeholder="URL de la imagen">
+                    <button type="button" onclick="previewProductImage()">👁️ Vista Previa</button>
+                  </div>
+                  <div class="admin-image-note">Puedes usar URLs de imágenes externas o GitHub</div>
+                  <div class="admin-image-preview">
+                    <div id="productImagePreview" class="admin-image-preview-empty">Aquí aparecerá la imagen</div>
+                  </div>
+                </div>
+
+                <div class="admin-buttons">
+                  <button type="button" class="admin-btn btn-primary" onclick="addProduct()">➕ Agregar Producto</button>
+                  <button type="button" class="admin-btn btn-secondary" onclick="resetProductForm()">🔄 Limpiar Formulario</button>
+                </div>
+              </div>
+
+              <!-- EDIT MODE -->
+              <div class="admin-form-section hidden" id="editSection">
+                <div class="admin-form-section-title">✏�� Editar Producto</div>
+
                 <div class="form-group">
-                  <label for="name">Nombre del Producto</label>
-                  <input type="text" id="name" placeholder="Ej: Pijama Elegante Rosa" required>
+                  <label for="editProductId">🔍 Buscar por ID</label>
+                  <input type="text" id="editProductId" placeholder="ID del producto">
+                  <button type="button" onclick="searchProductToEdit()" style="margin-top: 0.5rem; width: 100%; padding: 0.7rem; background: #ff7fa0; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Buscar</button>
                 </div>
 
-                <!-- PRICE -->
+                <div id="editProductFields" style="display: none;">
+                  <div class="form-group">
+                    <label for="editProductName">📌 Nombre del Producto</label>
+                    <input type="text" id="editProductName">
+                  </div>
+
+                  <div class="form-group">
+                    <label for="editProductDescription">📝 Descripción</label>
+                    <textarea id="editProductDescription"></textarea>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="editProductPrice">💰 Precio (COP)</label>
+                    <input type="number" id="editProductPrice" min="1000">
+                  </div>
+
+                  <div class="form-group">
+                    <label for="editProductCategory">🏷️ Categoría</label>
+                    <select id="editProductCategory">
+                      <option value="pijamas">Pijamas</option>
+                      <option value="lenceria">Lencería</option>
+                      <option value="casual">Ropa casual</option>
+                      <option value="perfumeria">Perfumería</option>
+                    </select>
+                  </div>
+
+                  <div class="admin-image-section">
+                    <div class="admin-image-section-title">🖼️ Imagen del Producto</div>
+                    <div class="admin-image-inputs">
+                      <input type="text" id="editProductImageURL" placeholder="URL de la imagen">
+                      <button type="button" onclick="previewEditProductImage()">👁️ Vista Previa</button>
+                    </div>
+                    <div class="admin-image-preview">
+                      <div id="editProductImagePreview" class="admin-image-preview-empty">Aquí aparecerá la imagen</div>
+                    </div>
+                  </div>
+
+                  <div class="admin-buttons">
+                    <button type="button" class="admin-btn btn-primary" onclick="updateProduct()">✏️ Actualizar Producto</button>
+                    <button type="button" class="admin-btn btn-secondary" onclick="cancelEditProduct()">❌ Cancelar</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- DELETE MODE -->
+              <div class="admin-form-section hidden" id="deleteSection">
+                <div class="admin-form-section-title">🗑️ Eliminar Producto</div>
+
                 <div class="form-group">
-                  <label for="price">Precio (COP)</label>
-                  <input type="number" id="price" placeholder="89990" step="1" required>
+                  <label for="deleteProductId">🔍 ID del Producto a Eliminar</label>
+                  <input type="text" id="deleteProductId" placeholder="ID del producto">
+                  <button type="button" onclick="searchProductToDelete()" style="margin-top: 0.5rem; width: 100%; padding: 0.7rem; background: #ff7fa0; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Buscar</button>
                 </div>
 
-                <!-- DESCRIPTION (Full width) -->
-                <div class="form-group" style="grid-column: 1 / -1;">
-                  <label for="description">Descripción</label>
-                  <textarea id="description" placeholder="Describe el producto" required></textarea>
+                <div id="deleteProductInfo" style="display: none;">
+                  <div style="background-color: #ffebee; padding: 1.5rem; border-radius: 10px; margin-bottom: 1.5rem; border: 2px solid #f44336;">
+                    <p style="color: #c62828; margin: 0; font-weight: 600;">⚠️ Advertencia: Esta acción no se puede deshacer</p>
+                    <p style="color: #d32f2f; margin: 0.8rem 0 0 0; font-size: 0.9rem;">Se eliminará permanentemente el producto:</p>
+                    <p style="background: white; padding: 0.8rem; border-radius: 6px; margin-top: 0.8rem; color: #2c2c2c; font-weight: 600;" id="deleteProductName"></p>
+                  </div>
+
+                  <div class="admin-buttons">
+                    <button type="button" class="admin-btn" style="background-color: #f44336;" onclick="confirmDeleteProduct()">🗑️ Confirmar Eliminación</button>
+                    <button type="button" class="admin-btn btn-secondary" onclick="cancelDeleteProduct()">❌ Cancelar</button>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            <!-- IMAGE SECTION -->
-            <div class="admin-image-section">
-              <div class="admin-image-section-title">Selecciona o Escribe la Imagen</div>
-              
-              <div class="admin-image-inputs">
-                <select id="imageSelect" onchange="updateImagePreview()">
-                  <option value="">Cargando imágenes...</option>
-                </select>
-                <input 
-                  type="text" 
-                  id="customImageName" 
-                  placeholder="O escribe: foto.jpg"
-                  onchange="updateImagePreviewFromInput()"
-                >
-              </div>
-              
-              <div class="admin-image-note">
-                ✓ Selecciona del desplegable O escribe manualmente
-              </div>
-
-              <!-- IMAGE PREVIEW -->
-              <div class="admin-image-preview">
-                <div class="admin-image-preview-title">Vista Previa</div>
-                <img id="previewImage" src="" alt="Preview" style="display: none;">
-                <div id="previewPlaceholder" class="admin-image-preview-empty">
-                  La imagen se previsualiza aquí
-                </div>
-              </div>
-            </div>
-
-            <!-- BUTTONS -->
-            <div class="admin-buttons">
-              <button type="button" class="admin-btn btn-primary" id="submitBtn">Guardar Producto</button>
-              <button type="button" class="admin-btn btn-secondary" onclick="clearForm()">Limpiar Formulario</button>
             </div>
           </form>
         </div>
 
-        <!-- PRODUCTS LIST COLUMN -->
+        <!-- PRODUCTS LIST -->
         <div class="admin-products">
-          <h3 class="admin-products-title">Productos Disponibles</h3>
-          <div id="loadingProducts" style="text-align: center; padding: 2rem; color: #999;">
-            Cargando productos...
-          </div>
-          <div class="admin-products-list" id="productsList" style="display: none;">
-            <!-- Products will be loaded here -->
+          <div class="admin-products-title">Productos Actuales</div>
+          <div id="productsList" class="admin-products-list">
+            <p style="text-align: center; color: #999; padding: 2rem;">Cargando productos...</p>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- ORDERS PANEL -->
-    <div id="ordersPanel" class="admin-panel" style="display: none;">
-      <div class="orders-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 10px; text-align: center;">
-          <p style="font-size: 2rem; margin: 0; font-weight: 700;" id="totalOrders">0</p>
-          <p style="margin: 0; font-size: 0.9rem; opacity: 0.9;">Total de Órdenes</p>
-        </div>
-        <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 1.5rem; border-radius: 10px; text-align: center;">
-          <p style="font-size: 2rem; margin: 0; font-weight: 700;" id="totalRevenue">$0</p>
-          <p style="margin: 0; font-size: 0.9rem; opacity: 0.9;">Ingresos Totales</p>
-        </div>
-        <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 1.5rem; border-radius: 10px; text-align: center;">
-          <p style="font-size: 2rem; margin: 0; font-weight: 700;" id="pendingOrders">0</p>
-          <p style="margin: 0; font-size: 0.9rem; opacity: 0.9;">Pendientes</p>
-        </div>
-        <div style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; padding: 1.5rem; border-radius: 10px; text-align: center;">
-          <p style="font-size: 2rem; margin: 0; font-weight: 700;" id="confirmedOrders">0</p>
-          <p style="margin: 0; font-size: 0.9rem; opacity: 0.9;">Confirmadas</p>
+      <!-- ORDERS PANEL -->
+      <div id="ordersPanel" class="admin-panel hidden">
+        <div class="admin-products">
+          <div class="admin-products-title">📋 Órdenes Recibidas</div>
+
+          <!-- ORDERS STATS -->
+          <div class="orders-stats">
+            <div>
+              <p id="totalOrdersCount">0</p>
+              <p>Total de Órdenes</p>
+            </div>
+            <div>
+              <p id="pendingOrdersCount">0</p>
+              <p>Pendientes</p>
+            </div>
+            <div>
+              <p id="confirmedOrdersCount">0</p>
+              <p>Confirmadas</p>
+            </div>
+            <div>
+              <p id="deliveredOrdersCount">0</p>
+              <p>Entregadas</p>
+            </div>
+          </div>
+
+          <!-- ORDERS TABLE -->
+          <div class="orders-table-container">
+            <table class="orders-table">
+              <thead>
+                <tr>
+                  <th>Orden</th>
+                  <th>Cliente</th>
+                  <th>Teléfono</th>
+                  <th>Total</th>
+                  <th>Estado</th>
+                  <th>Fecha</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="ordersTableBody">
+                <tr>
+                  <td colspan="7" style="text-align: center; padding: 2rem; color: #999;">Cargando órdenes...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
-      <div class="orders-table-container">
-        <table class="orders-table" id="ordersTable">
-          <thead>
-            <tr>
-              <th>ID Orden</th>
-              <th>Fecha</th>
-              <th>Teléfono</th>
-              <th>Total</th>
-              <th>Productos</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="ordersBody">
-            <!-- Orders will be loaded here -->
-          </tbody>
-        </table>
-      </div>
     </div>
   </section>
 
@@ -208,320 +267,91 @@
   <script src="js/main.js"></script>
   <script type="module">
     import { getAllProducts, addProduct, updateProduct, deleteProduct } from './js/products.js';
-    import { getAllOrders, updateOrderStatus, deleteOrderDB } from './js/firebaseDB.js';
-    import { getImagesFromCategory, getImagePath } from './js/imageLoader.js';
+    import { getOrders, updateOrderStatus } from './js/firebaseDB.js';
+    import { generateCertificateHTML, downloadCertificateAsPDF, printCertificate } from './js/certificate.js';
 
-    let editingProductId = null;
     let currentMode = 'add';
-    let selectedImagePath = '';
-    let categoryImages = {};
+    let editingProductId = null;
+    let deletingProductId = null;
 
+    // Check admin authentication
     document.addEventListener('DOMContentLoaded', async () => {
-      checkAdminAuth();
-      await loadProductsToSelect();
-      await loadAdminProducts();
-      setupFormHandlers();
+      const adminUser = localStorage.getItem('adminUser');
+      if (!adminUser) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      await loadProducts();
       await loadOrders();
-      await updateStats();
-      
-      setInterval(async () => {
-        await loadOrders();
-        await updateStats();
-      }, 10000);
     });
 
-    function checkAdminAuth() {
-      const isAuthenticated = localStorage.getItem('emiluxe_admin_logged_in');
-      if (!isAuthenticated) {
-        window.location.href = 'login.html';
-      }
-    }
-
-    window.switchPanel = function(panel, button) {
+    // Switch between panels
+    window.switchPanel = function(panel) {
       const productsPanel = document.getElementById('productsPanel');
       const ordersPanel = document.getElementById('ordersPanel');
       const buttons = document.querySelectorAll('.admin-nav-btn');
 
-      buttons.forEach(btn => {
-        btn.classList.remove('active');
-      });
-
-      button.classList.add('active');
-
       if (panel === 'products') {
         productsPanel.style.display = 'block';
         ordersPanel.style.display = 'none';
+        buttons[0].classList.add('active');
+        buttons[1].classList.remove('active');
       } else {
         productsPanel.style.display = 'none';
         ordersPanel.style.display = 'block';
+        buttons[0].classList.remove('active');
+        buttons[1].classList.add('active');
+        loadOrders();
       }
     }
 
+    // Switch between modes
     window.switchMode = function(mode) {
       currentMode = mode;
-      const editModeSection = document.getElementById('editModeSection');
-      const modeButtons = document.querySelectorAll('.admin-mode-btn');
-      
-      // Actualizar botones activos
-      modeButtons.forEach(btn => {
-        btn.classList.remove('active');
-      });
-      document.querySelector(`.admin-mode-btn[data-mode="${mode}"]`).classList.add('active');
-      
+      const buttons = document.querySelectorAll('.admin-mode-btn');
+      buttons.forEach(btn => btn.classList.remove('active'));
+
       if (mode === 'add') {
-        editModeSection.classList.add('hidden');
-        clearForm();
-        document.getElementById('submitBtn').textContent = '➕ Agregar Producto';
-      } else {
-        editModeSection.classList.remove('hidden');
-        clearForm();
-        document.getElementById('submitBtn').textContent = '✏️ Guardar Cambios';
+        document.getElementById('addSection').classList.remove('hidden');
+        document.getElementById('editSection').classList.add('hidden');
+        document.getElementById('deleteSection').classList.add('hidden');
+        buttons[0].classList.add('active');
+      } else if (mode === 'edit') {
+        document.getElementById('addSection').classList.add('hidden');
+        document.getElementById('editSection').classList.remove('hidden');
+        document.getElementById('deleteSection').classList.add('hidden');
+        buttons[1].classList.add('active');
+      } else if (mode === 'delete') {
+        document.getElementById('addSection').classList.add('hidden');
+        document.getElementById('editSection').classList.add('hidden');
+        document.getElementById('deleteSection').classList.remove('hidden');
+        buttons[2].classList.add('active');
       }
     }
 
-    // Cargar imágenes dinámicamente de GitHub
-    window.loadImagesForCategory = async function() {
-      const category = document.getElementById('category').value;
-      const imageSelect = document.getElementById('imageSelect');
-      const customImageName = document.getElementById('customImageName');
-      
-      imageSelect.innerHTML = '<option value="">Cargando imágenes...</option>';
-      customImageName.value = '';
-      selectedImagePath = '';
-      updateImagePreview();
-
-      if (!category) {
-        imageSelect.innerHTML = '<option value="">Selecciona una categoría primero</option>';
-        return;
-      }
-
+    // Load products
+    window.loadProducts = async function() {
       try {
-        // Obtener imágenes de GitHub
-        const images = await getImagesFromCategory(category);
-        categoryImages[category] = images;
-        
-        if (images.length === 0) {
-          imageSelect.innerHTML = '<option value="">No hay imágenes en esta carpeta</option>';
-          return;
-        }
-
-        // Llenar desplegable
-        imageSelect.innerHTML = '<option value="">Elige una imagen de la carpeta...</option>';
-        images.forEach(img => {
-          const option = document.createElement('option');
-          option.value = getImagePath(category, img);
-          option.textContent = img;
-          imageSelect.appendChild(option);
-        });
-
-        console.log(`✓ ${images.length} imágenes cargadas para ${category}`);
-      } catch (error) {
-        console.error('Error cargando imágenes:', error);
-        imageSelect.innerHTML = '<option value="">Error al cargar imágenes</option>';
-      }
-    }
-
-    window.updateImagePreview = function() {
-      const imageSelect = document.getElementById('imageSelect');
-      const customImageName = document.getElementById('customImageName');
-      const preview = document.getElementById('previewImage');
-      const placeholder = document.getElementById('previewPlaceholder');
-      
-      selectedImagePath = imageSelect.value;
-      customImageName.value = '';
-
-      if (selectedImagePath) {
-        preview.src = selectedImagePath;
-        preview.style.display = 'block';
-        placeholder.style.display = 'none';
-      } else {
-        preview.style.display = 'none';
-        placeholder.style.display = 'block';
-      }
-    }
-
-    window.updateImagePreviewFromInput = function() {
-      const category = document.getElementById('category').value;
-      const customImageName = document.getElementById('customImageName').value.trim();
-      const imageSelect = document.getElementById('imageSelect');
-      const preview = document.getElementById('previewImage');
-      const placeholder = document.getElementById('previewPlaceholder');
-
-      imageSelect.value = '';
-
-      if (customImageName && category) {
-        selectedImagePath = getImagePath(category, customImageName);
-        preview.src = selectedImagePath;
-        preview.style.display = 'block';
-        placeholder.style.display = 'none';
-      } else {
-        preview.style.display = 'none';
-        placeholder.style.display = 'block';
-      }
-    }
-
-    async function loadProductsToSelect() {
-      try {
-        const allProducts = await getAllProducts();
-        const productSelect = document.getElementById('productSelect');
-
-        productSelect.innerHTML = '<option value="">Elige un producto...</option>' + 
-          allProducts.map(product => `
-            <option value="${product.id}">${product.name}</option>
-          `).join('');
-      } catch (error) {
-        console.error('Error cargando productos:', error);
-      }
-    }
-
-    window.loadProductData = async function() {
-      try {
-        const productSelect = document.getElementById('productSelect');
-        const productId = productSelect.value;
-
-        if (!productId) {
-          clearForm();
-          return;
-        }
-
-        const allProducts = await getAllProducts();
-        const product = allProducts.find(p => p.id == productId);
-
-        if (product) {
-          editingProductId = productId;
-          document.getElementById('category').value = product.category;
-          
-          await loadImagesForCategory();
-          
-          const filename = product.image.split('/').pop();
-          document.getElementById('customImageName').value = filename;
-          
-          document.getElementById('name').value = product.name;
-          document.getElementById('description').value = product.description;
-          document.getElementById('price').value = product.price;
-          
-          updateImagePreviewFromInput();
-        }
-      } catch (error) {
-        console.error('Error cargando producto:', error);
-        showNotification('Error al cargar el producto', 'error');
-      }
-    }
-
-    function setupFormHandlers() {
-      const form = document.getElementById('productForm');
-      if (!form) return;
-
-      const submitBtn = form.querySelector('#submitBtn');
-      submitBtn.addEventListener('click', handleFormSubmit);
-    }
-
-    async function handleFormSubmit(e) {
-      e.preventDefault();
-
-      const category = document.getElementById('category').value.trim();
-      const customImageName = document.getElementById('customImageName').value.trim();
-      const name = document.getElementById('name').value.trim();
-      const description = document.getElementById('description').value.trim();
-      const price = parseInt(document.getElementById('price').value);
-
-      if (!category || (!selectedImagePath && !customImageName) || !name || !description || !price) {
-        showNotification('Por favor completa todos los campos', 'error');
-        return;
-      }
-
-      if (price <= 0) {
-        showNotification('El precio debe ser mayor a 0', 'error');
-        return;
-      }
-
-      try {
-        const imageName = customImageName || selectedImagePath.split('/').pop();
-        const imagePath = getImagePath(category, imageName);
-
-        if (currentMode === 'add') {
-          const newProduct = {
-            name,
-            description,
-            price,
-            image: imagePath,
-            category
-          };
-
-          await addProduct(newProduct);
-          showNotification('Producto agregado exitosamente', 'success');
-        } else {
-          if (!editingProductId) {
-            showNotification('Por favor selecciona un producto', 'error');
-            return;
-          }
-
-          const productData = {
-            name,
-            description,
-            price,
-            image: imagePath
-          };
-
-          await updateProduct(editingProductId, productData);
-          showNotification('Producto actualizado exitosamente', 'success');
-        }
-
-        clearForm();
-        await loadProductsToSelect();
-        await loadAdminProducts();
-      } catch (error) {
-        console.error('Error:', error);
-        showNotification('Error al guardar el producto', 'error');
-      }
-    }
-
-    window.clearForm = function() {
-      const form = document.getElementById('productForm');
-      if (form) {
-        form.reset();
-      }
-      
-      editingProductId = null;
-      selectedImagePath = '';
-      
-      const preview = document.getElementById('previewImage');
-      const placeholder = document.getElementById('previewPlaceholder');
-      preview.style.display = 'none';
-      placeholder.style.display = 'block';
-      
-      document.getElementById('imageSelect').innerHTML = '<option value="">Elige una imagen de la carpeta...</option>';
-      document.getElementById('customImageName').value = '';
-      document.getElementById('productSelect').value = '';
-    }
-
-    async function loadAdminProducts() {
-      try {
+        const products = await getAllProducts();
         const productsList = document.getElementById('productsList');
-        const loadingProducts = document.getElementById('loadingProducts');
-        
-        if (!productsList) return;
 
-        const allProducts = await getAllProducts();
-
-        loadingProducts.style.display = 'none';
-        productsList.style.display = 'block';
-
-        if (allProducts.length === 0) {
-          productsList.innerHTML = '<p style="text-align: center; color: #999;">No hay productos aún. ¡Agrega uno!</p>';
+        if (products.length === 0) {
+          productsList.innerHTML = '<p style="text-align: center; color: #999; padding: 2rem;">No hay productos aún</p>';
           return;
         }
 
-        productsList.innerHTML = allProducts.map(product => `
+        productsList.innerHTML = products.map(product => `
           <div class="admin-product-item">
-            <img src="${product.image}" alt="${product.name}" style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover;" onerror="this.src='assets/images/placeholder.png'">
+            <img src="${product.image}" alt="${product.name}" onerror="this.src='assets/images/placeholder.png'">
             <div class="admin-product-info">
               <div class="admin-product-name">${product.name}</div>
               <div class="admin-product-price">${formatPrice(product.price)}</div>
+              <small style="color: #999;">${product.category}</small>
             </div>
             <div class="admin-product-actions">
-              <button class="btn-edit" onclick="selectProductToEdit('${product.id}')">Editar</button>
-              <button class="btn-delete" onclick="deleteProductConfirm('${product.id}')">Eliminar</button>
+              <button type="button" class="btn-edit" onclick="editProductClick('${product.id}')">✏️ Editar</button>
+              <button type="button" class="btn-delete" onclick="deleteProductClick('${product.id}')">🗑️ Eliminar</button>
             </div>
           </div>
         `).join('');
@@ -530,128 +360,268 @@
       }
     }
 
-    window.selectProductToEdit = async function(id) {
-      // Cambiar a modo editar
-      document.querySelector('.admin-mode-btn[data-mode="edit"]').click();
-      
-      const productSelect = document.getElementById('productSelect');
-      productSelect.value = id;
-      await loadProductData();
-      
-      // Scroll suave hacia el formulario
-      document.getElementById('productForm').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    window.deleteProductConfirm = async function(id) {
-      if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
-        try {
-          await deleteProduct(id);
-          await loadProductsToSelect();
-          await loadAdminProducts();
-          showNotification('Producto eliminado exitosamente', 'success');
-        } catch (error) {
-          console.error('Error:', error);
-          showNotification('Error al eliminar el producto', 'error');
-        }
-      }
-    }
-
-    async function loadOrders() {
-  try {
-    const orders = await getAllOrders();
-    const ordersBody = document.getElementById('ordersBody');
-
-    if (orders.length === 0) {
-      ordersBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem; color: #999;">No hay órdenes aún</td></tr>';
-      return;
-    }
-
-    ordersBody.innerHTML = orders.map(order => {
-      // Agregar 57 si no lo tiene el número
-      let phoneNumber = order.phoneNumber;
-      if (!phoneNumber.startsWith('57')) {
-        phoneNumber = '57' + phoneNumber;
-      }
-      
-      const message = encodeURIComponent(`📱 *COMPRA REALIZADA EN EMILUXE*\n\n🛍️ ID de Orden: #${order.orderId || order.id}\n\n📦 Detalles del Pedido:\n${order.items.map(i => `• ${i.name} (x${i.quantity})`).join('\n')}\n\n💰 Total: ${formatPrice(order.total)}`);
-      
-      return `
-        <tr>
-          <td><strong style="color: var(--dark-pink);">#${order.orderId || order.id}</strong></td>
-          <td><small>${order.date}</small></td>
-          <td>
-            <a href="https://wa.me/${phoneNumber}?text=${message}" target="_blank" style="color: #25d366; text-decoration: none; font-weight: 600;">
-              📱 ${order.phoneNumber}
-            </a>
-          </td>
-          <td><strong>${formatPrice(order.total)}</strong></td>
-          <td><small style="color: #666;">${order.items.map(i => `${i.name} (x${i.quantity})`).join(', ')}</small></td>
-          <td>
-            <span style="background-color: ${order.status.includes('Confirmada') ? '#c8e6c9' : '#fff3cd'}; color: ${order.status.includes('Confirmada') ? '#2e7d32' : '#856404'}; padding: 0.5rem 0.8rem; border-radius: 4px; font-weight: 600; display: inline-block;">
-              ${order.status}
-            </span>
-          </td>
-          <td>
-            <div style="display: flex; gap: 0.4rem;">
-              <button type="button" onclick="confirmOrder('${order.id}')" style="background: #4caf50; color: white; border: none; padding: 0.5rem 0.8rem; border-radius: 4px; cursor: pointer; font-weight: 600;">✅</button>
-              <button type="button" onclick="deleteOrder('${order.id}')" style="background: #f44336; color: white; border: none; padding: 0.5rem 0.8rem; border-radius: 4px; cursor: pointer; font-weight: 600;">❌</button>
-            </div>
-          </td>
-        </tr>
-      `;
-    }).join('');
-  } catch (error) {
-    console.error('Error cargando órdenes:', error);
-  }
-}
-
-    async function updateStats() {
+    // Load orders
+    window.loadOrders = async function() {
       try {
-        const orders = await getAllOrders();
-        
-        const totalOrders = orders.length;
-        const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
-        const pendingOrders = orders.filter(o => !o.status.includes('Confirmada')).length;
-        const confirmedOrders = orders.filter(o => o.status.includes('Confirmada')).length;
+        const orders = JSON.parse(localStorage.getItem('emiluxe_orders')) || [];
+        const ordersTableBody = document.getElementById('ordersTableBody');
 
-        document.getElementById('totalOrders').textContent = totalOrders;
-        document.getElementById('totalRevenue').textContent = formatPrice(totalRevenue);
-        document.getElementById('pendingOrders').textContent = pendingOrders;
-        document.getElementById('confirmedOrders').textContent = confirmedOrders;
-      } catch (error) {
-        console.error('Error actualizando estadísticas:', error);
-      }
-    }
+        // Update stats
+        document.getElementById('totalOrdersCount').textContent = orders.length;
+        document.getElementById('pendingOrdersCount').textContent = orders.filter(o => o.status === 'Pendiente de Confirmación').length;
+        document.getElementById('confirmedOrdersCount').textContent = orders.filter(o => o.status === 'Confirmada').length;
+        document.getElementById('deliveredOrdersCount').textContent = orders.filter(o => o.status === 'Entregada').length;
 
-    window.confirmOrder = async function(orderId) {
-      try {
-        await updateOrderStatus(orderId, '✅ Confirmada');
-        await loadOrders();
-        await updateStats();
-        showNotification('Orden confirmada exitosamente', 'success');
-      } catch (error) {
-        console.error('Error confirmando orden:', error);
-        showNotification('Error al confirmar la orden', 'error');
-      }
-    }
-
-    window.deleteOrder = async function(orderId) {
-      if (confirm('¿Estás seguro?')) {
-        try {
-          await deleteOrderDB(orderId);
-          await loadOrders();
-          await updateStats();
-          showNotification('Orden eliminada exitosamente', 'success');
-        } catch (error) {
-          console.error('Error:', error);
-          showNotification('Error al eliminar la orden', 'error');
+        if (orders.length === 0) {
+          ordersTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem; color: #999;">No hay órdenes aún</td></tr>';
+          return;
         }
+
+        ordersTableBody.innerHTML = orders.reverse().map(order => `
+          <tr>
+            <td>#${order.orderId}</td>
+            <td>${order.customerName}</td>
+            <td>${order.phoneNumber}</td>
+            <td>${formatPrice(order.total)}</td>
+            <td style="color: ${order.status === 'Entregada' ? '#4caf50' : '#ff7fa0'}; font-weight: 600;">${order.status}</td>
+            <td>${order.date}</td>
+            <td>
+              <button type="button" class="btn-edit" onclick="downloadOrderCertificate('${order.orderId}', '${order.customerName}', '${order.phoneNumber}', '${order.deliveryAddress}', '${order.preferredTime}', '${order.total}', '${JSON.stringify(order.items).replace(/'/g, "&#39;")}')">📄 Comprobante</button>
+              <button type="button" class="btn-delete" onclick="sendToWhatsApp('${order.phoneNumber}', '${order.orderId}')">💬 Enviar</button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (error) {
+        console.error('Error cargando órdenes:', error);
       }
     }
 
+    // Add product
+    window.addProduct = async function() {
+      const name = document.getElementById('productName').value.trim();
+      const description = document.getElementById('productDescription').value.trim();
+      const price = parseFloat(document.getElementById('productPrice').value);
+      const category = document.getElementById('productCategory').value;
+      const image = document.getElementById('productImageURL').value.trim();
+
+      if (!name || !description || !price || !category || !image) {
+        showNotification('❌ Por favor completa todos los campos', 'error');
+        return;
+      }
+
+      try {
+        await addProduct({
+          name,
+          description,
+          price,
+          category,
+          image
+        });
+
+        showNotification('✅ Producto agregado exitosamente', 'success');
+        resetProductForm();
+        await loadProducts();
+      } catch (error) {
+        console.error('Error:', error);
+        showNotification('❌ Error al agregar el producto', 'error');
+      }
+    }
+
+    // Reset form
+    window.resetProductForm = function() {
+      document.getElementById('productForm').reset();
+      document.getElementById('productImagePreview').innerHTML = '<div class="admin-image-preview-empty">Aquí aparecerá la imagen</div>';
+    }
+
+    // Preview image
+    window.previewProductImage = function() {
+      const imageURL = document.getElementById('productImageURL').value.trim();
+      const preview = document.getElementById('productImagePreview');
+
+      if (!imageURL) {
+        preview.innerHTML = '<div class="admin-image-preview-empty">Ingresa una URL válida</div>';
+        return;
+      }
+
+      preview.innerHTML = `<img src="${imageURL}" alt="preview" style="max-width: 100%; max-height: 300px; border-radius: 10px;" onerror="this.parentElement.innerHTML='<div class=\"admin-image-preview-empty\">Error al cargar la imagen</div>'">`;
+    }
+
+    // Edit product click
+    window.editProductClick = async function(productId) {
+      switchMode('edit');
+      await searchProductToEdit(productId);
+    }
+
+    // Search product to edit
+    window.searchProductToEdit = async function(productId = null) {
+      const searchId = productId || document.getElementById('editProductId').value.trim();
+      if (!searchId) {
+        showNotification('❌ Ingresa un ID de producto', 'error');
+        return;
+      }
+
+      const products = await getAllProducts();
+      const product = products.find(p => p.id === searchId);
+
+      if (!product) {
+        showNotification('❌ Producto no encontrado', 'error');
+        return;
+      }
+
+      editingProductId = product.id;
+      document.getElementById('editProductName').value = product.name;
+      document.getElementById('editProductDescription').value = product.description;
+      document.getElementById('editProductPrice').value = product.price;
+      document.getElementById('editProductCategory').value = product.category;
+      document.getElementById('editProductImageURL').value = product.image;
+      document.getElementById('editProductFields').style.display = 'block';
+
+      const preview = document.getElementById('editProductImagePreview');
+      preview.innerHTML = `<img src="${product.image}" alt="${product.name}" style="max-width: 100%; max-height: 300px; border-radius: 10px;" onerror="this.parentElement.innerHTML='<div class=\"admin-image-preview-empty\">Error</div>'">`;
+    }
+
+    // Update product
+    window.updateProduct = async function() {
+      if (!editingProductId) {
+        showNotification('❌ Selecciona un producto primero', 'error');
+        return;
+      }
+
+      const name = document.getElementById('editProductName').value.trim();
+      const description = document.getElementById('editProductDescription').value.trim();
+      const price = parseFloat(document.getElementById('editProductPrice').value);
+      const category = document.getElementById('editProductCategory').value;
+      const image = document.getElementById('editProductImageURL').value.trim();
+
+      if (!name || !description || !price || !category || !image) {
+        showNotification('❌ Por favor completa todos los campos', 'error');
+        return;
+      }
+
+      try {
+        await updateProduct(editingProductId, {
+          name,
+          description,
+          price,
+          category,
+          image
+        });
+
+        showNotification('✅ Producto actualizado exitosamente', 'success');
+        cancelEditProduct();
+        await loadProducts();
+      } catch (error) {
+        console.error('Error:', error);
+        showNotification('❌ Error al actualizar el producto', 'error');
+      }
+    }
+
+    // Cancel edit
+    window.cancelEditProduct = function() {
+      editingProductId = null;
+      document.getElementById('editProductFields').style.display = 'none';
+      document.getElementById('editProductId').value = '';
+    }
+
+    // Preview edit image
+    window.previewEditProductImage = function() {
+      const imageURL = document.getElementById('editProductImageURL').value.trim();
+      const preview = document.getElementById('editProductImagePreview');
+
+      if (!imageURL) {
+        preview.innerHTML = '<div class="admin-image-preview-empty">Ingresa una URL válida</div>';
+        return;
+      }
+
+      preview.innerHTML = `<img src="${imageURL}" alt="preview" style="max-width: 100%; max-height: 300px; border-radius: 10px;" onerror="this.parentElement.innerHTML='<div class=\"admin-image-preview-empty\">Error al cargar la imagen</div>'">`;
+    }
+
+    // Delete product click
+    window.deleteProductClick = async function(productId) {
+      switchMode('delete');
+      await searchProductToDelete(productId);
+    }
+
+    // Search product to delete
+    window.searchProductToDelete = async function(productId = null) {
+      const searchId = productId || document.getElementById('deleteProductId').value.trim();
+      if (!searchId) {
+        showNotification('❌ Ingresa un ID de producto', 'error');
+        return;
+      }
+
+      const products = await getAllProducts();
+      const product = products.find(p => p.id === searchId);
+
+      if (!product) {
+        showNotification('❌ Producto no encontrado', 'error');
+        return;
+      }
+
+      deletingProductId = product.id;
+      document.getElementById('deleteProductName').textContent = product.name;
+      document.getElementById('deleteProductInfo').style.display = 'block';
+    }
+
+    // Confirm delete
+    window.confirmDeleteProduct = async function() {
+      if (!deletingProductId) {
+        showNotification('❌ Error interno', 'error');
+        return;
+      }
+
+      try {
+        await deleteProduct(deletingProductId);
+        showNotification('✅ Producto eliminado exitosamente', 'success');
+        cancelDeleteProduct();
+        await loadProducts();
+      } catch (error) {
+        console.error('Error:', error);
+        showNotification('❌ Error al eliminar el producto', 'error');
+      }
+    }
+
+    // Cancel delete
+    window.cancelDeleteProduct = function() {
+      deletingProductId = null;
+      document.getElementById('deleteProductInfo').style.display = 'none';
+      document.getElementById('deleteProductId').value = '';
+    }
+
+    // Download order certificate
+    window.downloadOrderCertificate = function(orderId, customerName, phoneNumber, address, preferredTime, total, itemsJSON) {
+      try {
+        const items = JSON.parse(itemsJSON.replace(/&#39;/g, "'"));
+        const order = {
+          orderId,
+          customerName,
+          phoneNumber,
+          deliveryAddress: address,
+          preferredTime,
+          total: parseFloat(total),
+          items,
+          date: new Date().toLocaleString('es-CO'),
+          status: 'Pendiente de Confirmación'
+        };
+
+        downloadCertificateAsPDF(order);
+      } catch (error) {
+        console.error('Error generando PDF:', error);
+        showNotification('❌ Error al generar el comprobante', 'error');
+      }
+    }
+
+    // Send to WhatsApp
+    window.sendToWhatsApp = function(phoneNumber, orderId) {
+      const message = `🎀 ¡Hola! Tu orden #${orderId} ha sido procesada. Te contactaremos pronto para confirmar detalles. ¡Gracias por tu compra!`;
+      const encodedMessage = encodeURIComponent(message);
+      window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
+    }
+
+    // Logout
     window.logoutAdmin = function() {
-      if (confirm('¿Deseas cerrar sesión?')) {
-        localStorage.removeItem('emiluxe_admin_logged_in');
+      if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+        localStorage.removeItem('adminUser');
         window.location.href = 'login.html';
       }
     }
