@@ -52,7 +52,7 @@ export async function getAllProducts() {
 
 /**
  * Obtener productos por categoría
- * @param {string} category - Categoría (pijamas, lenceria, casual)
+ * @param {string} category - Categoría (pijamas, lenceria, casual, perfumeria)
  * @returns {Promise<Array>} Array de productos filtrados
  */
 export async function getProductsByCategory(category) {
@@ -72,7 +72,7 @@ export async function getProductsByCategory(category) {
  * @returns {Array} Array de categorías
  */
 export function getCategories() {
-  return ['pijamas', 'lenceria', 'casual'];
+  return ['pijamas', 'lenceria', 'casual', 'perfumeria'];
 }
 
 /**
@@ -109,7 +109,7 @@ export async function getAllProductsIncludingCustom() {
  * @param {string} product.description - Descripción
  * @param {number} product.price - Precio en COP
  * @param {string} product.image - Ruta de la imagen
- * @param {string} product.category - Categoría (pijamas, lenceria, casual)
+ * @param {string} product.category - Categoría (pijamas, lenceria, casual, perfumeria)
  * @returns {Promise<Object>} Producto creado con ID
  */
 export async function addProduct(product) {
