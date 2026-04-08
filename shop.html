@@ -38,6 +38,7 @@
       <button class="filter-btn active" onclick="filterProducts('pijamas')">Pijamas</button>
       <button class="filter-btn" onclick="filterProducts('lenceria')">Lencería</button>
       <button class="filter-btn" onclick="filterProducts('casual')">Ropa casual</button>
+      <button class="filter-btn" onclick="filterProducts('perfumeria')">Perfumería</button>
     </div>
 
     <!-- LOADING INDICATOR -->
@@ -145,7 +146,8 @@
         if (
           (btnCategory.includes('pijamas') && currentCategory === 'pijamas') ||
           (btnCategory.includes('lencería') && currentCategory === 'lenceria') ||
-          (btnCategory.includes('casual') && currentCategory === 'casual')
+          (btnCategory.includes('casual') && currentCategory === 'casual') ||
+          (btnCategory.includes('perfumería') && currentCategory === 'perfumeria')
         ) {
           btn.classList.add('active');
         }
