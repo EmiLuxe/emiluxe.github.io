@@ -68,9 +68,10 @@
 
     // Check if already logged in
     document.addEventListener('DOMContentLoaded', () => {
-      const isAuthenticated = localStorage.getItem('emiluxe_admin_logged_in');
+      const isAuthenticated = localStorage.getItem('adminUser');
       if (isAuthenticated) {
         window.location.href = 'admin.html';
+        return;
       }
 
       // Setup form submission
@@ -87,8 +88,12 @@
 
       // Validate credentials
       if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-        // Set authentication
-        localStorage.setItem('emiluxe_admin_logged_in', 'true');
+        // Set authentication - USAR LA MISMA CLAVE QUE admin.html BUSCA
+        localStorage.setItem('adminUser', JSON.stringify({
+          username: username,
+          loginTime: new Date().toISOString()
+        }));
+        
         showNotification('¡Bienvenido al panel de administración!', 'success');
 
         // Redirect to admin
