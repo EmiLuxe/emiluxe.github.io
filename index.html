@@ -8,6 +8,42 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* ⚠️ ESTILOS ADICIONALES PARA LOADING */
+    .bestsellers-loading {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 40px 20px;
+      color: #999;
+      font-size: 16px;
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid var(--dark-pink);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 10px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error-message {
+      grid-column: 1 / -1;
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      border: 1px solid #f5c6cb;
+    }
+  </style>
 </head>
 <body>
   <!-- NAVBAR -->
@@ -19,6 +55,7 @@
     <ul class="navbar-menu">
       <li><a href="index.html">Inicio</a></li>
       <li><a href="shop.html">Tienda</a></li>
+      <li><a href="orders.html">Mis Órdenes</a></li>
     </ul>
     <div class="navbar-icons">
       <a href="cart.html" style="position: relative;">
@@ -42,7 +79,7 @@
     <h3>💝 Ofertas Especiales</h3>
     <p>Envío gratis desde $80.000</p>
     <p>10% OFF en tu primera compra</p>
-    <div class="promo-badge">🎀 Hoy es tu día</div>
+    <div class="promo-badge">���� Hoy es tu día</div>
   </section>
 
   <!-- CATEGORIES SECTION -->
@@ -93,6 +130,7 @@
     <h2>🔥 Más Vendidos</h2>
     <div id="bestsellersContainer" class="bestsellers-grid">
       <div class="bestsellers-loading">
+        <div class="loading-spinner"></div>
         <p>Cargando productos...</p>
       </div>
     </div>
@@ -114,17 +152,69 @@
   <script type="module">
     import { loadProductsFromFirebase, getAllProducts } from './js/products.js';
 
+    // ========================================
+    // TIMEOUT GLOBAL PARA PREVENIR CARGA INFINITA
+    // ========================================
+    const LOAD_TIMEOUT = 15000; // 15 segundos máximo
+    let loadTimeout;
+
     // Precargar productos al abrir la app
     document.addEventListener('DOMContentLoaded', async () => {
       try {
+        console.log('🔥 Iniciando carga de productos...');
+        
+        // Establecer timeout de seguridad
+        loadTimeout = setTimeout(() => {
+          console.warn('⏱️ TIMEOUT: Carga de productos excedió 15 segundos');
+          handleLoadTimeout();
+        }, LOAD_TIMEOUT);
+
         console.log('🔥 Cargando productos de Firebase...');
         await loadProductsFromFirebase();
         console.log('✓ Productos cargados exitosamente');
+        
+        // Limpiar timeout si se cargó exitosamente
+        clearTimeout(loadTimeout);
+        
         await loadBestsellers();
       } catch (error) {
         console.error('✗ Error cargando productos:', error);
+        clearTimeout(loadTimeout);
+        handleLoadError(error);
       }
     });
+
+    // Manejar timeout
+    window.handleLoadTimeout = function() {
+      const container = document.getElementById('bestsellersContainer');
+      container.innerHTML = `
+        <div class="error-message">
+          ⏱️ La carga está tomando más de lo esperado.
+          <br/>
+          <small>Por favor recarga la página o intenta más tarde</small>
+          <br/>
+          <button onclick="location.reload()" style="margin-top: 10px; padding: 8px 16px; background: #721c24; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            Recargar Página
+          </button>
+        </div>
+      `;
+    };
+
+    // Manejar errores de carga
+    window.handleLoadError = function(error) {
+      const container = document.getElementById('bestsellersContainer');
+      container.innerHTML = `
+        <div class="error-message">
+          ❌ Error cargando productos: ${error.message}
+          <br/>
+          <small>Verifica tu conexión a internet</small>
+          <br/>
+          <button onclick="location.reload()" style="margin-top: 10px; padding: 8px 16px; background: #721c24; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            Intentar Nuevamente
+          </button>
+        </div>
+      `;
+    };
 
     // Cargar más vendidos
     window.loadBestsellers = async function() {
@@ -133,7 +223,7 @@
         const container = document.getElementById('bestsellersContainer');
 
         if (allProducts.length === 0) {
-          container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: #999;">No hay productos disponibles</div>';
+          container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: #999; padding: 40px;">No hay productos disponibles</div>';
           return;
         }
 
@@ -153,8 +243,15 @@
             </div>
           </div>
         `).join('');
+
+        console.log('✓ Más vendidos cargados exitosamente:', bestsellers.length);
       } catch (error) {
-        console.error('Error cargando más vendidos:', error);
+        console.error('✗ Error cargando más vendidos:', error);
+        document.getElementById('bestsellersContainer').innerHTML = `
+          <div class="error-message">
+            Error cargando más vendidos. Intenta recargar la página.
+          </div>
+        `;
       }
     }
 
@@ -167,9 +264,13 @@
         if (product) {
           addToCart(product, 1);
           showNotification(`${product.name} agregado al carrito 🛒`, 'success');
+        } else {
+          console.warn('Producto no encontrado:', productId);
+          showNotification('Error: Producto no encontrado', 'error');
         }
       } catch (error) {
         console.error('Error:', error);
+        showNotification('Error agregando al carrito', 'error');
       }
     }
 
