@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pagar - EmiLuxe</title>
+  <title>Completar Pedido - EmiLuxe</title>
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -28,49 +28,85 @@
 
   <!-- CHECKOUT SECTION -->
   <section class="checkout-container">
-    <!-- LEFT COLUMN: PAYMENT INFO -->
+    <!-- LEFT COLUMN: DELIVERY INFO (CONTRA ENTREGA) -->
     <div class="checkout-column">
-      <h2 class="checkout-title">Información de Pago</h2>
+      <h2 class="checkout-title">📍 Información de Envío</h2>
 
-      <div class="payment-method">
-        <div class="payment-label">Método de Pago</div>
-        <div class="payment-value">💳 Nequi</div>
-      </div>
-
-      <div class="payment-method">
-        <div class="payment-label">Número de Cuenta</div>
-        <div class="payment-value">3245535644</div>
-      </div>
-
-      <div class="payment-method">
-        <div class="payment-label">A Nombre De</div>
-        <div class="payment-value name">INGRITH TATIANA HENAO VALENCIA</div>
-      </div>
-
+      <!-- DELIVERY METHOD INFO -->
       <div class="payment-method" style="background-color: #e8f5e9; border: 2px solid #4caf50;">
-        <div class="payment-label" style="color: #2e7d32;">✅ Pasos para completar tu pago:</div>
-        <ol style="text-align: left; color: #2e7d32; margin-top: 1rem; padding-left: 1.5rem; font-size: 0.9rem; line-height: 1.6;">
-          <li>Realiza la transferencia a Nequi</li>
-          <li>Ingresa tu número de teléfono</li>
-          <li>Presiona "Enviar Comprobante por WhatsApp"</li>
-          <li>Envía tu comprobante al WhatsApp</li>
-        </ol>
+        <div class="payment-label" style="color: #2e7d32;">✅ Pago Contra Entrega</div>
+        <p style="color: #2e7d32; margin: 0.8rem 0 0 0; font-size: 0.9rem; line-height: 1.5;">
+          📍 <strong>Disponible en:</strong><br>
+          • Pereira<br>
+          • Dosquebradas<br><br>
+          💰 Pagarás cuando recibas tu pedido
+        </p>
       </div>
 
-      <div class="form-group">
-        <label for="phoneNumber">📱 Tu Número de Teléfono</label>
-        <input type="tel" id="phoneNumber" placeholder="Ej: 3001234567" maxlength="10" required>
-        <small style="color: #999; display: block; margin-top: 0.3rem; font-size: 0.8rem;">Usaremos este número para verificar tu comprobante en WhatsApp</small>
-      </div>
+      <!-- DELIVERY FORM -->
+      <form id="deliveryForm">
+        <!-- Nombre Completo -->
+        <div class="form-group">
+          <label for="fullName">👤 Nombre Completo</label>
+          <input type="text" id="fullName" placeholder="Ej: María García Pérez" required>
+          <small style="color: #999;">Mínimo 3 caracteres</small>
+        </div>
 
-      <button class="confirm-btn" id="whatsappBtn" style="background-color: #25d366; margin-top: 1rem;">
-        📤 Enviar Comprobante por WhatsApp
-      </button>
+        <!-- Teléfono Principal -->
+        <div class="form-group">
+          <label for="mainPhone">📱 Número de Teléfono</label>
+          <input type="tel" id="mainPhone" placeholder="Ej: 3001234567" maxlength="10" required>
+          <small style="color: #999;">10 dígitos sin espacios ni caracteres especiales</small>
+        </div>
 
-      <div class="success-message" id="successMessage">
-        ✅ ¡Perfecto! Se está abriendo WhatsApp para que envíes tu comprobante. <br><br>
-        <strong>Recuerda:</strong> Envía una foto clara de tu comprobante de transferencia.
-      </div>
+        <!-- Teléfono Secundario -->
+        <div class="form-group">
+          <label for="secondaryPhone">📱 Número Secundario (Opcional)</label>
+          <input type="tel" id="secondaryPhone" placeholder="Ej: 3109876543" maxlength="10">
+          <small style="color: #999;">Para contactarte en caso de ser necesario</small>
+        </div>
+
+        <!-- Dirección -->
+        <div class="form-group">
+          <label for="address">🏠 Dirección de Envío</label>
+          <textarea id="address" placeholder="Ej: Calle 10 #20-5, Apto 302, Pereira" required></textarea>
+          <small style="color: #999;">Incluye barrio, calle, número y apartamento si aplica</small>
+        </div>
+
+        <!-- Hora de Preferencia -->
+        <div class="form-group">
+          <label for="preferredTime">⏰ Hora de Preferencia para Entrega</label>
+          <select id="preferredTime" required>
+            <option value="">Selecciona una hora</option>
+            <option value="08:00-12:00">08:00 AM - 12:00 PM</option>
+            <option value="12:00-16:00">12:00 PM - 04:00 PM</option>
+            <option value="16:00-20:00">04:00 PM - 08:00 PM</option>
+            <option value="flexible">Flexible (cualquier hora)</option>
+          </select>
+          <small style="color: #999;">Haremos lo posible por respetar tu preferencia</small>
+        </div>
+
+        <!-- Notas Adicionales -->
+        <div class="form-group">
+          <label for="notes">📝 Notas Adicionales (Opcional)</label>
+          <textarea id="notes" placeholder="Ej: La casa tiene portero..." style="min-height: 80px;"></textarea>
+          <small style="color: #999;">Información importante para el repartidor</small>
+        </div>
+
+        <!-- Error Message -->
+        <div class="error-message" id="errorMessage"></div>
+
+        <!-- Complete Order Button -->
+        <button type="button" class="confirm-btn" id="completeOrderBtn" style="background-color: #25d366; margin-top: 1rem;">
+          ✅ Completar Pedido y Pagar por WhatsApp
+        </button>
+
+        <!-- Success Message -->
+        <div class="success-message" id="successMessage">
+          ✅ ¡Perfecto! Se está abriendo WhatsApp para completar tu compra. <br><br>
+          <strong>Gracias por elegir EmiLuxe 💕</strong>
+        </div>
+      </form>
     </div>
 
     <!-- RIGHT COLUMN: ORDER SUMMARY -->
@@ -89,11 +125,11 @@
       <div class="cart-summary">
         <div class="summary-row">
           <span>Subtotal:</span>
-          <span id="orderTotal">$0</span>
+          <span id="orderSubtotal">$0</span>
         </div>
         <div class="summary-row">
           <span>Envío:</span>
-          <span>Gratis</span>
+          <span id="shippingCost">Gratis</span>
         </div>
         <div class="summary-row total">
           <span>Total a Pagar:</span>
@@ -102,9 +138,16 @@
       </div>
 
       <div style="background-color: #fff3e0; padding: 1.5rem; border-radius: 10px; margin-top: 1.5rem;">
-        <p style="font-size: 0.85rem; color: #e65100; line-height: 1.4;">
+        <p style="font-size: 0.85rem; color: #e65100; line-height: 1.4; margin: 0;">
           <strong>⏱️ Tiempo de confirmación:</strong> <br>
           Normalmente confirmamos tu pedido en menos de 1 hora durante horario laboral.
+        </p>
+      </div>
+
+      <div style="background-color: #e8f5e9; padding: 1.5rem; border-radius: 10px; margin-top: 1rem;">
+        <p style="font-size: 0.85rem; color: #2e7d32; line-height: 1.4; margin: 0;">
+          <strong>💰 Pago Contra Entrega:</strong> <br>
+          Paga directamente al repartidor cuando recibas tu pedido. ¡Es seguro y fácil!
         </p>
       </div>
     </div>
@@ -125,7 +168,7 @@
     // Load order summary on page load
     document.addEventListener('DOMContentLoaded', () => {
       loadOrderSummary();
-      setupWhatsAppButton();
+      setupFormHandlers();
     });
 
     // Load order summary
@@ -155,7 +198,8 @@
       `).join('');
 
       const total = getCartTotal();
-      document.getElementById('orderTotal').textContent = formatPrice(total);
+      document.getElementById('orderSubtotal').textContent = formatPrice(total);
+      document.getElementById('shippingCost').textContent = total >= 80000 ? 'Gratis ✓' : 'Gratis ✓';
       document.getElementById('orderGrandTotal').textContent = formatPrice(total);
     }
 
@@ -164,35 +208,75 @@
       return Math.floor(Math.random() * 10000000000000).toString().padStart(13, '0');
     }
 
-    // Setup WhatsApp button
-    function setupWhatsAppButton() {
-      const btn = document.getElementById('whatsappBtn');
-      btn.addEventListener('click', sendToWhatsApp);
+    // Setup form handlers
+    function setupFormHandlers() {
+      const completeBtn = document.getElementById('completeOrderBtn');
+      completeBtn.addEventListener('click', handleCompleteOrder);
     }
 
-    // Enviar a WhatsApp (sin window.open, usando location.href)
-    async function sendToWhatsApp(e) {
+    // Validar formulario
+    function validateForm() {
+      const fullName = document.getElementById('fullName').value.trim();
+      const mainPhone = document.getElementById('mainPhone').value.trim();
+      const address = document.getElementById('address').value.trim();
+      const preferredTime = document.getElementById('preferredTime').value;
+      const errorMessage = document.getElementById('errorMessage');
+
+      errorMessage.textContent = '';
+      errorMessage.classList.remove('show');
+
+      // Validar nombre
+      if (fullName.length < 3) {
+        errorMessage.textContent = '❌ El nombre debe tener al menos 3 caracteres';
+        errorMessage.classList.add('show');
+        return false;
+      }
+
+      // Validar teléfono
+      if (mainPhone.length !== 10 || isNaN(mainPhone)) {
+        errorMessage.textContent = '❌ El teléfono debe tener 10 dígitos';
+        errorMessage.classList.add('show');
+        return false;
+      }
+
+      // Validar dirección
+      if (address.length < 10) {
+        errorMessage.textContent = '❌ La dirección debe tener al menos 10 caracteres';
+        errorMessage.classList.add('show');
+        return false;
+      }
+
+      // Validar hora
+      if (!preferredTime) {
+        errorMessage.textContent = '❌ Debes seleccionar una hora de preferencia';
+        errorMessage.classList.add('show');
+        return false;
+      }
+
+      return true;
+    }
+
+    // Completar orden
+    async function handleCompleteOrder(e) {
       e.preventDefault();
 
-      const phoneNumber = document.getElementById('phoneNumber').value.trim();
-      const successMessage = document.getElementById('successMessage');
-      
-      // Validar número telefónico
-      if (!phoneNumber) {
-        showNotification('Por favor ingresa tu número de teléfono', 'error');
+      if (!validateForm()) {
         return;
       }
 
-      if (phoneNumber.length < 10) {
-        showNotification('Por favor ingresa un número válido', 'error');
-        return;
-      }
+      const fullName = document.getElementById('fullName').value.trim();
+      const mainPhone = document.getElementById('mainPhone').value.trim();
+      const secondaryPhone = document.getElementById('secondaryPhone').value.trim();
+      const address = document.getElementById('address').value.trim();
+      const preferredTime = document.getElementById('preferredTime').value;
+      const notes = document.getElementById('notes').value.trim();
+      const successMessage = document.getElementById('successMessage');
 
       const cart = getCart();
       const total = getCartTotal();
 
       try {
-        // Construir mensaje con ID de orden
+        // Construir mensaje con información de envío
         let cartItems = cart.map(item => 
           `• ${item.name} (x${item.quantity}): ${formatPrice(item.price * item.quantity)}`
         ).join('\n');
@@ -201,23 +285,28 @@
 
 *ID de Orden: #${currentOrderId}*
 
-*Detalles del Pedido:*
+👤 *INFORMACIÓN PERSONAL:*
+Nombre: ${fullName}
+Teléfono: ${mainPhone}
+${secondaryPhone ? `Teléfono Secundario: ${secondaryPhone}\n` : ''}
+
+📦 *DETALLES DEL PEDIDO:*
 ${cartItems}
 
-*Total: ${formatPrice(total)}*
+📍 *DIRECCIÓN DE ENVÍO:*
+${address}
 
-📋 *Instrucciones de pago:*
-Realiza una transferencia a:
-📱 Nequi: 3245535644
-👤 A nombre de: INGRITH TATIANA HENAO VALENCIA
+⏰ *HORA DE PREFERENCIA:*
+${preferredTime}
 
-💰 *Monto: ${formatPrice(total)}*
+${notes ? `📝 *NOTAS ADICIONALES:*\n${notes}\n\n` : ''}*TOTAL A PAGAR: ${formatPrice(total)}*
 
-📸 Por favor envía una foto clara de tu comprobante de transferencia.
+💰 *MÉTODO DE PAGO: Contra Entrega*
+Pagarás directamente al repartidor cuando recibas tu pedido.
 
 Gracias por tu compra ❤️`;
 
-        // Número WhatsApp (con código de país)
+        // Número WhatsApp
         const whatsappNumber = '573117965474'; // Colombia +57
 
         // Crear URL de WhatsApp
@@ -226,12 +315,11 @@ Gracias por tu compra ❤️`;
         // Mostrar mensaje de éxito
         successMessage.classList.add('show');
 
-        // Guardar la orden en Firebase PRIMERO
-        await saveOrderToFirebase(phoneNumber, total, cart, currentOrderId);
+        // Guardar la orden en Firebase
+        await saveOrderToFirebase(fullName, mainPhone, secondaryPhone, address, preferredTime, notes, total, cart, currentOrderId);
 
-        // Esperar un poco y luego abrir WhatsApp usando location.href (más confiable en celular)
+        // Esperar un poco y luego abrir WhatsApp
         setTimeout(() => {
-          // Usar location.href en lugar de window.open para celular
           window.location.href = whatsappURL;
 
           // Redirigir después de 3 segundos
@@ -243,17 +331,24 @@ Gracias por tu compra ❤️`;
 
       } catch (error) {
         console.error('Error:', error);
-        showNotification('Error al procesar la orden', 'error');
+        const errorMessage = document.getElementById('errorMessage');
+        errorMessage.textContent = '❌ Error al procesar la orden. Intenta nuevamente.';
+        errorMessage.classList.add('show');
       }
     }
 
     // Guardar orden en Firebase
-    async function saveOrderToFirebase(phoneNumber, total, cart, orderId) {
+    async function saveOrderToFirebase(fullName, mainPhone, secondaryPhone, address, preferredTime, notes, total, cart, orderId) {
       try {
         const order = {
           orderId: orderId,
           date: new Date().toLocaleString('es-CO'),
-          phoneNumber: phoneNumber,
+          phoneNumber: mainPhone,
+          secondaryPhone: secondaryPhone,
+          customerName: fullName,
+          deliveryAddress: address,
+          preferredTime: preferredTime,
+          notes: notes,
           total: total,
           items: cart,
           status: 'Pendiente de Confirmación'
