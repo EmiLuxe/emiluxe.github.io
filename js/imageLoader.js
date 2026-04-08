@@ -5,7 +5,7 @@ const GITHUB_API = 'https://api.github.com/repos/EmiLuxe/emiluxe.github.io/conte
 
 /**
  * Obtener lista de imágenes de una carpeta en GitHub
- * @param {string} category - Categoría (pijamas, lenceria, casual)
+ * @param {string} category - Categoría (pijamas, lenceria, casual, perfumeria)
  * @returns {Promise<Array>} Array de nombres de archivos
  */
 export async function getImagesFromCategory(category) {
@@ -39,11 +39,11 @@ export async function getImagesFromCategory(category) {
 
 /**
  * Cargar imágenes para todas las categorías
- * @returns {Promise<Object>} Objeto con im��genes por categoría
+ * @returns {Promise<Object>} Objeto con imágenes por categoría
  */
 export async function getAllCategoryImages() {
   try {
-    const categories = ['pijamas', 'lenceria', 'casual'];
+    const categories = ['pijamas', 'lenceria', 'casual', 'perfumeria'];
     const imagesByCategory = {};
 
     for (const category of categories) {
