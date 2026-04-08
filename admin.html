@@ -8,8 +8,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
-  <!-- Para generar PDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
   <!-- NAVBAR -->
@@ -118,7 +116,7 @@
 
               <!-- EDIT MODE -->
               <div class="admin-form-section hidden" id="editSection">
-                <div class="admin-form-section-title">✏�� Editar Producto</div>
+                <div class="admin-form-section-title">✏️ Editar Producto</div>
 
                 <div class="form-group">
                   <label for="editProductId">🔍 Buscar por ID</label>
@@ -207,7 +205,7 @@
       </div>
 
       <!-- ORDERS PANEL -->
-      <div id="ordersPanel" class="admin-panel hidden">
+      <div id="ordersPanel" class="admin-panel" style="display: none;">
         <div class="admin-products">
           <div class="admin-products-title">📋 Órdenes Recibidas</div>
 
@@ -267,8 +265,8 @@
   <script src="js/main.js"></script>
   <script type="module">
     import { getAllProducts, addProduct, updateProduct, deleteProduct } from './js/products.js';
-    import { getOrders, updateOrderStatus } from './js/firebaseDB.js';
-    import { generateCertificateHTML, downloadCertificateAsPDF, printCertificate } from './js/certificate.js';
+    import { getAllOrders, updateOrderStatus } from './js/firebaseDB.js';
+    import { generateCertificateHTML, downloadCertificateAsHTML } from './js/certificate.js';
 
     let currentMode = 'add';
     let editingProductId = null;
@@ -363,7 +361,15 @@
     // Load orders
     window.loadOrders = async function() {
       try {
-        const orders = JSON.parse(localStorage.getItem('emiluxe_orders')) || [];
+        // Intentar cargar de Firebase primero
+        let orders = [];
+        try {
+          orders = await getAllOrders();
+        } catch (error) {
+          console.warn('No se pudo cargar de Firebase, usando localStorage:', error);
+          orders = JSON.parse(localStorage.getItem('emiluxe_orders')) || [];
+        }
+
         const ordersTableBody = document.getElementById('ordersTableBody');
 
         // Update stats
@@ -604,9 +610,10 @@
           status: 'Pendiente de Confirmación'
         };
 
-        downloadCertificateAsPDF(order);
+        // Descargar como HTML (sin dependencias externas)
+        downloadCertificateAsHTML(order);
       } catch (error) {
-        console.error('Error generando PDF:', error);
+        console.error('Error generando certificado:', error);
         showNotification('❌ Error al generar el comprobante', 'error');
       }
     }
