@@ -1,0 +1,27 @@
+/* ========================================
+   EMILUXE - LAYOUTS: FOOTER
+   ======================================== */
+
+footer {
+  background-color: var(--white);
+  text-align: center;
+  padding: 1.2rem 1rem;
+  color: #999;
+  font-size: 0.8rem;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+  margin-top: 2rem;
+}
+
+/* Media queries para tablet */
+@media (min-width: 768px) {
+  footer {
+    padding: 1.5rem 2rem;
+  }
+}
+
+/* Media queries para desktop */
+@media (min-width: 1024px) {
+  footer {
+    padding: 1.5rem 2rem;
+  }
+}

@@ -1,0 +1,54 @@
+ ========================================
+   EMILUXE - COMPONENTS FILTERS
+   ======================================== 
+
+.filter-controls {
+  display flex;
+  gap 0.6rem;
+  margin-bottom 1.5rem;
+  flex-wrap wrap;
+  justify-content center;
+  position relative;
+  z-index 5;
+}
+
+.filter-btn {
+  padding 0.6rem 1rem;
+  border 2px solid var(--primary-pink);
+  background-color var(--white);
+  color var(--dark-gray);
+  border-radius 20px;
+  cursor pointer;
+  transition var(--transition);
+  font-weight 500;
+  font-size 0.85rem;
+}
+
+.filter-btnhover {
+  transform translateY(-2px);
+}
+
+.filter-btnactive,
+.filter-btn.active {
+  background-color var(--primary-pink);
+  color var(--white);
+}
+
+ Media queries para tablet 
+@media (min-width 768px) {
+  .filter-controls {
+    justify-content center;
+  }
+
+  .filter-btn {
+    padding 0.7rem 1.2rem;
+    font-size 0.9rem;
+  }
+}
+
+ Media queries para desktop 
+@media (min-width 1024px) {
+  .filter-controls {
+    justify-content center;
+  }
+}

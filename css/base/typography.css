@@ -1,0 +1,51 @@
+/* ========================================
+   EMILUXE - BASE: TIPOGRAFÍA
+   ======================================== */
+
+/* Variables de colores ya importadas de reset.css */
+
+/* Estilos base de tipografía */
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-weight: 700;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+}
+
+input, select, textarea {
+  font-family: inherit;
+}
+
+/* Estilos de enlace general */
+a:hover {
+  transition: var(--transition);
+}
+
+/* Estilos para listas */
+ul, ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Estilos para tablas */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  padding: 0;
+  text-align: left;
+}

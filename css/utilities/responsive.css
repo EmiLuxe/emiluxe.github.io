@@ -1,0 +1,306 @@
+/* ========================================
+   EMILUXE - UTILITIES: RESPONSIVE DESIGN
+   ======================================== */
+
+/* ========================================
+   MEDIA QUERIES - TABLET (768px+)
+   ======================================== */
+
+@media (min-width: 768px) {
+  /* Navbar */
+  nav {
+    padding: 1rem 2rem;
+  }
+
+  .navbar-logo {
+    font-size: 1.4rem;
+  }
+
+  .navbar-menu {
+    display: flex;
+    gap: 2rem;
+  }
+
+  .navbar-menu a {
+    color: var(--dark-gray);
+    text-decoration: none;
+    transition: var(--transition);
+  }
+
+  .navbar-menu a:hover {
+    color: var(--dark-pink);
+  }
+
+  /* Hero */
+  .hero {
+    padding: 5rem 2rem;
+    min-height: 400px;
+  }
+
+  .hero h1 {
+    font-size: 2.8rem;
+  }
+
+  .hero p {
+    font-size: 1.1rem;
+  }
+
+  /* Categories */
+  .categories {
+    padding: 3rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .categories h2 {
+    font-size: 2rem;
+  }
+
+  .category-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+
+  .category-card {
+    flex-direction: column;
+  }
+
+  .category-image {
+    width: 100%;
+    height: 150px;
+  }
+
+  .category-card > div:not(.category-image) {
+    padding: 1.2rem;
+  }
+
+  /* Promo Banner */
+  .promo-banner {
+    margin: 2rem auto;
+    max-width: 800px;
+  }
+
+  /* Bestsellers */
+  .bestsellers-section {
+    padding: 3rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .bestsellers-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  /* Products */
+  .products-section {
+    padding: 3rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .products-section h1 {
+    font-size: 2rem;
+  }
+
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  .product-card {
+    flex-direction: column;
+  }
+
+  .product-image {
+    width: 100%;
+    height: 200px;
+  }
+
+  /* Cart */
+  .cart-container {
+    max-width: 900px;
+    margin: 2rem auto;
+  }
+
+  /* Checkout */
+  .checkout-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  /* Admin */
+  .admin-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+  }
+
+  .admin-layout {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .admin-form {
+    grid-column: 1 / -1;
+  }
+
+  .admin-products {
+    grid-column: 1 / -1;
+  }
+
+  .admin-mode-buttons {
+    justify-content: flex-start;
+  }
+
+  .admin-mode-btn {
+    flex: 0 1 150px;
+  }
+
+  .admin-image-inputs {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .orders-stats {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .orders-table {
+    font-size: 0.8rem;
+  }
+
+  .admin-product-item {
+    grid-template-columns: 70px 1fr 100px;
+  }
+
+  .btn-edit,
+  .btn-delete {
+    font-size: 0.75rem;
+    padding: 0.6rem 0.7rem;
+  }
+
+  .admin-form .form-group select {
+    font-size: 0.9rem;
+    min-height: 40px;
+  }
+
+  /* Login */
+  .login-container {
+    max-width: 600px;
+    margin: 3rem auto;
+    padding: 2rem;
+  }
+
+  .login-title {
+    font-size: 1.6rem;
+    margin-bottom: 2rem;
+  }
+
+  #loginForm {
+    gap: 1.2rem;
+  }
+
+  /* Forms */
+  .form-fields-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+  }
+
+  .admin-form-section {
+    grid-column: 1 / -1;
+  }
+
+  .admin-image-section {
+    grid-column: 1 / -1;
+  }
+
+  .admin-buttons {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ========================================
+   MEDIA QUERIES - DESKTOP (1024px+)
+   ======================================== */
+
+@media (min-width: 1024px) {
+  /* Admin */
+  .admin-container {
+    max-width: 1400px;
+    margin: 2rem auto;
+  }
+
+  .admin-layout {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .admin-form {
+    max-width: 100%;
+  }
+
+  .admin-products {
+    max-width: 100%;
+  }
+
+  /* Categories */
+  .category-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* Bestsellers */
+  .bestsellers-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.8rem;
+  }
+
+  /* Products */
+  .products-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* Admin Products */
+  .admin-product-item {
+    grid-template-columns: 80px 1fr 120px;
+  }
+
+  .btn-edit,
+  .btn-delete {
+    font-size: 0.8rem;
+    padding: 0.7rem 0.8rem;
+  }
+
+  .admin-image-inputs {
+    grid-template-columns: 2fr 1fr;
+  }
+
+  .orders-table {
+    font-size: 0.85rem;
+  }
+
+  .orders-table th,
+  .orders-table td {
+    padding: 0.8rem 0.6rem;
+  }
+
+  .admin-form .form-group select {
+    font-size: 1rem;
+    min-height: 40px;
+  }
+
+  /* Checkout */
+  .checkout-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  /* WhatsApp Button */
+  .whatsapp-button {
+    bottom: 2.5rem;
+    right: 2rem;
+  }
+}

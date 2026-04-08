@@ -1,0 +1,36 @@
+/* ========================================
+   EMILUXE - BASE: RESET & VARIABLES
+   ======================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --primary-pink: #f8a5c2;
+  --dark-pink: #ff7fa0;
+  --light-pink: #ffe6f0;
+  --cream: #fff5f8;
+  --white: #ffffff;
+  --beige: #f5f0ed;
+  --dark-gray: #2c2c2c;
+  --light-gray: #e8e8e8;
+  --gold: #fcd5ce;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --transition: all 0.3s ease;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--beige);
+  color: var(--dark-gray);
+  line-height: 1.6;
+  font-size: 16px;
+}

@@ -1,0 +1,161 @@
+/* ========================================
+   EMILUXE - PAGES: PRODUCTS (SHOP)
+   ======================================== */
+
+.products-section {
+  padding: 2rem 1rem;
+  max-width: 100%;
+}
+
+.products-section h1 {
+  text-align: center;
+  font-size: 1.6rem;
+  color: var(--dark-pink);
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.product-card {
+  background-color: var(--white);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  display: flex;
+  gap: 1rem;
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.product-card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+
+.product-card:active {
+  transform: scale(0.98);
+}
+
+.product-image {
+  width: 90px;
+  height: 90px;
+  min-width: 90px;
+  object-fit: contain;
+  background-color: var(--cream);
+  padding: 0.5rem;
+}
+
+.product-info {
+  padding: 0.9rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.product-category {
+  font-size: 0.7rem;
+  color: var(--dark-pink);
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+}
+
+.product-name {
+  font-size: 0.95rem;
+  color: var(--dark-gray);
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+  line-height: 1.2;
+}
+
+.product-description {
+  font-size: 0.8rem;
+  color: #999;
+  margin-bottom: 0.6rem;
+  line-height: 1.2;
+}
+
+.product-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.product-price {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--dark-pink);
+}
+
+.add-to-cart-btn {
+  background-color: var(--primary-pink);
+  color: var(--white);
+  border: none;
+  padding: 0.5rem 0.8rem;
+  border-radius: 18px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.8rem;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.add-to-cart-btn:hover {
+  background-color: var(--dark-pink);
+}
+
+.add-to-cart-btn:active {
+  background-color: var(--dark-pink);
+  transform: scale(0.95);
+}
+
+#loadingSpinner {
+  text-align: center;
+  padding: 2rem;
+  display: none;
+}
+
+#loadingSpinner p {
+  color: #999;
+}
+
+/* Media queries para tablet */
+@media (min-width: 768px) {
+  .products-section {
+    padding: 3rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .products-section h1 {
+    font-size: 2rem;
+  }
+
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  .product-card {
+    flex-direction: column;
+  }
+
+  .product-image {
+    width: 100%;
+    height: 200px;
+  }
+}
+
+/* Media queries para desktop */
+@media (min-width: 1024px) {
+  .products-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

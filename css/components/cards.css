@@ -1,0 +1,266 @@
+/* ========================================
+   EMILUXE - COMPONENTS: CARDS
+   ======================================== */
+
+.category-card {
+  background-color: var(--white);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  gap: 1rem;
+  transition: var(--transition);
+}
+
+.category-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+
+.category-card:active {
+  transform: scale(0.98);
+}
+
+.category-image {
+  width: 100px;
+  height: 100px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.category-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background-color: var(--cream);
+  padding: 0.5rem;
+}
+
+.product-card {
+  background-color: var(--white);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  display: flex;
+  gap: 1rem;
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.product-card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+
+.product-card:active {
+  transform: scale(0.98);
+}
+
+.product-image {
+  width: 90px;
+  height: 90px;
+  min-width: 90px;
+  object-fit: contain;
+  background-color: var(--cream);
+  padding: 0.5rem;
+}
+
+.product-info {
+  padding: 0.9rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.product-category {
+  font-size: 0.7rem;
+  color: var(--dark-pink);
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+}
+
+.product-name {
+  font-size: 0.95rem;
+  color: var(--dark-gray);
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+  line-height: 1.2;
+}
+
+.product-description {
+  font-size: 0.8rem;
+  color: #999;
+  margin-bottom: 0.6rem;
+  line-height: 1.2;
+}
+
+.product-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.product-price {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--dark-pink);
+}
+
+.bestseller-card {
+  background-color: var(--white);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: var(--transition);
+  position: relative;
+}
+
+.bestseller-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-hover);
+}
+
+.bestseller-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  background-color: var(--cream);
+}
+
+.bestseller-info {
+  padding: 1.2rem;
+  text-align: center;
+}
+
+.bestseller-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--dark-gray);
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.bestseller-price {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--dark-pink);
+  margin-bottom: 0.8rem;
+}
+
+.cart-item {
+  background-color: var(--white);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 12px;
+  display: flex;
+  gap: 1rem;
+  box-shadow: var(--shadow);
+}
+
+.cart-item-image {
+  width: 80px;
+  height: 80px;
+  min-width: 80px;
+  object-fit: contain;
+  background-color: var(--cream);
+  border-radius: 8px;
+  padding: 0.3rem;
+}
+
+.cart-item-details {
+  flex: 1;
+}
+
+.cart-item-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--dark-gray);
+  margin-bottom: 0.3rem;
+}
+
+.cart-item-price {
+  color: var(--dark-pink);
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+  font-size: 0.9rem;
+}
+
+.admin-product-item {
+  background-color: var(--beige);
+  padding: 1rem;
+  border-radius: 10px;
+  display: grid;
+  grid-template-columns: 60px 1fr 80px;
+  gap: 0.8rem;
+  align-items: center;
+  transition: var(--transition);
+  border-left: 4px solid transparent;
+}
+
+.admin-product-item:hover {
+  background-color: #f0ebe8;
+  border-left-color: var(--primary-pink);
+}
+
+.admin-product-item img {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  object-fit: contain;
+  background: white;
+  padding: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.admin-product-info {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.admin-product-name {
+  font-weight: 700;
+  color: var(--dark-gray);
+  font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-product-price {
+  color: var(--dark-pink);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.admin-product-actions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+/* Media queries para tablet */
+@media (min-width: 768px) {
+  .product-card {
+    flex-direction: column;
+  }
+
+  .product-image {
+    width: 100%;
+    height: 200px;
+  }
+
+  .admin-product-item {
+    grid-template-columns: 70px 1fr 100px;
+  }
+}
+
+/* Media queries para desktop */
+@media (min-width: 1024px) {
+  .admin-product-item {
+    grid-template-columns: 80px 1fr 120px;
+  }
+}

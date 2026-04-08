@@ -1,0 +1,45 @@
+/* ========================================
+   EMILUXE - PAGES: HOME
+   ======================================== */
+
+.products-section {
+  padding: 2rem 1rem;
+  max-width: 100%;
+}
+
+.products-section h1 {
+  text-align: center;
+  font-size: 1.6rem;
+  color: var(--dark-pink);
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+}
+
+.no-products {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #999;
+}
+
+/* Media queries para tablet */
+@media (min-width: 768px) {
+  .products-section {
+    padding: 3rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .products-section h1 {
+    font-size: 2rem;
+  }
+}
+
+/* Media queries para desktop */
+@media (min-width: 1024px) {
+  .products-section {
+    padding: 3rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+}

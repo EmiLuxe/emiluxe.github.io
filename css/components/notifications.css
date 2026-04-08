@@ -1,0 +1,117 @@
+/* ========================================
+   EMILUXE - COMPONENTS: NOTIFICATIONS
+   ======================================== */
+
+.whatsapp-button {
+  position: fixed;
+  bottom: 2rem;
+  right: 1rem;
+  width: 56px;
+  height: 56px;
+  background-color: #25d366;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(37, 211, 102, 0.4);
+  z-index: 999;
+  transition: var(--transition);
+  animation: pulse 3s ease-in-out infinite;
+}
+
+.whatsapp-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 24px rgba(37, 211, 102, 0.6);
+}
+
+.whatsapp-button:active {
+  transform: scale(0.95);
+}
+
+.whatsapp-icon {
+  font-size: 1.8rem;
+  color: var(--white);
+}
+
+.whatsapp-tooltip {
+  position: absolute;
+  bottom: 70px;
+  right: 0;
+  background-color: var(--dark-gray);
+  color: var(--white);
+  padding: 0.8rem 1.2rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.whatsapp-button:hover .whatsapp-tooltip {
+  opacity: 1;
+}
+
+.whatsapp-tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  right: 12px;
+  width: 10px;
+  height: 10px;
+  background-color: var(--dark-gray);
+  border-radius: 2px;
+  transform: rotate(45deg);
+}
+
+.error-message {
+  display: none;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.error-message.show {
+  display: block;
+}
+
+.success-message {
+  display: none;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+  padding: 1rem;
+  border-radius: 10px;
+  margin: 1rem 0;
+  text-align: center;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.success-message.show {
+  display: block;
+}
+
+/* Media queries para tablet */
+@media (min-width: 768px) {
+  .whatsapp-button {
+    bottom: 2.5rem;
+    right: 2rem;
+  }
+}
+
+/* Media queries para desktop */
+@media (min-width: 1024px) {
+  .whatsapp-button {
+    bottom: 2.5rem;
+    right: 2rem;
+  }
+}

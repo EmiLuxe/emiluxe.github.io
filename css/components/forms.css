@@ -1,0 +1,243 @@
+/* ========================================
+   EMILUXE - COMPONENTS: FORMS
+   ======================================== */
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+  color: var(--dark-gray);
+  font-size: 0.85rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.65rem;
+  border: 1px solid var(--light-gray);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: var(--transition);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary-pink);
+  box-shadow: 0 0 0 3px rgba(248, 165, 194, 0.1);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.form-group small {
+  color: #999;
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.8rem;
+}
+
+.quantity-control {
+  display: flex;
+  gap: 0.3rem;
+  align-items: center;
+  margin-bottom: 0.8rem;
+}
+
+.quantity-control button {
+  background-color: var(--cream);
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: var(--transition);
+}
+
+.quantity-control button:hover {
+  background-color: var(--primary-pink);
+  color: var(--white);
+}
+
+.quantity-control input {
+  width: 45px;
+  text-align: center;
+  border: 1px solid var(--light-gray);
+  border-radius: 5px;
+  padding: 0.3rem;
+  font-size: 0.9rem;
+}
+
+/* Admin form styles */
+.admin-form-mode-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--dark-gray);
+  display: block;
+  margin-bottom: 0.8rem;
+}
+
+.admin-mode-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.admin-mode-btn {
+  flex: 1;
+  padding: 0.7rem 1rem;
+  border: 2px solid var(--primary-pink);
+  background-color: var(--white);
+  color: var(--dark-gray);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: var(--transition);
+}
+
+.admin-mode-btn.active {
+  background-color: var(--primary-pink);
+  color: var(--white);
+}
+
+.admin-form-section {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: var(--beige);
+  border-radius: 10px;
+  border-left: 4px solid var(--primary-pink);
+  overflow: visible;
+  position: relative;
+  z-index: 8;
+}
+
+.admin-form-section.hidden {
+  display: none;
+}
+
+.admin-form-section-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--dark-gray);
+  margin-bottom: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-form-section-title::before {
+  content: '📋';
+  font-size: 1rem;
+}
+
+.form-fields-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  overflow: visible;
+  position: relative;
+}
+
+.admin-form .form-group {
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 10;
+  overflow: visible;
+}
+
+.admin-form .form-group label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--dark-gray);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.admin-form .form-group input,
+.admin-form .form-group select,
+.admin-form .form-group textarea {
+  font-size: 0.9rem;
+  padding: 0.8rem 0.7rem;
+  border: 1px solid var(--light-gray);
+  border-radius: 8px;
+  font-family: inherit;
+  position: relative;
+  z-index: 10;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: var(--white);
+}
+
+.admin-form .form-group select {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.7rem center;
+  background-size: 1.2em;
+  padding-right: 2.5rem;
+  min-height: 44px;
+  font-size: 16px;
+}
+
+.admin-form .form-group input:focus,
+.admin-form .form-group select:focus,
+.admin-form .form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary-pink);
+  box-shadow: 0 0 0 3px rgba(248, 165, 194, 0.1);
+}
+
+.admin-form .form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Media queries para tablet */
+@media (min-width: 768px) {
+  .admin-mode-buttons {
+    justify-content: flex-start;
+  }
+
+  .admin-mode-btn {
+    flex: 0 1 150px;
+  }
+
+  .form-fields-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+  }
+
+  .admin-form-section {
+    grid-column: 1 / -1;
+  }
+
+  .admin-form .form-group select {
+    font-size: 0.9rem;
+    min-height: 40px;
+  }
+}
+
+/* Media queries para desktop */
+@media (min-width: 1024px) {
+  .admin-form .form-group select {
+    font-size: 1rem;
+    min-height: 40px;
+  }
+}
