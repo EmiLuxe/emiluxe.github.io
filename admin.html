@@ -271,15 +271,22 @@
     let currentMode = 'add';
     let editingProductId = null;
     let deletingProductId = null;
+    let isInitialized = false;
 
     // Check admin authentication
     document.addEventListener('DOMContentLoaded', async () => {
+      // Evitar ejecución múltiple
+      if (isInitialized) return;
+      isInitialized = true;
+
       const adminUser = localStorage.getItem('adminUser');
       if (!adminUser) {
+        console.log('No admin user found, redirecting to login');
         window.location.href = 'login.html';
         return;
       }
 
+      console.log('Admin authenticated, loading data...');
       await loadProducts();
       await loadOrders();
     });
@@ -610,7 +617,6 @@
           status: 'Pendiente de Confirmación'
         };
 
-        // Descargar como HTML (sin dependencias externas)
         downloadCertificateAsHTML(order);
       } catch (error) {
         console.error('Error generando certificado:', error);
