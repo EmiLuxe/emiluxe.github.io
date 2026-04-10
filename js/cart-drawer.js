@@ -8,8 +8,7 @@ import { getAllProducts } from './products.js';
 
 let drawerState = {
   isOpen: false,
-  cartItems: [],
-  isAnimating: false
+  cartItems: []
 };
 
 export function initCartDrawer() {
@@ -64,7 +63,7 @@ function setupDrawerEventListeners() {
     const overlay = document.getElementById('cartDrawerOverlay');
 
     if (drawer && overlay && !drawer.contains(e.target) && !overlay.contains(e.target)) {
-      if (drawerState.isOpen && !drawerState.isAnimating) {
+      if (drawerState.isOpen) {
         closeCartDrawer();
       }
     }
@@ -79,54 +78,42 @@ function setupDrawerEventListeners() {
 
 export function openCartDrawer() {
   console.log('📂 Intentando abrir drawer...');
-  
-  if (drawerState.isOpen && !drawerState.isAnimating) {
+
+  if (drawerState.isOpen) {
     console.log('ℹ️ Drawer ya está abierto');
     return;
   }
 
-  if (drawerState.isAnimating) {
-    console.warn('⏳ Drawer está animando, esperando...');
-    return;
-  }
-
-  drawerState.isAnimating = true;
   drawerState.isOpen = true;
 
   const drawer = document.getElementById('cartDrawer');
   const overlay = document.getElementById('cartDrawerOverlay');
 
   if (drawer && overlay) {
-    console.log('✓ Aplicando estilos...');
-    
-    drawer.style.right = '0';
+    // ✅ FORZAR ESTILOS INLINE DIRECTOS
+    drawer.style.right = '0px';
+    drawer.style.display = 'flex';
     drawer.style.zIndex = '1000';
-    drawer.classList.add('open');
     
     overlay.style.display = 'block';
     overlay.style.zIndex = '999';
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
     overlay.style.opacity = '1';
+    overlay.style.pointerEvents = 'auto';
+    
+    drawer.classList.add('open');
     overlay.classList.add('visible');
     
-    console.log('✓ Drawer style.right:', drawer.style.right);
-    console.log('✓ Drawer class:', drawer.className);
     console.log('✓ Drawer abierto');
-
-    setTimeout(() => {
-      drawerState.isAnimating = false;
-      console.log('✓ Animación completada');
-    }, 300);
   } else {
     console.error('❌ Drawer o overlay no encontrados');
-    drawerState.isAnimating = false;
     drawerState.isOpen = false;
   }
 }
 
 export function closeCartDrawer() {
-  if (drawerState.isAnimating || !drawerState.isOpen) return;
+  if (!drawerState.isOpen) return;
 
-  drawerState.isAnimating = true;
   drawerState.isOpen = false;
 
   const drawer = document.getElementById('cartDrawer');
@@ -135,14 +122,13 @@ export function closeCartDrawer() {
   if (drawer && overlay) {
     drawer.style.right = '-450px';
     overlay.style.display = 'none';
+    overlay.style.opacity = '0';
+    overlay.style.pointerEvents = 'none';
+    
     drawer.classList.remove('open');
     overlay.classList.remove('visible');
-
-    setTimeout(() => {
-      drawerState.isAnimating = false;
-    }, 300);
-  } else {
-    drawerState.isAnimating = false;
+    
+    console.log('✓ Drawer cerrado');
   }
 }
 
