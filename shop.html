@@ -51,10 +51,10 @@
 
     <!-- FILTER CONTROLS (MEJORADO) ✨ ACTUALIZADO ✨ -->
     <div class="filter-controls">
-      <button class="filter-btn active" onclick="filterProducts('pijamas')">Pijamas</button>
-      <button class="filter-btn" onclick="filterProducts('lenceria')">Lencería</button>
-      <button class="filter-btn" onclick="filterProducts('casual')">Ropa casual</button>
-      <button class="filter-btn" onclick="filterProducts('perfumeria')">Perfumería</button>
+      <button class="filter-btn active" onclick="window.filterProducts('pijamas')">Pijamas</button>
+      <button class="filter-btn" onclick="window.filterProducts('lenceria')">Lencería</button>
+      <button class="filter-btn" onclick="window.filterProducts('casual')">Ropa casual</button>
+      <button class="filter-btn" onclick="window.filterProducts('perfumeria')">Perfumería</button>
     </div>
 
     <!-- LOADING INDICATOR -->
@@ -141,10 +141,15 @@
         const allProducts = await getAllProducts();
         allProductsData = allProducts;
 
+        console.log('🔥 Productos cargados:', allProducts.length);
+        console.log('📊 Filtrando por categoría:', currentFilter);
+
         // Filtrar por categoría actual
         productsToDisplay = allProducts.filter(p => 
           p.category.toLowerCase() === currentFilter.toLowerCase()
         );
+
+        console.log('✓ Productos filtrados:', productsToDisplay.length);
 
         loadingSpinner.style.display = 'none';
 
@@ -179,7 +184,7 @@
                 ${stockText}
                 <div class="product-footer">
                   <span class="product-price">${formatPrice(product.price)}</span>
-                  <button class="add-to-cart-btn" onclick="addProductToCart('${product.id}')">
+                  <button class="add-to-cart-btn" onclick="window.addProductToCart('${product.id}')">
                     Agregar
                   </button>
                   <button class="quick-buy-btn-small" onclick="window.quickBuyClick('${product.id}')" title="Compra rápida">
@@ -197,7 +202,7 @@
       }
     }
 
-    // Filter products
+    // Filter products ✨ MODIFICADO - Ahora es global ✨
     window.filterProducts = async function(category) {
       currentFilter = category;
       updateActiveFilter();
@@ -268,17 +273,23 @@
       document.getElementById('searchResults').classList.remove('show');
     }
 
-    window.selectSearchResult = function(productId) {
+    // ✨ MODIFICADO - Ahora abre modal de talla ✨
+    window.selectSearchResult = async function(productId) {
       const product = allProductsData.find(p => p.id === productId);
       if (product) {
-        const { openSizeModal } = await import('./js/size-selector-modal.js');
-        openSizeModal(product);
-        addToRecentSearches(product.name);
-        clearSearch();
+        try {
+          const { openSizeModal } = await import('./js/size-selector-modal.js');
+          openSizeModal(product);
+          addToRecentSearches(product.name);
+          window.clearSearch();
+        } catch (error) {
+          console.error('Error abriendo modal de talla:', error);
+          showNotification('Error al abrir el producto', 'error');
+        }
       }
     }
 
-    // Add product to cart ✨ MODIFICADO ✨
+    // Add product to cart ✨ MODIFICADO - Ahora abre modal de talla ✨
     window.addProductToCart = async function(productId) {
       try {
         const product = allProductsData.find(p => p.id === productId);
@@ -316,7 +327,7 @@
 
     // Abrir WhatsApp
     window.openWhatsApp = function() {
-      const phoneNumber = '573117965474'; //
+      const phoneNumber = '573117965474';
       const message = encodeURIComponent('Hola EmiLuxe, tengo una consulta 💕');
       window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
     }
