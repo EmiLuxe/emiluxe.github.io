@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/cart-drawer.css">
 </head>
 <body>
   <!-- NAVBAR -->
@@ -33,23 +34,7 @@
   <section class="products-section">
     <h1>Nuestra Tienda</h1>
 
-    <!-- BÚSQUEDA EN TIEMPO REAL ✨ NUEVA ✨ -->
-    <div class="search-container">
-      <div class="search-wrapper">
-        <span class="search-icon">��</span>
-        <input 
-          type="text" 
-          id="searchInput" 
-          class="search-input" 
-          placeholder="Busca por nombre..." 
-          onkeyup="window.handleSearch(event)"
-        >
-        <button class="search-clear-btn" onclick="window.clearSearch()">✕</button>
-        <div class="search-results" id="searchResults"></div>
-      </div>
-    </div>
-
-    <!-- FILTER CONTROLS (MEJORADO) ✨ ACTUALIZADO ✨ -->
+    <!-- FILTER CONTROLS -->
     <div class="filter-controls">
       <button class="filter-btn active" onclick="window.filterProducts('pijamas')">Pijamas</button>
       <button class="filter-btn" onclick="window.filterProducts('lenceria')">Lencería</button>
@@ -68,7 +53,7 @@
     </div>
   </section>
 
-  <!-- CARRITO DRAWER (MODAL LATERAL) ✨ NUEVO ✨ -->
+  <!-- CARRITO DRAWER (MODAL LATERAL) -->
   <div id="cartDrawerOverlay"></div>
   <div id="cartDrawer">
     <div class="cart-drawer-header">
@@ -93,10 +78,6 @@
     </div>
   </div>
 
-  <!-- QUICK BUY MODAL ✨ NUEVO ✨ -->
-  <div id="quickBuyModal"></div>
-  <div id="quickBuyCustomerModal"></div>
-
   <!-- BOTÓN WHATSAPP FLOTANTE -->
   <div class="whatsapp-button" onclick="openWhatsApp()">
     <span class="whatsapp-icon">💬</span>
@@ -112,7 +93,6 @@
   <script src="js/main.js"></script>
   <script type="module">
     import { getAllProducts } from './js/products.js';
-    import { search, addToRecentSearches } from './js/search.js';
 
     let currentFilter = 'pijamas';
     let allProductsData = [];
@@ -133,7 +113,6 @@
     window.renderProducts = async function() {
       const productsGrid = document.getElementById('productsGrid');
       const loadingSpinner = document.getElementById('loadingSpinner');
-      let productsToDisplay;
 
       loadingSpinner.style.display = 'block';
 
@@ -141,15 +120,9 @@
         const allProducts = await getAllProducts();
         allProductsData = allProducts;
 
-        console.log('🔥 Productos cargados:', allProducts.length);
-        console.log('📊 Filtrando por categoría:', currentFilter);
-
-        // Filtrar por categoría actual
-        productsToDisplay = allProducts.filter(p => 
+        const productsToDisplay = allProducts.filter(p => 
           p.category.toLowerCase() === currentFilter.toLowerCase()
         );
-
-        console.log('✓ Productos filtrados:', productsToDisplay.length);
 
         loadingSpinner.style.display = 'none';
 
@@ -162,7 +135,6 @@
           const badgeHTML = product.badges && product.badges.length > 0 
             ? `<div class="product-badge">${product.badges[0]}</div>` 
             : '';
-          
           const stockText = product.stock && product.stock <= 3 
             ? `<p class="product-stock-text">⚡ Stock bajo</p>` 
             : '';
@@ -187,9 +159,6 @@
                   <button class="add-to-cart-btn" onclick="window.addProductToCart('${product.id}')">
                     Agregar
                   </button>
-                  <button class="quick-buy-btn-small" onclick="window.quickBuyClick('${product.id}')" title="Compra rápida">
-                    ⚡
-                  </button>
                 </div>
               </div>
             </div>
@@ -202,7 +171,7 @@
       }
     }
 
-    // Filter products ✨ MODIFICADO - Ahora es global ✨
+    // Filter products
     window.filterProducts = async function(category) {
       currentFilter = category;
       updateActiveFilter();
@@ -228,95 +197,22 @@
       });
     }
 
-    // Búsqueda en tiempo real ✨ NUEVA ✨
-    window.handleSearch = function(event) {
-      const searchTerm = event.target.value;
-      const clearBtn = document.querySelector('.search-clear-btn');
-      const searchResults = document.getElementById('searchResults');
-
-      if (searchTerm.length === 0) {
-        searchResults.classList.remove('show');
-        clearBtn.classList.remove('show');
-        return;
-      }
-
-      clearBtn.classList.add('show');
-
-      const results = search(searchTerm);
-      
-      if (results.length === 0) {
-        searchResults.innerHTML = `
-          <div class="search-empty">
-            <div class="search-empty-icon">🔍</div>
-            <p class="search-empty-text">No encontramos resultados</p>
-          </div>
-        `;
-      } else {
-        searchResults.innerHTML = results.map(product => `
-          <div class="search-result-item" onclick="window.selectSearchResult('${product.id}')">
-            <img src="${product.image}" alt="${product.name}" class="search-result-image" onerror="this.src='https://via.placeholder.com/400x500?text=Sin+Imagen'">
-            <div class="search-result-info">
-              <p class="search-result-name">${product.name}</p>
-              <p class="search-result-category">${product.category}</p>
-            </div>
-            <span class="search-result-price">${formatPrice(product.price)}</span>
-          </div>
-        `).join('');
-      }
-
-      searchResults.classList.add('show');
-    }
-
-    window.clearSearch = function() {
-      document.getElementById('searchInput').value = '';
-      document.querySelector('.search-clear-btn').classList.remove('show');
-      document.getElementById('searchResults').classList.remove('show');
-    }
-
-    // ✨ MODIFICADO - Ahora abre modal de talla ✨
-    window.selectSearchResult = async function(productId) {
-      const product = allProductsData.find(p => p.id === productId);
-      if (product) {
-        try {
-          const { openSizeModal } = await import('./js/size-selector-modal.js');
-          openSizeModal(product);
-          addToRecentSearches(product.name);
-          window.clearSearch();
-        } catch (error) {
-          console.error('Error abriendo modal de talla:', error);
-          showNotification('Error al abrir el producto', 'error');
-        }
-      }
-    }
-
-    // Add product to cart ✨ MODIFICADO - Ahora abre modal de talla ✨
+    // Add product to cart
     window.addProductToCart = async function(productId) {
       try {
         const product = allProductsData.find(p => p.id === productId);
 
         if (product) {
-          const { openSizeModal } = await import('./js/size-selector-modal.js');
-          openSizeModal(product);
+          addToCart(product, 1);
+          showNotification(`${product.name} agregado al carrito 🛒`, 'success');
+          // Abrir el drawer al agregar
+          window.openDrawer();
         } else {
           showNotification('Producto no encontrado', 'error');
         }
       } catch (error) {
         console.error('Error agregando producto:', error);
         showNotification('Error al agregar producto', 'error');
-      }
-    }
-
-    // Quick buy
-    window.quickBuyClick = async function(productId) {
-      try {
-        const { openQuickBuyModal } = await import('./js/quick-buy.js');
-        const product = allProductsData.find(p => p.id === productId);
-        if (product) {
-          openQuickBuyModal(product);
-        }
-      } catch (error) {
-        console.error('Error en quick buy:', error);
-        showNotification('Error al abrir compra rápida', 'error');
       }
     }
 
@@ -331,16 +227,6 @@
       const message = encodeURIComponent('Hola EmiLuxe, tengo una consulta 💕');
       window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
     }
-  </script>
-
-  <!-- ✨ INICIALIZAR CART DRAWER ✨ -->
-  <script type="module">
-    import { initCartDrawer } from './js/cart-drawer.js';
-    
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log('🎯 Inicializando drawer en shop.html');
-      initCartDrawer();
-    });
   </script>
 </body>
 </html>
