@@ -117,9 +117,15 @@ export async function getProductById(productId) {
   }
 }
 
+// ========================================
+// ✨ MODIFICADO: addProduct con sizes, stock, badges
+// ========================================
+
 export async function addProduct(product) {
   try {
     console.log('📝 Agregando producto:', product.name);
+    console.log('📦 Tallas:', product.sizes);
+    console.log('🏷️ Etiquetas:', product.badges);
     
     const docRef = await addDoc(collection(db, 'products'), {
       name: product.name,
@@ -127,17 +133,25 @@ export async function addProduct(product) {
       price: parseInt(product.price),
       image: product.image,
       category: product.category.toLowerCase(),
+      sizes: product.sizes && product.sizes.length > 0 ? product.sizes : ['UNIQUE'],
+      stock: product.stock ? parseInt(product.stock) : null,
+      badges: product.badges && product.badges.length > 0 ? product.badges : [],
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now()
     });
     
     console.log('✓ Producto agregado con ID:', docRef.id);
+    console.log('✓ Tallas guardadas:', product.sizes);
+    console.log('✓ Etiquetas guardadas:', product.badges);
     
     return {
       id: docRef.id,
       ...product,
       price: parseInt(product.price),
-      category: product.category.toLowerCase()
+      category: product.category.toLowerCase(),
+      sizes: product.sizes && product.sizes.length > 0 ? product.sizes : ['UNIQUE'],
+      stock: product.stock ? parseInt(product.stock) : null,
+      badges: product.badges && product.badges.length > 0 ? product.badges : []
     };
   } catch (error) {
     console.error('✗ Error agregando producto:', error);
@@ -145,9 +159,15 @@ export async function addProduct(product) {
   }
 }
 
+// ========================================
+// ✨ MODIFICADO: updateProduct con sizes, stock, badges
+// ========================================
+
 export async function updateProduct(productId, updatedData) {
   try {
     console.log('📝 Actualizando producto:', productId);
+    console.log('📦 Tallas:', updatedData.sizes);
+    console.log('🏷️ Etiquetas:', updatedData.badges);
     
     const productRef = doc(db, 'products', productId);
     
@@ -160,10 +180,23 @@ export async function updateProduct(productId, updatedData) {
     if (updatedData.price) dataToUpdate.price = parseInt(updatedData.price);
     if (updatedData.image) dataToUpdate.image = updatedData.image;
     if (updatedData.category) dataToUpdate.category = updatedData.category.toLowerCase();
+    
+    // ✨ NUEVOS CAMPOS
+    if (updatedData.sizes) {
+      dataToUpdate.sizes = updatedData.sizes.length > 0 ? updatedData.sizes : ['UNIQUE'];
+    }
+    if (updatedData.stock !== undefined) {
+      dataToUpdate.stock = updatedData.stock ? parseInt(updatedData.stock) : null;
+    }
+    if (updatedData.badges) {
+      dataToUpdate.badges = updatedData.badges.length > 0 ? updatedData.badges : [];
+    }
 
     await updateDoc(productRef, dataToUpdate);
     
     console.log('✓ Producto actualizado:', productId);
+    console.log('✓ Tallas actualizadas:', updatedData.sizes);
+    console.log('✓ Etiquetas actualizadas:', updatedData.badges);
     return true;
   } catch (error) {
     console.error('✗ Error actualizando producto:', error);
@@ -300,7 +333,7 @@ export async function createOrder(order) {
       orderId: order.orderId,
       date: order.date,
       phoneNumber: order.phoneNumber,
-      customerName: customerName, // ✅ AGREGADO: Guardar nombre del cliente
+      customerName: customerName,
       total: order.total,
       items: order.items,
       status: order.status || 'Pendiente de Confirmación',
@@ -313,7 +346,7 @@ export async function createOrder(order) {
     return {
       id: docRef.id,
       ...order,
-      customerName: customerName // Retornar con el nombre garantizado
+      customerName: customerName
     };
   } catch (error) {
     console.error('✗ Error creando orden:', error);
