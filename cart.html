@@ -21,10 +21,10 @@
       <li><a href="shop.html">Tienda</a></li>
     </ul>
     <div class="navbar-icons">
-      <a href="cart.html" style="position: relative;">
+      <button onclick="window.openDrawer()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; position: relative;">
         🛒
         <span class="cart-badge">0</span>
-      </a>
+      </button>
       <a href="login.html">👤</a>
     </div>
   </nav>
@@ -37,6 +37,27 @@
       <!-- Cart items will be loaded here -->
     </div>
   </section>
+
+  <!-- CARRITO DRAWER (MODAL LATERAL) ✨ NUEVO ✨ -->
+  <div id="cartDrawerOverlay"></div>
+  <div id="cartDrawer">
+    <div class="cart-drawer-header">
+      <h2>Tu Carrito</h2>
+      <button class="cart-drawer-close" onclick="window.closeDrawer()">✕</button>
+    </div>
+
+    <div id="cartDrawerEmpty" class="show">
+      <div class="empty-icon">🛒</div>
+      <h3>Carrito Vacío</h3>
+      <p>Agrega productos para comenzar</p>
+    </div>
+
+    <div id="cartDrawerItems"></div>
+
+    <div class="cart-drawer-footer">
+      <div id="cartDrawerTotal"></div>
+    </div>
+  </div>
 
   <!-- BOTÓN WHATSAPP FLOTANTE -->
   <div class="whatsapp-button" onclick="openWhatsApp()">
@@ -52,7 +73,7 @@
   <script src="js/cart.js"></script>
   <script src="js/main.js"></script>
   <script>
-    // Renderizar carrito
+    // Renderizar carrito ✨ MEJORADO ✨
     function renderCart() {
       const cartContent = document.getElementById('cartContent');
       const cart = getCart();
@@ -72,18 +93,21 @@
       let cartHTML = '<div class="cart-items">';
       
       cart.forEach(item => {
+        const sizeText = item.size ? `<p style="color: #999; font-size: 0.85rem; margin: 0.3rem 0 0 0;">Talla: <strong>${item.size}</strong></p>` : '';
+        
         cartHTML += `
           <div class="cart-item">
             <img src="${item.image}" alt="${item.name}" class="cart-item-image" onerror="this.src='assets/images/placeholder.png'">
             <div class="cart-item-details">
               <h3 class="cart-item-name">${item.name}</h3>
               <p class="cart-item-price">${formatPrice(item.price)}</p>
+              ${sizeText}
               <div class="quantity-control">
-                <button onclick="decreaseQuantity('${item.id}')">−</button>
+                <button onclick="decreaseQuantity('${item.cartItemId || item.id}')">−</button>
                 <input type="number" value="${item.quantity}" readonly>
-                <button onclick="increaseQuantity('${item.id}')">+</button>
+                <button onclick="increaseQuantity('${item.cartItemId || item.id}')">+</button>
               </div>
-              <button class="remove-btn" onclick="removeProductFromCart('${item.id}')">Eliminar</button>
+              <button class="remove-btn" onclick="removeProductFromCart('${item.cartItemId || item.id}')">Eliminar</button>
             </div>
           </div>
         `;
@@ -120,29 +144,29 @@
     }
 
     // Aumentar cantidad
-    window.increaseQuantity = function(productId) {
+    window.increaseQuantity = function(cartItemId) {
       const cart = getCart();
-      const item = cart.find(p => p.id === productId);
+      const item = cart.find(p => (p.cartItemId || p.id) === cartItemId);
       if (item) {
-        updateQuantity(productId, item.quantity + 1);
+        updateQuantity(cartItemId, item.quantity + 1);
         renderCart();
       }
     }
 
     // Disminuir cantidad
-    window.decreaseQuantity = function(productId) {
+    window.decreaseQuantity = function(cartItemId) {
       const cart = getCart();
-      const item = cart.find(p => p.id === productId);
+      const item = cart.find(p => (p.cartItemId || p.id) === cartItemId);
       if (item && item.quantity > 1) {
-        updateQuantity(productId, item.quantity - 1);
+        updateQuantity(cartItemId, item.quantity - 1);
         renderCart();
       }
     }
 
     // Eliminar del carrito
-    window.removeProductFromCart = function(productId) {
+    window.removeProductFromCart = function(cartItemId) {
       if (confirm('¿Deseas eliminar este producto del carrito?')) {
-        removeFromCart(productId);
+        removeFromCart(cartItemId);
         renderCart();
         showNotification('Producto eliminado del carrito', 'success');
       }
