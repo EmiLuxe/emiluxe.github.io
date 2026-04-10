@@ -9,17 +9,39 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
   <style>
-    /* ✨ FIX: Asegurar que los checkboxes sean clickeables */
+    /* ✨ FIX: Asegurar que los checkboxes sean clickeables con feedback visual */
     input[type="checkbox"] {
       cursor: pointer;
       accent-color: #FF6B9D;
       width: 18px;
       height: 18px;
       margin: 0;
+      flex-shrink: 0;
     }
     
+    input[type="checkbox"]:hover {
+      transform: scale(1.1);
+      transition: transform 0.2s ease;
+    }
+
+    input[type="checkbox"]:checked {
+      accent-color: #FF6B9D;
+      box-shadow: 0 0 0 2px #FF6B9D;
+    }
+
     label input[type="checkbox"] {
       pointer-events: auto;
+    }
+
+    /* Hacer el label clickeable completo */
+    label {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    label:has(input[type="checkbox"]:checked) {
+      color: #FF6B9D;
+      font-weight: 600;
     }
   </style>
 </head>
@@ -110,23 +132,23 @@
                   </select>
                 </div>
 
-                <!-- TALLAS ✨ ARREGLADO ✨ -->
+                <!-- TALLAS ✨ ARREGLADO CON FEEDBACK VISUAL ✨ -->
                 <div class="form-group">
                   <label>👕 Tallas Disponibles</label>
                   <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem;">
-                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer; transition: color 0.2s ease;">
                       <input type="checkbox" id="sizeS" value="S"> S
                     </label>
-                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer; transition: color 0.2s ease;">
                       <input type="checkbox" id="sizeM" value="M"> M
                     </label>
-                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer; transition: color 0.2s ease;">
                       <input type="checkbox" id="sizeL" value="L"> L
                     </label>
-                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer; transition: color 0.2s ease;">
                       <input type="checkbox" id="sizeXL" value="XL"> XL
                     </label>
-                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer; transition: color 0.2s ease;">
                       <input type="checkbox" id="sizeUnique" value="UNIQUE"> Talla Única
                     </label>
                   </div>
@@ -138,17 +160,17 @@
                   <input type="number" id="productStock" placeholder="Ej: 10" min="0">
                 </div>
 
-                <!-- BADGES/ETIQUETAS ✨ ARREGLADO ✨ -->
+                <!-- BADGES/ETIQUETAS ✨ ARREGLADO CON FEEDBACK VISUAL ✨ -->
                 <div class="form-group">
                   <label>🏷️ Etiquetas</label>
                   <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.8rem;">
-                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer; transition: color 0.2s ease;">
                       <input type="checkbox" id="badgeBestseller" value="bestseller"> 🔥 Más Vendido
                     </label>
-                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer; transition: color 0.2s ease;">
                       <input type="checkbox" id="badgeOffer" value="offer"> 💝 Oferta
                     </label>
-                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer; transition: color 0.2s ease;">
                       <input type="checkbox" id="badgeNew" value="new"> ✨ Nuevo
                     </label>
                   </div>
@@ -208,23 +230,23 @@
                     </select>
                   </div>
 
-                  <!-- EDITAR TALLAS ✨ ARREGLADO ✨ -->
+                  <!-- EDITAR TALLAS ✨ ARREGLADO CON FEEDBACK VISUAL ✨ -->
                   <div class="form-group">
                     <label>👕 Tallas Disponibles</label>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem;">
-                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
+                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer; transition: color 0.2s ease;">
                         <input type="checkbox" id="editSizeS" value="S"> S
                       </label>
-                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
+                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer; transition: color 0.2s ease;">
                         <input type="checkbox" id="editSizeM" value="M"> M
                       </label>
-                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
+                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer; transition: color 0.2s ease;">
                         <input type="checkbox" id="editSizeL" value="L"> L
                       </label>
-                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
+                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer; transition: color 0.2s ease;">
                         <input type="checkbox" id="editSizeXL" value="XL"> XL
                       </label>
-                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
+                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer; transition: color 0.2s ease;">
                         <input type="checkbox" id="editSizeUnique" value="UNIQUE"> Talla Única
                       </label>
                     </div>
@@ -236,17 +258,17 @@
                     <input type="number" id="editProductStock" placeholder="Ej: 10" min="0">
                   </div>
 
-                  <!-- EDITAR BADGES ✨ ARREGLADO ✨ -->
+                  <!-- EDITAR BADGES ✨ ARREGLADO CON FEEDBACK VISUAL ✨ -->
                   <div class="form-group">
                     <label>🏷️ Etiquetas</label>
                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.8rem;">
-                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
+                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer; transition: color 0.2s ease;">
                         <input type="checkbox" id="editBadgeBestseller" value="bestseller"> 🔥 Más Vendido
                       </label>
-                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
+                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer; transition: color 0.2s ease;">
                         <input type="checkbox" id="editBadgeOffer" value="offer"> 💝 Oferta
                       </label>
-                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
+                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer; transition: color 0.2s ease;">
                         <input type="checkbox" id="editBadgeNew" value="new"> ✨ Nuevo
                       </label>
                     </div>
