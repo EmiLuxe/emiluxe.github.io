@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Completar Pedido - EmiLuxe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -18,10 +21,10 @@
       <li><a href="shop.html">Tienda</a></li>
     </ul>
     <div class="navbar-icons">
-      <a href="cart.html" style="position: relative;">
+      <button onclick="window.openDrawer()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; position: relative;">
         🛒
         <span class="cart-badge">0</span>
-      </a>
+      </button>
       <a href="login.html">👤</a>
     </div>
   </nav>
@@ -43,7 +46,7 @@
         </p>
       </div>
 
-      <!-- DELIVERY FORM -->
+      <!-- DELIVERY FORM ✨ MEJORADO ✨ -->
       <form id="deliveryForm">
         <!-- Nombre Completo -->
         <div class="form-group">
@@ -158,6 +161,27 @@
     <p>&copy; 2026 EmiLuxe. Todos los derechos reservados. | Hecho con ❤️ para ti</p>
   </footer>
 
+  <!-- CARRITO DRAWER (MODAL LATERAL) ✨ NUEVO ✨ -->
+  <div id="cartDrawerOverlay"></div>
+  <div id="cartDrawer">
+    <div class="cart-drawer-header">
+      <h2>Tu Carrito</h2>
+      <button class="cart-drawer-close" onclick="window.closeDrawer()">✕</button>
+    </div>
+
+    <div id="cartDrawerEmpty" class="show">
+      <div class="empty-icon">🛒</div>
+      <h3>Carrito Vacío</h3>
+      <p>Agrega productos para comenzar</p>
+    </div>
+
+    <div id="cartDrawerItems"></div>
+
+    <div class="cart-drawer-footer">
+      <div id="cartDrawerTotal"></div>
+    </div>
+  </div>
+
   <script src="js/cart.js"></script>
   <script src="js/main.js"></script>
   <script type="module">
@@ -185,17 +209,22 @@
       currentOrderId = generateOrderId();
       document.getElementById('orderId').textContent = `#${currentOrderId}`;
 
-      orderSummary.innerHTML = cart.map(item => `
-        <div class="cart-item">
-          <img src="${item.image}" alt="${item.name}" class="cart-item-image">
-          <div class="cart-item-details">
-            <h3 class="cart-item-name">${item.name}</h3>
-            <p class="cart-item-price">${formatPrice(item.price)}</p>
-            <p style="color: #999; font-size: 0.85rem;">Cantidad: <strong>${item.quantity}</strong></p>
-            <p style="color: var(--dark-pink); font-weight: 600; font-size: 0.9rem;">Subtotal: ${formatPrice(item.price * item.quantity)}</p>
+      orderSummary.innerHTML = cart.map(item => {
+        const sizeText = item.size ? `<p style="color: #999; font-size: 0.85rem; margin: 0.3rem 0 0 0;">Talla: <strong>${item.size}</strong></p>` : '';
+        
+        return `
+          <div class="cart-item">
+            <img src="${item.image}" alt="${item.name}" class="cart-item-image" onerror="this.src='assets/images/placeholder.png'">
+            <div class="cart-item-details">
+              <h3 class="cart-item-name">${item.name}</h3>
+              <p class="cart-item-price">${formatPrice(item.price)}</p>
+              ${sizeText}
+              <p style="color: #999; font-size: 0.85rem; margin: 0.3rem 0 0 0;">Cantidad: <strong>${item.quantity}</strong></p>
+              <p style="color: var(--dark-pink); font-weight: 600; font-size: 0.9rem; margin: 0.5rem 0 0 0;">Subtotal: ${formatPrice(item.price * item.quantity)}</p>
+            </div>
           </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
 
       const total = getCartTotal();
       document.getElementById('orderSubtotal').textContent = formatPrice(total);
@@ -214,7 +243,7 @@
       completeBtn.addEventListener('click', handleCompleteOrder);
     }
 
-    // Validar formulario
+    // Validar formulario ✨ MEJORADO ✨
     function validateForm() {
       const fullName = document.getElementById('fullName').value.trim();
       const mainPhone = document.getElementById('mainPhone').value.trim();
@@ -277,9 +306,10 @@
 
       try {
         // Construir mensaje con información de envío
-        let cartItems = cart.map(item => 
-          `• ${item.name} (x${item.quantity}): ${formatPrice(item.price * item.quantity)}`
-        ).join('\n');
+        let cartItems = cart.map(item => {
+          const sizeText = item.size ? ` (${item.size})` : '';
+          return `• ${item.name}${sizeText} (x${item.quantity}): ${formatPrice(item.price * item.quantity)}`;
+        }).join('\n');
 
         const message = `🛍️ *COMPRA REALIZADA EN EMILUXE* 🛍️
 
@@ -289,7 +319,6 @@
 Nombre: ${fullName}
 Teléfono: ${mainPhone}
 ${secondaryPhone ? `Teléfono Secundario: ${secondaryPhone}\n` : ''}
-
 📦 *DETALLES DEL PEDIDO:*
 ${cartItems}
 
@@ -318,7 +347,7 @@ Gracias por tu compra ❤️`;
         // Guardar la orden en Firebase
         await saveOrderToFirebase(fullName, mainPhone, secondaryPhone, address, preferredTime, notes, total, cart, currentOrderId);
 
-        // Esperar un poco y luego abrir WhatsApp
+        // Esperar un bit y luego abrir WhatsApp
         setTimeout(() => {
           window.location.href = whatsappURL;
 
@@ -360,7 +389,19 @@ Gracias por tu compra ❤️`;
         console.error('Error guardando orden:', error);
         // Guardar en localStorage como respaldo
         let orders = JSON.parse(localStorage.getItem('emiluxe_orders')) || [];
-        orders.push(order);
+        orders.push({
+          orderId: orderId,
+          date: new Date().toLocaleString('es-CO'),
+          phoneNumber: mainPhone,
+          secondaryPhone: secondaryPhone,
+          customerName: fullName,
+          deliveryAddress: address,
+          preferredTime: preferredTime,
+          notes: notes,
+          total: total,
+          items: cart,
+          status: 'Pendiente de Confirmación'
+        });
         localStorage.setItem('emiluxe_orders', JSON.stringify(orders));
         console.log('✓ Orden guardada en localStorage (respaldo)');
       }
