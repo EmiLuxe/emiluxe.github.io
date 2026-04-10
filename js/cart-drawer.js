@@ -28,7 +28,52 @@ export function initCartDrawer() {
   console.log('🛒 Inicializando Cart Drawer...');
   loadCartFromStorage();
   setupDrawerEventListeners();
+  setupDrawerHTML();
   console.log('✓ Cart Drawer inicializado');
+}
+
+/**
+ * Asegurar que el HTML del drawer existe
+ * @returns {void}
+ */
+function setupDrawerHTML() {
+  // Verificar que los elementos del drawer existen
+  let drawer = document.getElementById('cartDrawer');
+  let overlay = document.getElementById('cartDrawerOverlay');
+
+  if (!drawer || !overlay) {
+    console.warn('⚠️ Elementos del drawer no encontrados en HTML');
+    // Crear drawer si no existe
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'cartDrawerOverlay';
+      document.body.appendChild(overlay);
+    }
+    if (!drawer) {
+      drawer = document.createElement('div');
+      drawer.id = 'cartDrawer';
+      drawer.innerHTML = `
+        <div class="cart-drawer-header">
+          <h2>Tu Carrito</h2>
+          <button class="cart-drawer-close" onclick="window.closeDrawer()">✕</button>
+        </div>
+        <div id="cartDrawerEmpty" class="show">
+          <div class="empty-icon">🛒</div>
+          <h3>Carrito Vacío</h3>
+          <p>Agrega productos para comenzar</p>
+          <a href="shop.html">Continuar Comprando</a>
+        </div>
+        <div id="cartDrawerItems"></div>
+        <div class="cart-drawer-footer">
+          <div id="cartDrawerTotal"></div>
+          <button id="cartDrawerCheckoutBtn" onclick="window.goToCheckout()" style="display: none;">
+            Ir a Checkout
+          </button>
+        </div>
+      `;
+      document.body.appendChild(drawer);
+    }
+  }
 }
 
 /**
@@ -39,9 +84,9 @@ function setupDrawerEventListeners() {
   // Cerrar al hacer click fuera del drawer
   document.addEventListener('click', (e) => {
     const drawer = document.getElementById('cartDrawer');
-    const toggleBtn = document.getElementById('cartToggleBtn');
+    const overlay = document.getElementById('cartDrawerOverlay');
 
-    if (drawer && toggleBtn && !drawer.contains(e.target) && !toggleBtn.contains(e.target)) {
+    if (drawer && overlay && !drawer.contains(e.target) && !overlay.contains(e.target)) {
       if (drawerState.isOpen && !drawerState.isAnimating) {
         closeCartDrawer();
       }
@@ -65,7 +110,12 @@ function setupDrawerEventListeners() {
  * @returns {void}
  */
 export function openCartDrawer() {
-  if (drawerState.isAnimating || drawerState.isOpen) return;
+  console.log('📂 Intentando abrir drawer...');
+  
+  if (drawerState.isAnimating || drawerState.isOpen) {
+    console.warn('⚠️ Drawer ya está abierto o animando');
+    return;
+  }
 
   drawerState.isAnimating = true;
   drawerState.isOpen = true;
@@ -73,13 +123,21 @@ export function openCartDrawer() {
   const drawer = document.getElementById('cartDrawer');
   const overlay = document.getElementById('cartDrawerOverlay');
 
-  if (drawer) {
+  console.log('🎯 Drawer encontrado:', !!drawer);
+  console.log('🎯 Overlay encontrado:', !!overlay);
+
+  if (drawer && overlay) {
     drawer.classList.add('open');
-    if (overlay) overlay.classList.add('visible');
+    overlay.classList.add('visible');
+    console.log('✓ Drawer abierto');
 
     setTimeout(() => {
       drawerState.isAnimating = false;
     }, 300);
+  } else {
+    console.error('❌ Drawer o overlay no encontrados');
+    drawerState.isAnimating = false;
+    drawerState.isOpen = false;
   }
 }
 
@@ -96,9 +154,9 @@ export function closeCartDrawer() {
   const drawer = document.getElementById('cartDrawer');
   const overlay = document.getElementById('cartDrawerOverlay');
 
-  if (drawer) {
+  if (drawer && overlay) {
     drawer.classList.remove('open');
-    if (overlay) overlay.classList.remove('visible');
+    overlay.classList.remove('visible');
 
     setTimeout(() => {
       drawerState.isAnimating = false;
@@ -331,7 +389,10 @@ export function updateDrawerDisplay() {
   const totalElement = document.getElementById('cartDrawerTotal');
   const checkoutBtn = document.getElementById('cartDrawerCheckoutBtn');
 
-  if (!itemsContainer) return;
+  if (!itemsContainer) {
+    console.warn('⚠️ Contenedor de items no encontrado');
+    return;
+  }
 
   if (drawerState.cartItems.length === 0) {
     itemsContainer.innerHTML = '';
@@ -448,7 +509,7 @@ function saveCartToStorage() {
   localStorage.setItem('emiluxe_cart_drawer', JSON.stringify(drawerState.cartItems));
   // Sincronizar también con cart.js antiguo para compatibilidad
   localStorage.setItem('emiluxe_cart', JSON.stringify(drawerState.cartItems));
-  console.log('✓ Carrito sincronizado en localStorage');
+  console.log('✓ Carrito sincronizado en localStorage:', drawerState.cartItems.length, 'items');
 }
 
 /**
@@ -498,12 +559,29 @@ window.removeFromDrawerUI = function(cartItemId) {
   removeFromDrawer(cartItemId);
 };
 
+/**
+ * Abrir drawer - ✨ MEJORADO CON DEBUGGING ✨
+ * @returns {void}
+ */
 window.openDrawer = function() {
-  openCartDrawer();
+  console.log('🔔 openDrawer() llamado');
+  try {
+    openCartDrawer();
+  } catch (error) {
+    console.error('❌ Error en openDrawer:', error);
+  }
 };
 
+/**
+ * Cerrar drawer
+ * @returns {void}
+ */
 window.closeDrawer = function() {
-  closeCartDrawer();
+  try {
+    closeCartDrawer();
+  } catch (error) {
+    console.error('Error en closeDrawer:', error);
+  }
 };
 
 // ========================================
