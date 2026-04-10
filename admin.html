@@ -63,7 +63,7 @@
 
           <form id="productForm">
             <div class="form-fields-container">
-              <!-- ADD MODE -->
+              <!-- ADD MODE ✨ MODIFICADO ✨ -->
               <div class="admin-form-section" id="addSection">
                 <div class="admin-form-section-title">📝 Agregar Nuevo Producto</div>
 
@@ -96,6 +96,50 @@
                   </select>
                 </div>
 
+                <!-- TALLAS ✨ NUEVO ✨ -->
+                <div class="form-group">
+                  <label>👕 Tallas Disponibles</label>
+                  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                      <input type="checkbox" id="sizeS" value="S"> S
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                      <input type="checkbox" id="sizeM" value="M"> M
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                      <input type="checkbox" id="sizeL" value="L"> L
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                      <input type="checkbox" id="sizeXL" value="XL"> XL
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                      <input type="checkbox" id="sizeUnique" value="UNIQUE"> Talla Única
+                    </label>
+                  </div>
+                </div>
+
+                <!-- STOCK ✨ NUEVO ✨ -->
+                <div class="form-group">
+                  <label for="productStock">📦 Stock (dejar vac��o si no aplica)</label>
+                  <input type="number" id="productStock" placeholder="Ej: 10" min="0">
+                </div>
+
+                <!-- BADGES/ETIQUETAS ✨ NUEVO ✨ -->
+                <div class="form-group">
+                  <label>🏷️ Etiquetas</label>
+                  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                      <input type="checkbox" id="badgeBestseller" value="bestseller"> 🔥 Más Vendido
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                      <input type="checkbox" id="badgeOffer" value="offer"> 💝 Oferta
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                      <input type="checkbox" id="badgeNew" value="new"> ✨ Nuevo
+                    </label>
+                  </div>
+                </div>
+
                 <div class="admin-image-section">
                   <div class="admin-image-section-title">🖼️ Imagen del Producto</div>
                   <div class="admin-image-inputs">
@@ -114,7 +158,7 @@
                 </div>
               </div>
 
-              <!-- EDIT MODE -->
+              <!-- EDIT MODE ✨ MODIFICADO ✨ -->
               <div class="admin-form-section hidden" id="editSection">
                 <div class="admin-form-section-title">✏️ Editar Producto</div>
 
@@ -148,6 +192,50 @@
                       <option value="casual">Ropa casual</option>
                       <option value="perfumeria">Perfumería</option>
                     </select>
+                  </div>
+
+                  <!-- EDITAR TALLAS ✨ NUEVO ✨ -->
+                  <div class="form-group">
+                    <label>👕 Tallas Disponibles</label>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
+                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                        <input type="checkbox" id="editSizeS" value="S"> S
+                      </label>
+                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                        <input type="checkbox" id="editSizeM" value="M"> M
+                      </label>
+                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                        <input type="checkbox" id="editSizeL" value="L"> L
+                      </label>
+                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                        <input type="checkbox" id="editSizeXL" value="XL"> XL
+                      </label>
+                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                        <input type="checkbox" id="editSizeUnique" value="UNIQUE"> Talla Única
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- EDITAR STOCK ✨ NUEVO ✨ -->
+                  <div class="form-group">
+                    <label for="editProductStock">📦 Stock (dejar vacío si no aplica)</label>
+                    <input type="number" id="editProductStock" placeholder="Ej: 10" min="0">
+                  </div>
+
+                  <!-- EDITAR BADGES ✨ NUEVO ✨ -->
+                  <div class="form-group">
+                    <label>🏷️ Etiquetas</label>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem;">
+                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                        <input type="checkbox" id="editBadgeBestseller" value="bestseller"> 🔥 Más Vendido
+                      </label>
+                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                        <input type="checkbox" id="editBadgeOffer" value="offer"> 💝 Oferta
+                      </label>
+                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                        <input type="checkbox" id="editBadgeNew" value="new"> ✨ Nuevo
+                      </label>
+                    </div>
                   </div>
 
                   <div class="admin-image-section">
@@ -409,7 +497,7 @@
       }
     }
 
-    // Add product
+    // Add product ✨ MODIFICADO ✨
     window.addProduct = async function() {
       const name = document.getElementById('productName').value.trim();
       const description = document.getElementById('productDescription').value.trim();
@@ -417,8 +505,27 @@
       const category = document.getElementById('productCategory').value;
       const image = document.getElementById('productImageURL').value.trim();
 
-      if (!name || !description || !price || !category || !image) {
-        showNotification('❌ Por favor completa todos los campos', 'error');
+      // Obtener tallas seleccionadas
+      const sizes = [];
+      if (document.getElementById('sizeS').checked) sizes.push('S');
+      if (document.getElementById('sizeM').checked) sizes.push('M');
+      if (document.getElementById('sizeL').checked) sizes.push('L');
+      if (document.getElementById('sizeXL').checked) sizes.push('XL');
+      if (document.getElementById('sizeUnique').checked) sizes.push('UNIQUE');
+
+      // Obtener stock
+      const stock = document.getElementById('productStock').value 
+        ? parseInt(document.getElementById('productStock').value) 
+        : null;
+
+      // Obtener badges
+      const badges = [];
+      if (document.getElementById('badgeBestseller').checked) badges.push('bestseller');
+      if (document.getElementById('badgeOffer').checked) badges.push('offer');
+      if (document.getElementById('badgeNew').checked) badges.push('new');
+
+      if (!name || !description || !price || !category || !image || sizes.length === 0) {
+        showNotification('❌ Por favor completa todos los campos requeridos y selecciona al menos una talla', 'error');
         return;
       }
 
@@ -428,7 +535,10 @@
           description,
           price,
           category,
-          image
+          image,
+          sizes,
+          stock,
+          badges
         });
 
         showNotification('✅ Producto agregado exitosamente', 'success');
@@ -465,7 +575,7 @@
       await searchProductToEdit(productId);
     }
 
-    // Search product to edit
+    // Search product to edit ✨ MODIFICADO ✨
     window.searchProductToEdit = async function(productId = null) {
       const searchId = productId || document.getElementById('editProductId').value.trim();
       if (!searchId) {
@@ -487,13 +597,29 @@
       document.getElementById('editProductPrice').value = product.price;
       document.getElementById('editProductCategory').value = product.category;
       document.getElementById('editProductImageURL').value = product.image;
+
+      // Establecer tallas
+      document.getElementById('editSizeS').checked = product.sizes && product.sizes.includes('S');
+      document.getElementById('editSizeM').checked = product.sizes && product.sizes.includes('M');
+      document.getElementById('editSizeL').checked = product.sizes && product.sizes.includes('L');
+      document.getElementById('editSizeXL').checked = product.sizes && product.sizes.includes('XL');
+      document.getElementById('editSizeUnique').checked = product.sizes && product.sizes.includes('UNIQUE');
+
+      // Establecer stock
+      document.getElementById('editProductStock').value = product.stock || '';
+
+      // Establecer badges
+      document.getElementById('editBadgeBestseller').checked = product.badges && product.badges.includes('bestseller');
+      document.getElementById('editBadgeOffer').checked = product.badges && product.badges.includes('offer');
+      document.getElementById('editBadgeNew').checked = product.badges && product.badges.includes('new');
+
       document.getElementById('editProductFields').style.display = 'block';
 
       const preview = document.getElementById('editProductImagePreview');
       preview.innerHTML = `<img src="${product.image}" alt="${product.name}" style="max-width: 100%; max-height: 300px; border-radius: 10px;" onerror="this.parentElement.innerHTML='<div class=\"admin-image-preview-empty\">Error</div>'">`;
     }
 
-    // Update product
+    // Update product ✨ MODIFICADO ✨
     window.updateProduct = async function() {
       if (!editingProductId) {
         showNotification('❌ Selecciona un producto primero', 'error');
@@ -506,8 +632,27 @@
       const category = document.getElementById('editProductCategory').value;
       const image = document.getElementById('editProductImageURL').value.trim();
 
-      if (!name || !description || !price || !category || !image) {
-        showNotification('❌ Por favor completa todos los campos', 'error');
+      // Obtener tallas seleccionadas
+      const sizes = [];
+      if (document.getElementById('editSizeS').checked) sizes.push('S');
+      if (document.getElementById('editSizeM').checked) sizes.push('M');
+      if (document.getElementById('editSizeL').checked) sizes.push('L');
+      if (document.getElementById('editSizeXL').checked) sizes.push('XL');
+      if (document.getElementById('editSizeUnique').checked) sizes.push('UNIQUE');
+
+      // Obtener stock
+      const stock = document.getElementById('editProductStock').value 
+        ? parseInt(document.getElementById('editProductStock').value) 
+        : null;
+
+      // Obtener badges
+      const badges = [];
+      if (document.getElementById('editBadgeBestseller').checked) badges.push('bestseller');
+      if (document.getElementById('editBadgeOffer').checked) badges.push('offer');
+      if (document.getElementById('editBadgeNew').checked) badges.push('new');
+
+      if (!name || !description || !price || !category || !image || sizes.length === 0) {
+        showNotification('❌ Por favor completa todos los campos requeridos', 'error');
         return;
       }
 
@@ -517,7 +662,10 @@
           description,
           price,
           category,
-          image
+          image,
+          sizes,
+          stock,
+          badges
         });
 
         showNotification('✅ Producto actualizado exitosamente', 'success');
