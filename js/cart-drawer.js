@@ -106,14 +106,25 @@ function setupDrawerEventListeners() {
 // ========================================
 
 /**
- * Abrir carrito drawer
+ * Abrir carrito drawer - ✨ ARREGLADO CON DEBUGGING ✨
  * @returns {void}
  */
 export function openCartDrawer() {
   console.log('📂 Intentando abrir drawer...');
+  console.log('Estado actual:', {
+    isOpen: drawerState.isOpen,
+    isAnimating: drawerState.isAnimating
+  });
   
-  if (drawerState.isAnimating || drawerState.isOpen) {
-    console.warn('⚠️ Drawer ya está abierto o animando');
+  // Si ya está abierto y no animando, simplemente retorna
+  if (drawerState.isOpen && !drawerState.isAnimating) {
+    console.log('ℹ️ Drawer ya está abierto');
+    return;
+  }
+
+  // Si está animando, esperar
+  if (drawerState.isAnimating) {
+    console.warn('⏳ Drawer está animando, esperando...');
     return;
   }
 
@@ -127,15 +138,23 @@ export function openCartDrawer() {
   console.log('🎯 Overlay encontrado:', !!overlay);
 
   if (drawer && overlay) {
+    console.log('✨ Agregando clases: open y visible');
     drawer.classList.add('open');
     overlay.classList.add('visible');
+    
+    // Log de verificación
+    console.log('✓ Clase "open" en drawer:', drawer.classList.contains('open'));
+    console.log('✓ Clase "visible" en overlay:', overlay.classList.contains('visible'));
     console.log('✓ Drawer abierto');
 
     setTimeout(() => {
       drawerState.isAnimating = false;
+      console.log('✓ Animación completada');
     }, 300);
   } else {
     console.error('❌ Drawer o overlay no encontrados');
+    console.error('drawer:', drawer);
+    console.error('overlay:', overlay);
     drawerState.isAnimating = false;
     drawerState.isOpen = false;
   }
@@ -161,6 +180,8 @@ export function closeCartDrawer() {
     setTimeout(() => {
       drawerState.isAnimating = false;
     }, 300);
+  } else {
+    drawerState.isAnimating = false;
   }
 }
 
@@ -443,7 +464,7 @@ function createCartItemHTML(item) {
         <img 
           src="${item.image}" 
           alt="${item.name}"
-          onerror="this.src='assets/images/placeholder.png'"
+          onerror="this.src='https://via.placeholder.com/400x500?text=Sin+Imagen'"
         >
       </div>
       <div class="cart-item-details">
