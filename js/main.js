@@ -2,6 +2,9 @@
 // EMILUXE - MAIN SCRIPT ✨ MODIFICADO ✨
 // ========================================
 
+// Variables globales para drawer
+let drawerModule = null;
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', async () => {
   initCart();
@@ -181,16 +184,28 @@ function clearOrderData() {
 }
 
 // ========================================
-// DRAWER GLOBALES ✨ MEJORADO ✨
+// DRAWER GLOBALES ✨ ARREGLADO ✨
 // ========================================
 
 /**
- * Abrir drawer del carrito
+ * Cargar módulo del drawer una sola vez
+ * @returns {Promise<Object>}
+ */
+async function loadDrawerModule() {
+  if (!drawerModule) {
+    drawerModule = await import('./cart-drawer.js');
+  }
+  return drawerModule;
+}
+
+/**
+ * Abrir drawer del carrito - ✨ ARREGLADO ✨
  * @returns {void}
  */
 window.openDrawer = async function() {
   try {
-    const { openCartDrawer } = await import('./cart-drawer.js');
+    console.log('🔔 openDrawer() llamado desde main.js');
+    const { openCartDrawer } = await loadDrawerModule();
     openCartDrawer();
   } catch (error) {
     console.error('Error abriendo drawer:', error);
@@ -204,7 +219,7 @@ window.openDrawer = async function() {
  */
 window.closeDrawer = async function() {
   try {
-    const { closeCartDrawer } = await import('./cart-drawer.js');
+    const { closeCartDrawer } = await loadDrawerModule();
     closeCartDrawer();
   } catch (error) {
     console.error('Error cerrando drawer:', error);
