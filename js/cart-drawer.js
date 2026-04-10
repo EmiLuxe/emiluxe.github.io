@@ -436,32 +436,47 @@ export function updateCartBadge() {
 }
 
 // ========================================
-// PERSISTENCIA EN LOCALSTORAGE
+// ✨ SINCRONIZACIÓN CON LOCALSTORAGE
 // ========================================
 
 /**
- * Guardar carrito en localStorage
+ * Guardar carrito en localStorage (sincronizar con cart.js antiguo)
  * @returns {void}
  */
 function saveCartToStorage() {
+  // Guardar en drawer
   localStorage.setItem('emiluxe_cart_drawer', JSON.stringify(drawerState.cartItems));
+  // Sincronizar también con cart.js antiguo para compatibilidad
+  localStorage.setItem('emiluxe_cart', JSON.stringify(drawerState.cartItems));
+  console.log('✓ Carrito sincronizado en localStorage');
 }
 
 /**
- * Cargar carrito del localStorage
+ * Cargar carrito del localStorage (con fallback al formato antiguo)
  * @returns {void}
  */
 function loadCartFromStorage() {
-  const saved = localStorage.getItem('emiluxe_cart_drawer');
+  // Intentar cargar del drawer primero
+  let saved = localStorage.getItem('emiluxe_cart_drawer');
+  
+  // Si no existe, cargar del cart.js antiguo
+  if (!saved) {
+    saved = localStorage.getItem('emiluxe_cart');
+  }
+  
   if (saved) {
     try {
       drawerState.cartItems = JSON.parse(saved);
       console.log('✓ Carrito cargado del localStorage:', drawerState.cartItems.length, 'items');
       updateCartBadge();
+      updateDrawerDisplay();
     } catch (error) {
-      console.warn('Error cargando carrito:', error);
+      console.warn('⚠️ Error cargando carrito:', error);
       drawerState.cartItems = [];
     }
+  } else {
+    console.log('ℹ️ Carrito vacío (primera vez)');
+    drawerState.cartItems = [];
   }
 }
 
