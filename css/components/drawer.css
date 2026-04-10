@@ -2,18 +2,17 @@
    EMILUXE - COMPONENTS: CART DRAWER
    ======================================== */
 
-/* Overlay del drawer */
 #cartDrawerOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0);
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: rgba(0, 0, 0, 0) !important;
   z-index: 995 !important;
-  transition: background 0.3s ease, opacity 0.3s ease;
-  opacity: 0;
-  pointer-events: none;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.3s ease !important;
 }
 
 #cartDrawerOverlay.visible {
@@ -24,20 +23,18 @@
 
 /* Drawer principal */
 #cartDrawer {
-  position: fixed;
-  right: -450px;
-  top: 0;
-  width: 400px;
-  max-width: 100vw;
-  height: 100vh;
-  background: white;
-  box-shadow: -5px 0 20px rgba(0, 0, 0, 0.2);
+  position: fixed !important;
+  right: -450px !important;
+  top: 0 !important;
+  width: 400px !important;
+  height: 100vh !important;
+  background: white !important;
+  box-shadow: -5px 0 20px rgba(0, 0, 0, 0.2) !important;
   z-index: 1000 !important;
-  display: flex;
-  flex-direction: column;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow-y: auto !important;
   transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  overflow-y: auto;
-  will-change: right;
 }
 
 #cartDrawer.open {
@@ -46,159 +43,159 @@
 
 /* Header del drawer */
 .cart-drawer-header {
-  padding: 1.5rem;
-  border-bottom: 2px solid #f0f0f0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-shrink: 0;
-  background: white;
+  padding: 1.5rem !important;
+  border-bottom: 2px solid #f0f0f0 !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  flex-shrink: 0 !important;
+  background: white !important;
 }
 
 .cart-drawer-header h2 {
-  margin: 0;
-  font-size: 1.3rem;
-  color: #FF6B9D;
-  font-weight: 700;
+  margin: 0 !important;
+  font-size: 1.3rem !important;
+  color: #FF6B9D !important;
+  font-weight: 700 !important;
 }
 
 .cart-drawer-close {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #999;
-  transition: color 0.2s;
-  padding: 0;
+  background: none !important;
+  border: none !important;
+  font-size: 24px !important;
+  cursor: pointer !important;
+  color: #999 !important;
+  transition: color 0.2s !important;
+  padding: 0 !important;
 }
 
 .cart-drawer-close:hover {
-  color: #FF6B9D;
+  color: #FF6B9D !important;
 }
 
 /* Contenedor de items */
 #cartDrawerItems {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
-  background: white;
+  flex: 1 !important;
+  overflow-y: auto !important;
+  padding: 1rem !important;
+  background: white !important;
 }
 
 /* Item del carrito */
 .cart-drawer-item {
-  display: grid;
-  grid-template-columns: 80px 1fr 80px;
-  gap: 0.8rem;
-  padding: 1rem;
-  border: 1px solid #f0f0f0;
-  border-radius: 8px;
-  margin-bottom: 0.8rem;
-  align-items: start;
-  background: #fafafa;
+  display: grid !important;
+  grid-template-columns: 80px 1fr 80px !important;
+  gap: 0.8rem !important;
+  padding: 1rem !important;
+  border: 1px solid #f0f0f0 !important;
+  border-radius: 8px !important;
+  margin-bottom: 0.8rem !important;
+  align-items: start !important;
+  background: #fafafa !important;
 }
 
 .cart-item-image {
-  width: 80px;
-  height: 80px;
-  background: #f5f5f5;
-  border-radius: 8px;
-  overflow: hidden;
-  grid-column: 1;
+  width: 80px !important;
+  height: 80px !important;
+  background: #f5f5f5 !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  grid-column: 1 !important;
 }
 
 .cart-item-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
 }
 
 .cart-item-details {
-  grid-column: 2;
+  grid-column: 2 !important;
 }
 
 .cart-item-details h4 {
-  margin: 0 0 0.3rem 0;
-  font-size: 0.95rem;
-  color: #333;
-  font-weight: 600;
+  margin: 0 0 0.3rem 0 !important;
+  font-size: 0.95rem !important;
+  color: #333 !important;
+  font-weight: 600 !important;
 }
 
 .cart-item-price {
-  color: #FF6B9D;
-  font-weight: 700;
-  font-size: 0.9rem;
+  color: #FF6B9D !important;
+  font-weight: 700 !important;
+  font-size: 0.9rem !important;
 }
 
 /* Controles de cantidad */
 .cart-item-controls {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  justify-content: center;
-  grid-column: 3;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.3rem !important;
+  justify-content: center !important;
+  grid-column: 3 !important;
 }
 
 .qty-btn {
-  background: #f0f0f0;
-  border: none;
-  width: 28px;
-  height: 28px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s;
+  background: #f0f0f0 !important;
+  border: none !important;
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  font-weight: 600 !important;
+  transition: all 0.2s !important;
 }
 
 .qty-btn:hover {
-  background: #FF6B9D;
-  color: white;
+  background: #FF6B9D !important;
+  color: white !important;
 }
 
 .qty-value {
-  font-weight: 600;
-  color: #333;
-  min-width: 20px;
-  text-align: center;
+  font-weight: 600 !important;
+  color: #333 !important;
+  min-width: 20px !important;
+  text-align: center !important;
 }
 
 /* Subtotal del item */
 .cart-item-subtotal {
-  grid-column: 1 / -1;
-  text-align: right;
-  font-weight: 700;
-  color: #333;
-  padding-top: 0.5rem;
-  border-top: 1px solid #f0f0f0;
+  grid-column: 1 / -1 !important;
+  text-align: right !important;
+  font-weight: 700 !important;
+  color: #333 !important;
+  padding-top: 0.5rem !important;
+  border-top: 1px solid #f0f0f0 !important;
 }
 
 /* Botón eliminar */
 .cart-item-remove {
-  background: #ffcccc;
-  border: none;
-  color: #cc0000;
-  width: 24px;
-  height: 24px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 700;
-  transition: all 0.2s;
+  background: #ffcccc !important;
+  border: none !important;
+  color: #cc0000 !important;
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  font-weight: 700 !important;
+  transition: all 0.2s !important;
 }
 
 .cart-item-remove:hover {
-  background: #ff9999;
+  background: #ff9999 !important;
 }
 
 /* Mensaje carrito vacío */
 #cartDrawerEmpty {
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  text-align: center;
-  color: #999;
-  flex: 1;
-  background: white;
+  display: none !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 2rem !important;
+  text-align: center !important;
+  color: #999 !important;
+  flex: 1 !important;
+  background: white !important;
 }
 
 #cartDrawerEmpty.show {
@@ -206,86 +203,86 @@
 }
 
 .empty-icon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
+  font-size: 3rem !important;
+  margin-bottom: 1rem !important;
 }
 
 #cartDrawerEmpty h3 {
-  margin: 0 0 0.5rem 0;
-  color: #333;
+  margin: 0 0 0.5rem 0 !important;
+  color: #333 !important;
 }
 
 #cartDrawerEmpty p {
-  margin: 0 0 1rem 0;
+  margin: 0 0 1rem 0 !important;
 }
 
 #cartDrawerEmpty a {
-  background: #FF6B9D;
-  color: white;
-  padding: 0.7rem 1.5rem;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: 600;
-  transition: background 0.2s;
+  background: #FF6B9D !important;
+  color: white !important;
+  padding: 0.7rem 1.5rem !important;
+  border-radius: 8px !important;
+  text-decoration: none !important;
+  font-weight: 600 !important;
+  transition: background 0.2s !important;
+  display: inline-block !important;
 }
 
 #cartDrawerEmpty a:hover {
-  background: #E63A7F;
+  background: #E63A7F !important;
 }
 
 /* Footer del drawer */
 .cart-drawer-footer {
-  padding: 1.5rem;
-  border-top: 2px solid #f0f0f0;
-  flex-shrink: 0;
-  background: white;
+  padding: 1.5rem !important;
+  border-top: 2px solid #f0f0f0 !important;
+  flex-shrink: 0 !important;
+  background: white !important;
 }
 
 #cartDrawerTotal {
-  margin-bottom: 1rem;
+  margin-bottom: 1rem !important;
 }
 
 .cart-total-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 0.5rem;
-  font-size: 0.95rem;
-  color: #333;
+  display: flex !important;
+  justify-content: space-between !important;
+  margin-bottom: 0.5rem !important;
+  font-size: 0.95rem !important;
+  color: #333 !important;
 }
 
 .cart-total-row.highlight {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #FF6B9D;
-  border-top: 1px solid #f0f0f0;
-  padding-top: 0.5rem;
+  font-size: 1.1rem !important;
+  font-weight: 700 !important;
+  color: #FF6B9D !important;
+  border-top: 1px solid #f0f0f0 !important;
+  padding-top: 0.5rem !important;
 }
 
 #cartDrawerCheckoutBtn {
-  width: 100%;
-  padding: 0.9rem;
-  background: linear-gradient(135deg, #FF6B9D 0%, #E63A7F 100%);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(255, 107, 157, 0.3);
-  font-size: 1rem;
+  width: 100% !important;
+  padding: 0.9rem !important;
+  background: linear-gradient(135deg, #FF6B9D 0%, #E63A7F 100%) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 12px rgba(255, 107, 157, 0.3) !important;
+  font-size: 1rem !important;
 }
 
 #cartDrawerCheckoutBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(255, 107, 157, 0.4);
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 16px rgba(255, 107, 157, 0.4) !important;
 }
 
 /* Responsive */
 @media (max-width: 480px) {
   #cartDrawer {
-    width: 100vw;
-    max-width: 100vw;
-    right: -100vw;
+    width: 100vw !important;
+    right: -100vw !important;
   }
   
   #cartDrawer.open {
