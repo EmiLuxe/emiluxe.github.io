@@ -21,7 +21,7 @@
       <li><a href="shop.html">Tienda</a></li>
     </ul>
     <div class="navbar-icons">
-      <button id="cartButton" onclick="window.openDrawer()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; position: relative;">
+      <button id="cartButton" onclick="window.openDrawer(); event.stopPropagation();" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; position: relative;">
         🛒
         <span class="cart-badge">0</span>
       </button>
