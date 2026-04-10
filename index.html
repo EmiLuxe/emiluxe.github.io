@@ -296,21 +296,21 @@
         console.error('✗ Error cargando más vendidos:', error);
         document.getElementById('bestsellersContainer').innerHTML = `
           <div class="error-message">
-            Error cargando más vendidos. Intenta recargar la página.
+            Error cargando m��s vendidos. Intenta recargar la página.
           </div>
         `;
       }
     }
 
-    // Agregar producto al carrito desde más vendidos
+    // Agregar producto al carrito desde más vendidos ✨ MODIFICADO ✨
     window.addProductToCart = async function(productId) {
       try {
         const allProducts = await getAllProducts();
         const product = allProducts.find(p => p.id === productId);
 
         if (product) {
-          addToCart(product, 1);
-          showNotification(`${product.name} agregado al carrito 🛒`, 'success');
+          const { openSizeModal } = await import('./js/size-selector-modal.js');
+          openSizeModal(product);
         } else {
           console.warn('Producto no encontrado:', productId);
           showNotification('Error: Producto no encontrado', 'error');
