@@ -181,7 +181,7 @@ function clearOrderData() {
 }
 
 // ========================================
-// DRAWER GLOBALES ✨ NUEVO ✨
+// DRAWER GLOBALES ✨ MEJORADO ✨
 // ========================================
 
 /**
@@ -194,6 +194,7 @@ window.openDrawer = async function() {
     openCartDrawer();
   } catch (error) {
     console.error('Error abriendo drawer:', error);
+    showNotification('Error al abrir el carrito', 'error');
   }
 }
 
