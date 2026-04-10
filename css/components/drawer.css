@@ -1,291 +1,434 @@
-/* ========================================
-   EMILUXE - COMPONENTS: CART DRAWER
-   ======================================== */
+// ========================================
+// EMILUXE - CART DRAWER SYSTEM
+// ========================================
+// Carrito lateral moderno con gestor de cantidades
 
-#cartDrawerOverlay {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  background: rgba(0, 0, 0, 0) !important;
-  z-index: 995 !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  transition: opacity 0.3s ease !important;
+import { formatProductForCart, requiresSizeSelection } from './product-utils.js';
+import { getAllProducts } from './products.js';
+
+let drawerState = {
+  isOpen: false,
+  cartItems: []
+};
+
+export function initCartDrawer() {
+  console.log('🛒 Inicializando Cart Drawer...');
+  loadCartFromStorage();
+  setupDrawerEventListeners();
+  setupDrawerHTML();
+  console.log('✓ Cart Drawer inicializado');
 }
 
-#cartDrawerOverlay.visible {
-  background: rgba(0, 0, 0, 0.5) !important;
-  opacity: 1 !important;
-  pointer-events: auto !important;
+function setupDrawerHTML() {
+  let drawer = document.getElementById('cartDrawer');
+  let overlay = document.getElementById('cartDrawerOverlay');
+
+  if (!drawer || !overlay) {
+    console.warn('⚠️ Elementos del drawer no encontrados en HTML');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'cartDrawerOverlay';
+      document.body.appendChild(overlay);
+    }
+    if (!drawer) {
+      drawer = document.createElement('div');
+      drawer.id = 'cartDrawer';
+      drawer.innerHTML = `
+        <div class="cart-drawer-header">
+          <h2>Tu Carrito</h2>
+          <button class="cart-drawer-close" onclick="window.closeDrawer()">✕</button>
+        </div>
+        <div id="cartDrawerEmpty" class="show">
+          <div class="empty-icon">🛒</div>
+          <h3>Carrito Vacío</h3>
+          <p>Agrega productos para comenzar</p>
+          <a href="shop.html">Continuar Comprando</a>
+        </div>
+        <div id="cartDrawerItems"></div>
+        <div class="cart-drawer-footer">
+          <div id="cartDrawerTotal"></div>
+          <button id="cartDrawerCheckoutBtn" onclick="window.goToCheckout()" style="display: none;">
+            Ir a Checkout
+          </button>
+        </div>
+      `;
+      document.body.appendChild(drawer);
+    }
+  }
 }
 
-/* Drawer principal */
-#cartDrawer {
-  position: fixed !important;
-  right: -450px !important;
-  top: 0 !important;
-  width: 400px !important;
-  height: 100vh !important;
-  background: white !important;
-  box-shadow: -5px 0 20px rgba(0, 0, 0, 0.2) !important;
-  z-index: 1000 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  overflow-y: auto !important;
-  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+function setupDrawerEventListeners() {
+  document.addEventListener('click', (e) => {
+    const drawer = document.getElementById('cartDrawer');
+    const overlay = document.getElementById('cartDrawerOverlay');
+
+    if (drawer && overlay && !drawer.contains(e.target) && !overlay.contains(e.target)) {
+      if (drawerState.isOpen && !drawerState.isAnimating) {
+        closeCartDrawer();
+      }
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && drawerState.isOpen) {
+      closeCartDrawer();
+    }
+  });
 }
 
-#cartDrawer.open {
-  right: 0 !important;
+export function openCartDrawer() {
+  console.log('📂 Intentando abrir drawer...');
+
+  if (drawerState.isOpen) {
+    console.log('ℹ️ Drawer ya está abierto');
+    return;
+  }
+
+  drawerState.isOpen = true;
+
+  const drawer = document.getElementById('cartDrawer');
+  const overlay = document.getElementById('cartDrawerOverlay');
+
+  if (drawer && overlay) {
+    // Limpiar cualquier estilo inline que interfiera con el CSS
+    drawer.style.removeProperty('right');
+    drawer.classList.add('open');
+    overlay.classList.add('visible');
+    overlay.style.pointerEvents = 'auto';
+    console.log('✓ Drawer abierto');
+  } else {
+    console.error('❌ Drawer o overlay no encontrados');
+    drawerState.isOpen = false;
+  }
 }
 
-/* Header del drawer */
-.cart-drawer-header {
-  padding: 1.5rem !important;
-  border-bottom: 2px solid #f0f0f0 !important;
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  flex-shrink: 0 !important;
-  background: white !important;
+export function closeCartDrawer() {
+  if (!drawerState.isOpen) return;
+
+  drawerState.isOpen = false;
+
+  const drawer = document.getElementById('cartDrawer');
+  const overlay = document.getElementById('cartDrawerOverlay');
+
+  if (drawer && overlay) {
+    drawer.classList.remove('open');
+    overlay.classList.remove('visible');
+    overlay.style.pointerEvents = 'none';
+    console.log('✓ Drawer cerrado');
+  }
 }
 
-.cart-drawer-header h2 {
-  margin: 0 !important;
-  font-size: 1.3rem !important;
-  color: #FF6B9D !important;
-  font-weight: 700 !important;
+export function toggleCartDrawer() {
+  if (drawerState.isOpen) {
+    closeCartDrawer();
+  } else {
+    openCartDrawer();
+  }
 }
 
-.cart-drawer-close {
-  background: none !important;
-  border: none !important;
-  font-size: 24px !important;
-  cursor: pointer !important;
-  color: #999 !important;
-  transition: color 0.2s !important;
-  padding: 0 !important;
+export function addProductToDrawer(product, selectedSize = null, quantity = 1) {
+  if (requiresSizeSelection(product) && !selectedSize) {
+    console.warn('⚠️ Producto requiere seleccionar talla');
+    return null;
+  }
+
+  const cartItem = formatProductForCart(product, selectedSize, quantity);
+  const existingIndex = drawerState.cartItems.findIndex(
+    item => item.cartItemId === cartItem.cartItemId
+  );
+
+  if (existingIndex !== -1) {
+    drawerState.cartItems[existingIndex].quantity += quantity;
+  } else {
+    drawerState.cartItems.push(cartItem);
+  }
+
+  saveCartToStorage();
+  updateDrawerDisplay();
+  updateCartBadge();
+
+  console.log('✓ Producto agregado al carrito:', product.name);
+  return cartItem;
 }
 
-.cart-drawer-close:hover {
-  color: #FF6B9D !important;
+export function removeFromDrawer(cartItemId) {
+  const initialLength = drawerState.cartItems.length;
+
+  drawerState.cartItems = drawerState.cartItems.filter(
+    item => item.cartItemId !== cartItemId
+  );
+
+  if (drawerState.cartItems.length < initialLength) {
+    saveCartToStorage();
+    updateDrawerDisplay();
+    updateCartBadge();
+    console.log('✓ Producto eliminado del carrito');
+    return true;
+  }
+
+  return false;
 }
 
-/* Contenedor de items */
-#cartDrawerItems {
-  flex: 1 !important;
-  overflow-y: auto !important;
-  padding: 1rem !important;
-  background: white !important;
+export function updateQuantity(cartItemId, quantity) {
+  const item = drawerState.cartItems.find(i => i.cartItemId === cartItemId);
+
+  if (!item) return false;
+
+  if (quantity <= 0) {
+    return removeFromDrawer(cartItemId);
+  }
+
+  item.quantity = quantity;
+  saveCartToStorage();
+  updateDrawerDisplay();
+  updateCartBadge();
+
+  return true;
 }
 
-/* Item del carrito */
-.cart-drawer-item {
-  display: grid !important;
-  grid-template-columns: 80px 1fr 80px !important;
-  gap: 0.8rem !important;
-  padding: 1rem !important;
-  border: 1px solid #f0f0f0 !important;
-  border-radius: 8px !important;
-  margin-bottom: 0.8rem !important;
-  align-items: start !important;
-  background: #fafafa !important;
+export function increaseQuantity(cartItemId) {
+  const item = drawerState.cartItems.find(i => i.cartItemId === cartItemId);
+
+  if (!item) return null;
+
+  item.quantity += 1;
+  saveCartToStorage();
+  updateDrawerDisplay();
+  updateCartBadge();
+
+  return item.quantity;
 }
 
-.cart-item-image {
-  width: 80px !important;
-  height: 80px !important;
-  background: #f5f5f5 !important;
-  border-radius: 8px !important;
-  overflow: hidden !important;
-  grid-column: 1 !important;
+export function decreaseQuantity(cartItemId) {
+  const item = drawerState.cartItems.find(i => i.cartItemId === cartItemId);
+
+  if (!item) return null;
+
+  if (item.quantity <= 1) {
+    removeFromDrawer(cartItemId);
+    return 0;
+  }
+
+  item.quantity -= 1;
+  saveCartToStorage();
+  updateDrawerDisplay();
+  updateCartBadge();
+
+  return item.quantity;
 }
 
-.cart-item-image img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
+export function clearCart() {
+  drawerState.cartItems = [];
+  saveCartToStorage();
+  updateDrawerDisplay();
+  updateCartBadge();
+  console.log('✓ Carrito vaciado');
 }
 
-.cart-item-details {
-  grid-column: 2 !important;
+export function getCartItems() {
+  return [...drawerState.cartItems];
 }
 
-.cart-item-details h4 {
-  margin: 0 0 0.3rem 0 !important;
-  font-size: 0.95rem !important;
-  color: #333 !important;
-  font-weight: 600 !important;
+export function getCartTotal() {
+  return drawerState.cartItems.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0
+  );
 }
 
-.cart-item-price {
-  color: #FF6B9D !important;
-  font-weight: 700 !important;
-  font-size: 0.9rem !important;
+export function getCartItemCount() {
+  return drawerState.cartItems.reduce((count, item) => count + item.quantity, 0);
 }
 
-/* Controles de cantidad */
-.cart-item-controls {
-  display: flex !important;
-  align-items: center !important;
-  gap: 0.3rem !important;
-  justify-content: center !important;
-  grid-column: 3 !important;
+export function getCartProductCount() {
+  return drawerState.cartItems.length;
 }
 
-.qty-btn {
-  background: #f0f0f0 !important;
-  border: none !important;
-  width: 28px !important;
-  height: 28px !important;
-  border-radius: 4px !important;
-  cursor: pointer !important;
-  font-weight: 600 !important;
-  transition: all 0.2s !important;
+export function getDrawerState() {
+  return {
+    isOpen: drawerState.isOpen,
+    itemCount: getCartItemCount(),
+    productCount: getCartProductCount(),
+    total: getCartTotal()
+  };
 }
 
-.qty-btn:hover {
-  background: #FF6B9D !important;
-  color: white !important;
+export function getCartItem(cartItemId) {
+  return drawerState.cartItems.find(item => item.cartItemId === cartItemId) || null;
 }
 
-.qty-value {
-  font-weight: 600 !important;
-  color: #333 !important;
-  min-width: 20px !important;
-  text-align: center !important;
+export function updateDrawerDisplay() {
+  const itemsContainer = document.getElementById('cartDrawerItems');
+  const emptyMessage = document.getElementById('cartDrawerEmpty');
+  const totalElement = document.getElementById('cartDrawerTotal');
+  const checkoutBtn = document.getElementById('cartDrawerCheckoutBtn');
+
+  if (!itemsContainer) {
+    console.warn('⚠️ Contenedor de items no encontrado');
+    return;
+  }
+
+  if (drawerState.cartItems.length === 0) {
+    itemsContainer.innerHTML = '';
+    if (emptyMessage) emptyMessage.style.display = 'flex';
+    if (totalElement) totalElement.style.display = 'none';
+    if (checkoutBtn) checkoutBtn.style.display = 'none';
+    return;
+  }
+
+  if (emptyMessage) emptyMessage.style.display = 'none';
+  if (totalElement) totalElement.style.display = 'block';
+  if (checkoutBtn) checkoutBtn.style.display = 'block';
+
+  itemsContainer.innerHTML = drawerState.cartItems
+    .map(item => createCartItemHTML(item))
+    .join('');
+
+  if (totalElement) {
+    totalElement.innerHTML = `
+      <div class="cart-total-row">
+        <span>Subtotal:</span>
+        <span>${formatPrice(getCartTotal())}</span>
+      </div>
+      <div class="cart-total-row highlight">
+        <span>Total:</span>
+        <span>${formatPrice(getCartTotal())}</span>
+      </div>
+    `;
+  }
+
+  setupItemEventListeners();
 }
 
-/* Subtotal del item */
-.cart-item-subtotal {
-  grid-column: 1 / -1 !important;
-  text-align: right !important;
-  font-weight: 700 !important;
-  color: #333 !important;
-  padding-top: 0.5rem !important;
-  border-top: 1px solid #f0f0f0 !important;
+function createCartItemHTML(item) {
+  const sizeText = item.size ? `<small style="color: #999;">Talla: ${item.size}</small>` : '';
+  const subtotal = item.price * item.quantity;
+
+  return `
+    <div class="cart-drawer-item" data-cart-item-id="${item.cartItemId}">
+      <div class="cart-item-image">
+        <img 
+          src="${item.image}" 
+          alt="${item.name}"
+          onerror="this.src='https://via.placeholder.com/400x500?text=Sin+Imagen'"
+        >
+      </div>
+      <div class="cart-item-details">
+        <h4>${item.name}</h4>
+        ${sizeText}
+        <div class="cart-item-price">${formatPrice(item.price)}</div>
+      </div>
+      <div class="cart-item-controls">
+        <button class="qty-btn minus" onclick="window.decreaseQtyInDrawer('${item.cartItemId}')">
+          −
+        </button>
+        <span class="qty-value">${item.quantity}</span>
+        <button class="qty-btn plus" onclick="window.increaseQtyInDrawer('${item.cartItemId}')">
+          +
+        </button>
+      </div>
+      <div class="cart-item-subtotal">
+        <span>${formatPrice(subtotal)}</span>
+      </div>
+      <button 
+        class="cart-item-remove" 
+        onclick="window.removeFromDrawerUI('${item.cartItemId}')"
+        title="Eliminar"
+      >
+        ✕
+      </button>
+    </div>
+  `;
 }
 
-/* Botón eliminar */
-.cart-item-remove {
-  background: #ffcccc !important;
-  border: none !important;
-  color: #cc0000 !important;
-  width: 24px !important;
-  height: 24px !important;
-  border-radius: 4px !important;
-  cursor: pointer !important;
-  font-weight: 700 !important;
-  transition: all 0.2s !important;
+function setupItemEventListeners() {
+  // Eventos configurados vía onclick inline en HTML
 }
 
-.cart-item-remove:hover {
-  background: #ff9999 !important;
+export function updateCartBadge() {
+  const badge = document.querySelector('.cart-badge');
+  if (badge) {
+    const count = getCartItemCount();
+    badge.textContent = count;
+    badge.style.display = count > 0 ? 'flex' : 'none';
+  }
 }
 
-/* Mensaje carrito vacío */
-#cartDrawerEmpty {
-  display: none !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 2rem !important;
-  text-align: center !important;
-  color: #999 !important;
-  flex: 1 !important;
-  background: white !important;
+function saveCartToStorage() {
+  localStorage.setItem('emiluxe_cart_drawer', JSON.stringify(drawerState.cartItems));
+  localStorage.setItem('emiluxe_cart', JSON.stringify(drawerState.cartItems));
+  console.log('✓ Carrito sincronizado en localStorage:', drawerState.cartItems.length, 'items');
 }
 
-#cartDrawerEmpty.show {
-  display: flex !important;
-}
-
-.empty-icon {
-  font-size: 3rem !important;
-  margin-bottom: 1rem !important;
-}
-
-#cartDrawerEmpty h3 {
-  margin: 0 0 0.5rem 0 !important;
-  color: #333 !important;
-}
-
-#cartDrawerEmpty p {
-  margin: 0 0 1rem 0 !important;
-}
-
-#cartDrawerEmpty a {
-  background: #FF6B9D !important;
-  color: white !important;
-  padding: 0.7rem 1.5rem !important;
-  border-radius: 8px !important;
-  text-decoration: none !important;
-  font-weight: 600 !important;
-  transition: background 0.2s !important;
-  display: inline-block !important;
-}
-
-#cartDrawerEmpty a:hover {
-  background: #E63A7F !important;
-}
-
-/* Footer del drawer */
-.cart-drawer-footer {
-  padding: 1.5rem !important;
-  border-top: 2px solid #f0f0f0 !important;
-  flex-shrink: 0 !important;
-  background: white !important;
-}
-
-#cartDrawerTotal {
-  margin-bottom: 1rem !important;
-}
-
-.cart-total-row {
-  display: flex !important;
-  justify-content: space-between !important;
-  margin-bottom: 0.5rem !important;
-  font-size: 0.95rem !important;
-  color: #333 !important;
-}
-
-.cart-total-row.highlight {
-  font-size: 1.1rem !important;
-  font-weight: 700 !important;
-  color: #FF6B9D !important;
-  border-top: 1px solid #f0f0f0 !important;
-  padding-top: 0.5rem !important;
-}
-
-#cartDrawerCheckoutBtn {
-  width: 100% !important;
-  padding: 0.9rem !important;
-  background: linear-gradient(135deg, #FF6B9D 0%, #E63A7F 100%) !important;
-  color: white !important;
-  border: none !important;
-  border-radius: 8px !important;
-  font-weight: 700 !important;
-  cursor: pointer !important;
-  transition: all 0.3s ease !important;
-  box-shadow: 0 4px 12px rgba(255, 107, 157, 0.3) !important;
-  font-size: 1rem !important;
-}
-
-#cartDrawerCheckoutBtn:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 6px 16px rgba(255, 107, 157, 0.4) !important;
-}
-
-/* Responsive */
-@media (max-width: 480px) {
-  #cartDrawer {
-    width: 100vw !important;
-    right: -100vw !important;
+function loadCartFromStorage() {
+  let saved = localStorage.getItem('emiluxe_cart_drawer');
+  
+  if (!saved) {
+    saved = localStorage.getItem('emiluxe_cart');
   }
   
-  #cartDrawer.open {
-    right: 0 !important;
+  if (saved) {
+    try {
+      drawerState.cartItems = JSON.parse(saved);
+      console.log('✓ Carrito cargado del localStorage:', drawerState.cartItems.length, 'items');
+      updateCartBadge();
+      updateDrawerDisplay();
+    } catch (error) {
+      console.warn('⚠️ Error cargando carrito:', error);
+      drawerState.cartItems = [];
+    }
+  } else {
+    console.log('ℹ️ Carrito vacío (primera vez)');
+    drawerState.cartItems = [];
   }
 }
+
+window.decreaseQtyInDrawer = function(cartItemId) {
+  decreaseQuantity(cartItemId);
+};
+
+window.increaseQtyInDrawer = function(cartItemId) {
+  increaseQuantity(cartItemId);
+};
+
+window.removeFromDrawerUI = function(cartItemId) {
+  removeFromDrawer(cartItemId);
+};
+
+window.openDrawer = function() {
+  console.log('🔔 openDrawer() llamado');
+  try {
+    openCartDrawer();
+  } catch (error) {
+    console.error('❌ Error en openDrawer:', error);
+  }
+};
+
+window.closeDrawer = function() {
+  try {
+    closeCartDrawer();
+  } catch (error) {
+    console.error('Error en closeDrawer:', error);
+  }
+};
+
+export default {
+  initCartDrawer,
+  openCartDrawer,
+  closeCartDrawer,
+  toggleCartDrawer,
+  addProductToDrawer,
+  removeFromDrawer,
+  updateQuantity,
+  increaseQuantity,
+  decreaseQuantity,
+  clearCart,
+  getCartItems,
+  getCartTotal,
+  getCartItemCount,
+  getCartProductCount,
+  getDrawerState,
+  getCartItem,
+  updateDrawerDisplay,
+  updateCartBadge
+};
