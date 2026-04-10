@@ -127,9 +127,12 @@
 
 .category-image {
   width: 100%;
-  height: 180px;
+  height: 200px;
   overflow: hidden;
   background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .category-image img {
@@ -219,7 +222,7 @@
 
 .bestseller-image {
   width: 100%;
-  height: 200px;
+  height: 240px;
   object-fit: cover;
   background: #f5f5f5;
 }
@@ -286,6 +289,105 @@
 }
 
 /* ========================================
+   SECCIÓN DE CONFIANZA - MEJORADA
+   ======================================== */
+
+.trust-section {
+  padding: 3rem 1rem;
+  background: #f9f9f9;
+  max-width: 100%;
+}
+
+.trust-section-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.trust-section h2 {
+  text-align: center;
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.trust-section .subtitle {
+  text-align: center;
+  color: #666;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+
+.trust-items {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.trust-item {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.trust-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(255, 107, 157, 0.15);
+  border-color: #FFB8D8;
+}
+
+.trust-item-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.trust-item h3 {
+  font-size: 1.1rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.trust-item p {
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.guarantee-section {
+  background: linear-gradient(135deg, #FFF5F8 0%, #FFE5E5 100%);
+  padding: 2rem;
+  border-radius: 12px;
+  text-align: center;
+  border: 2px solid #FFB8D8;
+}
+
+.guarantee-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.guarantee-section h3 {
+  font-size: 1.3rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.guarantee-section p {
+  color: #666;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0.3rem 0;
+}
+
+/* ========================================
    NO MOSTRAR DRAWER EN HOME
    ======================================== */
 
@@ -330,7 +432,7 @@
   }
 
   .category-image {
-    height: 220px;
+    height: 240px;
   }
 
   .bestsellers-section {
@@ -345,6 +447,23 @@
   .bestsellers-grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
+  }
+
+  .bestseller-image {
+    height: 260px;
+  }
+
+  .trust-section {
+    padding: 4rem 2rem;
+  }
+
+  .trust-items {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+
+  .guarantee-section {
+    padding: 2.5rem;
   }
 }
 
@@ -368,6 +487,28 @@
 
   .bestsellers-grid {
     grid-template-columns: repeat(4, 1fr);
+  }
+
+  .category-image {
+    height: 260px;
+  }
+
+  .bestseller-image {
+    height: 280px;
+  }
+
+  .trust-items {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1.5rem;
+  }
+
+  .trust-item {
+    padding: 1.25rem;
+  }
+
+  .guarantee-section {
+    padding: 2rem;
+    margin-top: 2rem;
   }
 }
 
