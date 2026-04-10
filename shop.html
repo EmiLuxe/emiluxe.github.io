@@ -36,7 +36,7 @@
     <!-- BÚSQUEDA EN TIEMPO REAL ✨ NUEVA ✨ -->
     <div class="search-container">
       <div class="search-wrapper">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon">��</span>
         <input 
           type="text" 
           id="searchInput" 
@@ -331,6 +331,16 @@
       const message = encodeURIComponent('Hola EmiLuxe, tengo una consulta 💕');
       window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
     }
+  </script>
+
+  <!-- ✨ INICIALIZAR CART DRAWER ✨ -->
+  <script type="module">
+    import { initCartDrawer } from './js/cart-drawer.js';
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('🎯 Inicializando drawer en shop.html');
+      initCartDrawer();
+    });
   </script>
 </body>
 </html>
