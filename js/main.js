@@ -188,28 +188,34 @@ function clearOrderData() {
 // ========================================
 
 /**
- * Cargar módulo del drawer una sola vez
- * @returns {Promise<Object>}
- */
-async function loadDrawerModule() {
-  if (!drawerModule) {
-    drawerModule = await import('./cart-drawer.js');
-  }
-  return drawerModule;
-}
-
-/**
- * Abrir drawer del carrito - ✨ ARREGLADO ✨
+ * Abrir drawer del carrito - ✨ FUNCIONA EN TODOS LADOS ✨
  * @returns {void}
  */
-window.openDrawer = async function() {
+window.openDrawer = function() {
   try {
     console.log('🔔 openDrawer() llamado desde main.js');
-    const { openCartDrawer } = await loadDrawerModule();
-    openCartDrawer();
+    const drawerEl = document.getElementById('cartDrawer');
+    const overlayEl = document.getElementById('cartDrawerOverlay');
+    
+    if (drawerEl && overlayEl) {
+      drawerEl.style.right = '0px';
+      drawerEl.style.display = 'flex';
+      drawerEl.style.zIndex = '1000';
+      
+      overlayEl.style.display = 'block';
+      overlayEl.style.zIndex = '999';
+      overlayEl.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+      overlayEl.style.opacity = '1';
+      overlayEl.style.pointerEvents = 'auto';
+      
+      drawerEl.classList.add('open');
+      overlayEl.classList.add('visible');
+      console.log('✓ Drawer abierto correctamente');
+    } else {
+      console.error('❌ Drawer o overlay no encontrados');
+    }
   } catch (error) {
     console.error('Error abriendo drawer:', error);
-    showNotification('Error al abrir el carrito', 'error');
   }
 }
 
@@ -217,10 +223,21 @@ window.openDrawer = async function() {
  * Cerrar drawer del carrito
  * @returns {void}
  */
-window.closeDrawer = async function() {
+window.closeDrawer = function() {
   try {
-    const { closeCartDrawer } = await loadDrawerModule();
-    closeCartDrawer();
+    const drawerEl = document.getElementById('cartDrawer');
+    const overlayEl = document.getElementById('cartDrawerOverlay');
+    
+    if (drawerEl && overlayEl) {
+      drawerEl.style.right = '-450px';
+      overlayEl.style.display = 'none';
+      overlayEl.style.opacity = '0';
+      overlayEl.style.pointerEvents = 'none';
+      
+      drawerEl.classList.remove('open');
+      overlayEl.classList.remove('visible');
+      console.log('✓ Drawer cerrado correctamente');
+    }
   } catch (error) {
     console.error('Error cerrando drawer:', error);
   }
