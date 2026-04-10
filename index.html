@@ -79,7 +79,7 @@
     <h3>💝 Ofertas Especiales</h3>
     <p>Envío gratis desde $80.000</p>
     <p>10% OFF en tu primera compra</p>
-    <div class="promo-badge">���� Hoy es tu día</div>
+    <div class="promo-badge">🎉 Hoy es tu día</div>
   </section>
 
   <!-- CATEGORIES SECTION -->
@@ -88,7 +88,7 @@
     <div class="category-grid">
       <div class="category-card" onclick="navigateToCategory('pijamas')">
         <div class="category-image">
-          <img src="assets/images/categories/pijama.jpg" alt="Pijamas" onerror="this.src='assets/images/placeholder.png'">
+          <img src="assets/images/categories/pijama.jpg" alt="Pijamas" onerror="this.src='assets/images/placeholder.png'" loading="lazy">
         </div>
         <div>
           <h3>Pijamas</h3>
@@ -97,7 +97,7 @@
       </div>
       <div class="category-card" onclick="navigateToCategory('lenceria')">
         <div class="category-image">
-          <img src="assets/images/categories/lenceria.webp" alt="Lencería" onerror="this.src='assets/images/placeholder.png'">
+          <img src="assets/images/categories/lenceria.webp" alt="Lencería" onerror="this.src='assets/images/placeholder.png'" loading="lazy">
         </div>
         <div>
           <h3>Lencería</h3>
@@ -106,7 +106,7 @@
       </div>
       <div class="category-card" onclick="navigateToCategory('casual')">
         <div class="category-image">
-          <img src="assets/images/categories/casual.jpg" alt="Ropa casual" onerror="this.src='assets/images/placeholder.png'">
+          <img src="assets/images/categories/casual.jpg" alt="Ropa casual" onerror="this.src='assets/images/placeholder.png'" loading="lazy">
         </div>
         <div>
           <h3>Ropa casual</h3>
@@ -115,7 +115,7 @@
       </div>
       <div class="category-card" onclick="navigateToCategory('perfumeria')">
         <div class="category-image">
-          <img src="assets/images/categories/perfumeria.png" alt="Perfumería" onerror="this.src='assets/images/placeholder.png'">
+          <img src="assets/images/categories/perfumeria.png" alt="Perfumería" onerror="this.src='assets/images/placeholder.png'" loading="lazy">
         </div>
         <div>
           <h3>Perfumería</h3>
@@ -132,6 +132,53 @@
       <div class="bestsellers-loading">
         <div class="loading-spinner"></div>
         <p>Cargando productos...</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECCIÓN DE CONFIANZA ✨ NUEVA ✨ -->
+  <section class="trust-section">
+    <div class="trust-section-content">
+      <h2>🛡️ Compra con Confianza</h2>
+      <p class="subtitle">Todo lo que necesitas para una compra segura</p>
+
+      <div class="trust-items">
+        <div class="trust-item payment">
+          <div class="trust-item-icon icon-payment">💳</div>
+          <h3>Pago Contra Entrega</h3>
+          <p>Recibe primero, paga después. Sin complicaciones.</p>
+        </div>
+
+        <div class="trust-item shipping">
+          <div class="trust-item-icon icon-shipping">🚚</div>
+          <h3>Envíos a Todo Colombia</h3>
+          <p>Envío gratis desde $80.000. Coordenamos contigo.</p>
+        </div>
+
+        <div class="trust-item exchange">
+          <div class="trust-item-icon icon-exchange">🔄</div>
+          <h3>Cambios Fáciles</h3>
+          <p>30 días para cambiar si algo no te gusta.</p>
+        </div>
+
+        <div class="trust-item quality">
+          <div class="trust-item-icon icon-quality">⭐</div>
+          <h3>Garantía de Calidad</h3>
+          <p>100% auténticas. Verifica antes de pagar.</p>
+        </div>
+
+        <div class="trust-item support">
+          <div class="trust-item-icon icon-support">💬</div>
+          <h3>Atención al Cliente</h3>
+          <p>Contacto por WhatsApp. Respuestas rápidas.</p>
+        </div>
+      </div>
+
+      <div class="guarantee-section">
+        <div class="guarantee-icon">✅</div>
+        <h3>Tu satisfacción es nuestra prioridad</h3>
+        <p>Somos una tienda de confianza con más de 200 compras satisfechas.</p>
+        <p>Compra sin preocupaciones.</p>
       </div>
     </div>
   </section>
@@ -233,7 +280,7 @@
         container.innerHTML = bestsellers.map((product, index) => `
           <div class="bestseller-card">
             <div class="bestseller-badge">🔥 #${index + 1}</div>
-            <img src="${product.image}" alt="${product.name}" class="bestseller-image" onerror="this.src='assets/images/placeholder.png'">
+            <img src="${product.image}" alt="${product.name}" class="bestseller-image" onerror="this.src='assets/images/placeholder.png'" loading="lazy">
             <div class="bestseller-info">
               <div class="bestseller-name">${product.name}</div>
               <div class="bestseller-price">${formatPrice(product.price)}</div>
