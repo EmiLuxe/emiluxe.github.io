@@ -106,15 +106,11 @@ function setupDrawerEventListeners() {
 // ========================================
 
 /**
- * Abrir carrito drawer - ✨ DEFINITIVO CON ESTILOS INLINE ✨
+ * Abrir carrito drawer - ✨ SOLUCIÓN DEFINITIVA ✨
  * @returns {void}
  */
 export function openCartDrawer() {
   console.log('📂 Intentando abrir drawer...');
-  console.log('Estado actual:', {
-    isOpen: drawerState.isOpen,
-    isAnimating: drawerState.isAnimating
-  });
   
   if (drawerState.isOpen && !drawerState.isAnimating) {
     console.log('ℹ️ Drawer ya está abierto');
@@ -132,24 +128,22 @@ export function openCartDrawer() {
   const drawer = document.getElementById('cartDrawer');
   const overlay = document.getElementById('cartDrawerOverlay');
 
-  console.log('🎯 Drawer encontrado:', !!drawer);
-  console.log('🎯 Overlay encontrado:', !!overlay);
-
   if (drawer && overlay) {
-    console.log('✨ Agregando clases: open y visible');
-    drawer.classList.add('open');
-    overlay.classList.add('visible');
+    // ✨ FORZAR REFLOW para que CSS se aplique
+    drawer.classList.remove('open');
+    overlay.classList.remove('visible');
     
-    // ✨ AGREGAR ESTILOS INLINE PARA FORZAR
-    drawer.style.right = '0';
-    drawer.style.zIndex = '1000';
-    overlay.style.zIndex = '999';
-    overlay.style.display = 'block';
-    
-    console.log('✓ Clase "open" en drawer:', drawer.classList.contains('open'));
-    console.log('✓ Clase "visible" en overlay:', overlay.classList.contains('visible'));
-    console.log('✓ Drawer style.right:', drawer.style.right);
-    console.log('✓ Drawer abierto');
+    // Esperar un frame
+    requestAnimationFrame(() => {
+      drawer.classList.add('open');
+      overlay.classList.add('visible');
+      
+      // Forzar estilos inline FUERTES
+      drawer.style.cssText = 'right: 0 !important; z-index: 1000 !important; transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;';
+      overlay.style.cssText = 'display: block !important; z-index: 999 !important; opacity: 1 !important; background: rgba(0, 0, 0, 0.5) !important;';
+      
+      console.log('✓ Drawer abierto con estilos forzados');
+    });
 
     setTimeout(() => {
       drawerState.isAnimating = false;
@@ -163,7 +157,7 @@ export function openCartDrawer() {
 }
 
 /**
- * Cerrar carrito drawer - ✨ DEFINITIVO CON ESTILOS INLINE ✨
+ * Cerrar carrito drawer - ✨ SOLUCIÓN DEFINITIVA ✨
  * @returns {void}
  */
 export function closeCartDrawer() {
@@ -176,12 +170,13 @@ export function closeCartDrawer() {
   const overlay = document.getElementById('cartDrawerOverlay');
 
   if (drawer && overlay) {
-    drawer.classList.remove('open');
-    overlay.classList.remove('visible');
-    
-    // ✨ REMOVER ESTILOS INLINE
-    drawer.style.right = '-450px';
-    overlay.style.display = 'none';
+    requestAnimationFrame(() => {
+      drawer.classList.remove('open');
+      overlay.classList.remove('visible');
+      
+      drawer.style.cssText = 'right: -450px !important; z-index: 1000 !important;';
+      overlay.style.cssText = 'display: none !important;';
+    });
 
     setTimeout(() => {
       drawerState.isAnimating = false;
@@ -587,7 +582,7 @@ window.removeFromDrawerUI = function(cartItemId) {
 };
 
 /**
- * Abrir drawer - ✨ MEJORADO CON DEBUGGING ✨
+ * Abrir drawer
  * @returns {void}
  */
 window.openDrawer = function() {
