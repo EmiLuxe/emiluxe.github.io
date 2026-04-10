@@ -61,6 +61,12 @@ function setupDrawerEventListeners() {
   document.addEventListener('click', (e) => {
     const drawer = document.getElementById('cartDrawer');
     const overlay = document.getElementById('cartDrawerOverlay');
+    const cartButton = document.getElementById('cartButton');
+
+    // NO cerrar si clickeaste el botón o dentro del drawer
+    if (cartButton && cartButton.contains(e.target)) {
+      return;
+    }
 
     if (drawer && overlay && !drawer.contains(e.target) && !overlay.contains(e.target)) {
       if (drawerState.isOpen) {
