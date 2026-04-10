@@ -1,6 +1,5 @@
- 
 // ========================================
-// EMILUXE - CART SYSTEM
+// EMILUXE - CART SYSTEM ✨ MODIFICADO ✨
 // ========================================
 
 // Cart key for localStorage
@@ -21,20 +20,26 @@ function getCart() {
   return JSON.parse(localStorage.getItem(CART_KEY)) || [];
 }
 
-// Add product to cart
-function addToCart(product, quantity = 1) {
+// Add product to cart ✨ MODIFICADO ✨
+function addToCart(product, quantity = 1, selectedSize = null) {
   let cart = getCart();
-  const existingItem = cart.find(item => item.id === product.id);
+  
+  // Crear ID único incluyendo talla si existe
+  const cartItemId = selectedSize ? `${product.id}_${selectedSize}` : product.id;
+  const existingItem = cart.find(item => (item.cartItemId || item.id) === cartItemId);
 
   if (existingItem) {
     existingItem.quantity += quantity;
   } else {
     cart.push({
       id: product.id,
+      cartItemId: cartItemId,
       name: product.name,
       price: product.price,
       image: product.image,
-      quantity: quantity
+      category: product.category,
+      quantity: quantity,
+      size: selectedSize || null
     });
   }
 
@@ -43,23 +48,23 @@ function addToCart(product, quantity = 1) {
   return cart;
 }
 
-// Remove product from cart
-function removeFromCart(productId) {
+// Remove product from cart ✨ MODIFICADO ✨
+function removeFromCart(cartItemId) {
   let cart = getCart();
-  cart = cart.filter(item => item.id !== productId);
+  cart = cart.filter(item => (item.cartItemId || item.id) !== cartItemId);
   localStorage.setItem(CART_KEY, JSON.stringify(cart));
   updateCartBadge();
   return cart;
 }
 
-// Update product quantity
-function updateQuantity(productId, quantity) {
+// Update product quantity ✨ MODIFICADO ✨
+function updateQuantity(cartItemId, quantity) {
   let cart = getCart();
-  const item = cart.find(item => item.id === productId);
+  const item = cart.find(item => (item.cartItemId || item.id) === cartItemId);
 
   if (item) {
     if (quantity <= 0) {
-      return removeFromCart(productId);
+      return removeFromCart(cartItemId);
     }
     item.quantity = quantity;
     localStorage.setItem(CART_KEY, JSON.stringify(cart));
