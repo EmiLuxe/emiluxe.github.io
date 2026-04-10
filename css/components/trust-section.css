@@ -1,0 +1,530 @@
+/* ========================================
+   EMILUXE - TRUST SECTION STYLES
+   ======================================== */
+
+/* ========================================
+   CONTENEDOR PRINCIPAL
+   ======================================== */
+
+.trust-section {
+  background: linear-gradient(135deg, #FFF5F8 0%, #FFE5E5 100%);
+  padding: 3rem 1rem;
+  margin: 3rem 0;
+  border-radius: 12px;
+  border: 2px solid #FFB8D8;
+}
+
+.trust-section-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ========================================
+   TÍTULO
+   ======================================== */
+
+.trust-section h2 {
+  text-align: center;
+  font-size: 1.75rem;
+  color: #333;
+  margin: 0 0 0.5rem;
+  font-weight: 700;
+}
+
+.trust-section .subtitle {
+  text-align: center;
+  color: #666;
+  font-size: 1rem;
+  margin: 0 0 2rem;
+}
+
+/* ========================================
+   GRID DE ELEMENTOS
+   ======================================== */
+
+.trust-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+/* ========================================
+   ITEM DE CONFIANZA
+   ======================================== */
+
+.trust-item {
+  background: white;
+  padding: 2rem 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.trust-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(255, 107, 157, 0.15);
+  border-color: #FFB8D8;
+}
+
+/* ========================================
+   ÍCONO DE ITEM
+   ======================================== */
+
+.trust-item-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  display: inline-block;
+  animation: float 3s ease-in-out infinite;
+}
+
+.trust-item-icon.icon-payment {
+  animation-delay: 0s;
+}
+
+.trust-item-icon.icon-shipping {
+  animation-delay: 0.5s;
+}
+
+.trust-item-icon.icon-exchange {
+  animation-delay: 1s;
+}
+
+.trust-item-icon.icon-quality {
+  animation-delay: 1.5s;
+}
+
+.trust-item-icon.icon-support {
+  animation-delay: 2s;
+}
+
+/* ========================================
+   CONTENIDO DEL ITEM
+   ======================================== */
+
+.trust-item h3 {
+  font-size: 1.1rem;
+  color: #333;
+  margin: 1rem 0 0.5rem;
+  font-weight: 600;
+}
+
+.trust-item p {
+  color: #666;
+  font-size: 0.95rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ========================================
+   VARIANTES DE ITEMS
+   ======================================== */
+
+.trust-item.payment {
+  border-top: 3px solid #4CAF50;
+}
+
+.trust-item.shipping {
+  border-top: 3px solid #2196F3;
+}
+
+.trust-item.exchange {
+  border-top: 3px solid #FF9800;
+}
+
+.trust-item.quality {
+  border-top: 3px solid #9C27B0;
+}
+
+.trust-item.support {
+  border-top: 3px solid #E91E63;
+}
+
+/* ========================================
+   CARACTERÍSTICAS DESTACADAS
+   ======================================== */
+
+.trust-features {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  margin-top: 2rem;
+  border: 1px solid #f0f0f0;
+}
+
+.trust-features h3 {
+  text-align: center;
+  color: #333;
+  margin-top: 0;
+  font-size: 1.2rem;
+}
+
+.features-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.features-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.features-list li::before {
+  content: "✓";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: #FFE5E5;
+  color: #FF6B9D;
+  border-radius: 50%;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+/* ========================================
+   SECCIÓN DE GARANTÍA
+   ======================================== */
+
+.guarantee-section {
+  background: linear-gradient(135deg, #FFE5E5 0%, #FFF5F8 100%);
+  padding: 2rem;
+  border-radius: 12px;
+  margin-top: 2rem;
+  text-align: center;
+  border: 2px dashed #FFB8D8;
+}
+
+.guarantee-section h3 {
+  color: #FF6B9D;
+  margin-top: 0;
+  font-size: 1.25rem;
+}
+
+.guarantee-section p {
+  color: #666;
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.guarantee-icon {
+  font-size: 2.5rem;
+  margin: 1rem 0;
+}
+
+/* ========================================
+   TESTIMONIOS
+   ======================================== */
+
+.trust-testimonials {
+  margin-top: 2rem;
+}
+
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.testimonial-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #FF6B9D;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.testimonial-stars {
+  color: #FFB800;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.testimonial-text {
+  color: #666;
+  font-size: 0.9rem;
+  margin: 0.75rem 0;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.testimonial-author {
+  color: #999;
+  font-size: 0.85rem;
+  margin-top: 0.75rem;
+}
+
+/* ========================================
+   BADGE DE SEGURIDAD
+   ======================================== */
+
+.trust-badges {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem 0;
+  flex-wrap: wrap;
+}
+
+.security-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  text-align: center;
+  min-width: 120px;
+}
+
+.security-badge-icon {
+  font-size: 2rem;
+}
+
+.security-badge-text {
+  font-size: 0.75rem;
+  color: #666;
+  font-weight: 500;
+}
+
+/* ========================================
+   BANNER CALL TO ACTION
+   ======================================== */
+
+.trust-cta {
+  background: linear-gradient(135deg, #FF6B9D 0%, #E63A7F 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.trust-cta h3 {
+  margin-top: 0;
+  font-size: 1.3rem;
+  color: white;
+}
+
+.trust-cta p {
+  color: rgba(255, 255, 255, 0.9);
+  margin: 1rem 0;
+  font-size: 0.95rem;
+}
+
+.trust-cta-btn {
+  display: inline-block;
+  background: white;
+  color: #FF6B9D;
+  padding: 0.75rem 2rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.trust-cta-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* ========================================
+   ANIMACIONES
+   ======================================== */
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.trust-item {
+  animation: slideInUp 0.6s ease;
+}
+
+.trust-item:nth-child(1) { animation-delay: 0.1s; }
+.trust-item:nth-child(2) { animation-delay: 0.2s; }
+.trust-item:nth-child(3) { animation-delay: 0.3s; }
+.trust-item:nth-child(4) { animation-delay: 0.4s; }
+.trust-item:nth-child(5) { animation-delay: 0.5s; }
+
+/* ========================================
+   RESPONSIVO
+   ======================================== */
+
+@media (max-width: 768px) {
+  .trust-section {
+    padding: 2rem 1rem;
+    margin: 2rem 0;
+  }
+
+  .trust-section h2 {
+    font-size: 1.5rem;
+  }
+
+  .trust-items {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .trust-item {
+    padding: 1.5rem 1rem;
+  }
+
+  .trust-item-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .trust-item h3 {
+    font-size: 1rem;
+  }
+
+  .trust-item p {
+    font-size: 0.9rem;
+  }
+
+  .trust-features {
+    padding: 1.5rem;
+  }
+
+  .features-list {
+    grid-template-columns: 1fr;
+  }
+
+  .testimonials-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .trust-badges {
+    gap: 0.75rem;
+    margin: 1.5rem 0;
+  }
+
+  .security-badge {
+    min-width: 100px;
+    padding: 0.75rem;
+  }
+
+  .security-badge-icon {
+    font-size: 1.5rem;
+  }
+
+  .security-badge-text {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .trust-section {
+    padding: 1.5rem 1rem;
+    margin: 1.5rem 0;
+    border-radius: 8px;
+  }
+
+  .trust-section h2 {
+    font-size: 1.25rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .trust-section .subtitle {
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .trust-items {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .trust-item {
+    padding: 1.25rem 1rem;
+  }
+
+  .trust-item-icon {
+    font-size: 2rem;
+  }
+
+  .trust-item h3 {
+    font-size: 0.95rem;
+    margin: 0.75rem 0 0.4rem;
+  }
+
+  .trust-item p {
+    font-size: 0.85rem;
+  }
+
+  .trust-features {
+    padding: 1rem;
+  }
+
+  .guarantee-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .guarantee-icon {
+    font-size: 2rem;
+    margin: 0.75rem 0;
+  }
+
+  .trust-cta {
+    padding: 1.5rem 1rem;
+  }
+
+  .trust-cta h3 {
+    font-size: 1.1rem;
+  }
+
+  .trust-cta p {
+    font-size: 0.85rem;
+    margin: 0.75rem 0;
+  }
+
+  .trust-cta-btn {
+    padding: 0.65rem 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  .trust-badges {
+    gap: 0.5rem;
+    margin: 1rem 0;
+  }
+
+  .security-badge {
+    min-width: 90px;
+    padding: 0.6rem;
+  }
+}
