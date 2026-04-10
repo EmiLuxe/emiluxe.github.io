@@ -174,7 +174,7 @@
                 src="${product.image}" 
                 alt="${product.name}" 
                 class="product-image" 
-                onerror="this.src='assets/images/placeholder.png'"
+                onerror="this.src='https://via.placeholder.com/400x500?text=Sin+Imagen'"
                 loading="lazy"
               >
               <div class="product-info">
@@ -254,7 +254,7 @@
       } else {
         searchResults.innerHTML = results.map(product => `
           <div class="search-result-item" onclick="window.selectSearchResult('${product.id}')">
-            <img src="${product.image}" alt="${product.name}" class="search-result-image" onerror="this.src='assets/images/placeholder.png'">
+            <img src="${product.image}" alt="${product.name}" class="search-result-image" onerror="this.src='https://via.placeholder.com/400x500?text=Sin+Imagen'">
             <div class="search-result-info">
               <p class="search-result-name">${product.name}</p>
               <p class="search-result-category">${product.category}</p>
