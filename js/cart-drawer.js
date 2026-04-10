@@ -6,24 +6,12 @@
 import { formatProductForCart, requiresSizeSelection } from './product-utils.js';
 import { getAllProducts } from './products.js';
 
-// ========================================
-// ESTADO DEL DRAWER
-// ========================================
-
 let drawerState = {
   isOpen: false,
   cartItems: [],
   isAnimating: false
 };
 
-// ========================================
-// INICIALIZAR CART DRAWER
-// ========================================
-
-/**
- * Inicializar el sistema de carrito drawer
- * @returns {void}
- */
 export function initCartDrawer() {
   console.log('🛒 Inicializando Cart Drawer...');
   loadCartFromStorage();
@@ -32,18 +20,12 @@ export function initCartDrawer() {
   console.log('✓ Cart Drawer inicializado');
 }
 
-/**
- * Asegurar que el HTML del drawer existe
- * @returns {void}
- */
 function setupDrawerHTML() {
-  // Verificar que los elementos del drawer existen
   let drawer = document.getElementById('cartDrawer');
   let overlay = document.getElementById('cartDrawerOverlay');
 
   if (!drawer || !overlay) {
     console.warn('⚠️ Elementos del drawer no encontrados en HTML');
-    // Crear drawer si no existe
     if (!overlay) {
       overlay = document.createElement('div');
       overlay.id = 'cartDrawerOverlay';
@@ -76,12 +58,7 @@ function setupDrawerHTML() {
   }
 }
 
-/**
- * Configurar event listeners del drawer
- * @returns {void}
- */
 function setupDrawerEventListeners() {
-  // Cerrar al hacer click fuera del drawer
   document.addEventListener('click', (e) => {
     const drawer = document.getElementById('cartDrawer');
     const overlay = document.getElementById('cartDrawerOverlay');
@@ -93,7 +70,6 @@ function setupDrawerEventListeners() {
     }
   });
 
-  // Cerrar con tecla Escape
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && drawerState.isOpen) {
       closeCartDrawer();
@@ -101,14 +77,6 @@ function setupDrawerEventListeners() {
   });
 }
 
-// ========================================
-// ABRIR Y CERRAR DRAWER
-// ========================================
-
-/**
- * Abrir carrito drawer - ✨ SOLUCIÓN FINAL ✨
- * @returns {void}
- */
 export function openCartDrawer() {
   console.log('📂 Intentando abrir drawer...');
   
@@ -131,7 +99,6 @@ export function openCartDrawer() {
   if (drawer && overlay) {
     console.log('✓ Aplicando estilos...');
     
-    // Aplicar estilos DIRECTAMENTE sin requestAnimationFrame
     drawer.style.right = '0';
     drawer.style.zIndex = '1000';
     drawer.classList.add('open');
@@ -156,10 +123,6 @@ export function openCartDrawer() {
   }
 }
 
-/**
- * Cerrar carrito drawer - ✨ SOLUCIÓN FINAL ✨
- * @returns {void}
- */
 export function closeCartDrawer() {
   if (drawerState.isAnimating || !drawerState.isOpen) return;
 
@@ -183,10 +146,6 @@ export function closeCartDrawer() {
   }
 }
 
-/**
- * Toggle abrir/cerrar drawer
- * @returns {void}
- */
 export function toggleCartDrawer() {
   if (drawerState.isOpen) {
     closeCartDrawer();
@@ -195,19 +154,7 @@ export function toggleCartDrawer() {
   }
 }
 
-// ========================================
-// GESTIONAR ITEMS DEL CARRITO
-// ========================================
-
-/**
- * Agregar producto al drawer
- * @param {Object} product - Producto a agregar
- * @param {string} selectedSize - Talla seleccionada
- * @param {number} quantity - Cantidad
- * @returns {Object|null} Item agregado o null si requiere seleccionar talla
- */
 export function addProductToDrawer(product, selectedSize = null, quantity = 1) {
-  // Validar si requiere talla
   if (requiresSizeSelection(product) && !selectedSize) {
     console.warn('⚠️ Producto requiere seleccionar talla');
     return null;
@@ -219,10 +166,8 @@ export function addProductToDrawer(product, selectedSize = null, quantity = 1) {
   );
 
   if (existingIndex !== -1) {
-    // Si existe, aumentar cantidad
     drawerState.cartItems[existingIndex].quantity += quantity;
   } else {
-    // Agregar nuevo item
     drawerState.cartItems.push(cartItem);
   }
 
@@ -234,11 +179,6 @@ export function addProductToDrawer(product, selectedSize = null, quantity = 1) {
   return cartItem;
 }
 
-/**
- * Eliminar producto del carrito
- * @param {string} cartItemId - ID del item del carrito
- * @returns {boolean}
- */
 export function removeFromDrawer(cartItemId) {
   const initialLength = drawerState.cartItems.length;
 
@@ -257,12 +197,6 @@ export function removeFromDrawer(cartItemId) {
   return false;
 }
 
-/**
- * Actualizar cantidad de producto
- * @param {string} cartItemId - ID del item
- * @param {number} quantity - Nueva cantidad
- * @returns {boolean}
- */
 export function updateQuantity(cartItemId, quantity) {
   const item = drawerState.cartItems.find(i => i.cartItemId === cartItemId);
 
@@ -280,11 +214,6 @@ export function updateQuantity(cartItemId, quantity) {
   return true;
 }
 
-/**
- * Aumentar cantidad de producto
- * @param {string} cartItemId - ID del item
- * @returns {number|null} Nueva cantidad o null si no existe
- */
 export function increaseQuantity(cartItemId) {
   const item = drawerState.cartItems.find(i => i.cartItemId === cartItemId);
 
@@ -298,11 +227,6 @@ export function increaseQuantity(cartItemId) {
   return item.quantity;
 }
 
-/**
- * Disminuir cantidad de producto
- * @param {string} cartItemId - ID del item
- * @returns {number|null} Nueva cantidad o null si no existe
- */
 export function decreaseQuantity(cartItemId) {
   const item = drawerState.cartItems.find(i => i.cartItemId === cartItemId);
 
@@ -321,10 +245,6 @@ export function decreaseQuantity(cartItemId) {
   return item.quantity;
 }
 
-/**
- * Limpiar carrito completo
- * @returns {void}
- */
 export function clearCart() {
   drawerState.cartItems = [];
   saveCartToStorage();
@@ -333,22 +253,10 @@ export function clearCart() {
   console.log('✓ Carrito vaciado');
 }
 
-// ========================================
-// GETTERS
-// ========================================
-
-/**
- * Obtener items del carrito
- * @returns {Array}
- */
 export function getCartItems() {
   return [...drawerState.cartItems];
 }
 
-/**
- * Obtener total del carrito
- * @returns {number}
- */
 export function getCartTotal() {
   return drawerState.cartItems.reduce(
     (total, item) => total + item.price * item.quantity,
@@ -356,26 +264,14 @@ export function getCartTotal() {
   );
 }
 
-/**
- * Obtener cantidad de items
- * @returns {number}
- */
 export function getCartItemCount() {
   return drawerState.cartItems.reduce((count, item) => count + item.quantity, 0);
 }
 
-/**
- * Obtener cantidad de productos únicos
- * @returns {number}
- */
 export function getCartProductCount() {
   return drawerState.cartItems.length;
 }
 
-/**
- * Obtener estado del drawer
- * @returns {Object}
- */
 export function getDrawerState() {
   return {
     isOpen: drawerState.isOpen,
@@ -385,23 +281,10 @@ export function getDrawerState() {
   };
 }
 
-/**
- * Obtener item específico del carrito
- * @param {string} cartItemId - ID del item
- * @returns {Object|null}
- */
 export function getCartItem(cartItemId) {
   return drawerState.cartItems.find(item => item.cartItemId === cartItemId) || null;
 }
 
-// ========================================
-// ACTUALIZAR DISPLAY
-// ========================================
-
-/**
- * Actualizar visualización del drawer
- * @returns {void}
- */
 export function updateDrawerDisplay() {
   const itemsContainer = document.getElementById('cartDrawerItems');
   const emptyMessage = document.getElementById('cartDrawerEmpty');
@@ -429,7 +312,6 @@ export function updateDrawerDisplay() {
     .map(item => createCartItemHTML(item))
     .join('');
 
-  // Actualizar total
   if (totalElement) {
     totalElement.innerHTML = `
       <div class="cart-total-row">
@@ -443,15 +325,9 @@ export function updateDrawerDisplay() {
     `;
   }
 
-  // Agregar event listeners a los botones
   setupItemEventListeners();
 }
 
-/**
- * Crear HTML de item del carrito
- * @param {Object} item - Item del carrito
- * @returns {string}
- */
 function createCartItemHTML(item) {
   const sizeText = item.size ? `<small style="color: #999;">Talla: ${item.size}</small>` : '';
   const subtotal = item.price * item.quantity;
@@ -493,19 +369,10 @@ function createCartItemHTML(item) {
   `;
 }
 
-/**
- * Configurar event listeners de items
- * @returns {void}
- */
 function setupItemEventListeners() {
-  // Los eventos se configuran a través de onclick inline en el HTML
-  // para mayor compatibilidad
+  // Eventos configurados vía onclick inline en HTML
 }
 
-/**
- * Actualizar badge del carrito en navbar
- * @returns {void}
- */
 export function updateCartBadge() {
   const badge = document.querySelector('.cart-badge');
   if (badge) {
@@ -515,31 +382,15 @@ export function updateCartBadge() {
   }
 }
 
-// ========================================
-// ✨ SINCRONIZACIÓN CON LOCALSTORAGE
-// ========================================
-
-/**
- * Guardar carrito en localStorage (sincronizar con cart.js antiguo)
- * @returns {void}
- */
 function saveCartToStorage() {
-  // Guardar en drawer
   localStorage.setItem('emiluxe_cart_drawer', JSON.stringify(drawerState.cartItems));
-  // Sincronizar también con cart.js antiguo para compatibilidad
   localStorage.setItem('emiluxe_cart', JSON.stringify(drawerState.cartItems));
   console.log('✓ Carrito sincronizado en localStorage:', drawerState.cartItems.length, 'items');
 }
 
-/**
- * Cargar carrito del localStorage (con fallback al formato antiguo)
- * @returns {void}
- */
 function loadCartFromStorage() {
-  // Intentar cargar del drawer primero
   let saved = localStorage.getItem('emiluxe_cart_drawer');
   
-  // Si no existe, cargar del cart.js antiguo
   if (!saved) {
     saved = localStorage.getItem('emiluxe_cart');
   }
@@ -560,12 +411,6 @@ function loadCartFromStorage() {
   }
 }
 
-// ========================================
-// FUNCIONES GLOBALES (para onclick)
-// ========================================
-
-// Estas funciones se exponen globalmente para ser usadas en onclick del HTML
-
 window.decreaseQtyInDrawer = function(cartItemId) {
   decreaseQuantity(cartItemId);
 };
@@ -578,10 +423,6 @@ window.removeFromDrawerUI = function(cartItemId) {
   removeFromDrawer(cartItemId);
 };
 
-/**
- * Abrir drawer
- * @returns {void}
- */
 window.openDrawer = function() {
   console.log('🔔 openDrawer() llamado');
   try {
@@ -591,7 +432,31 @@ window.openDrawer = function() {
   }
 };
 
-/**
- * Cerrar drawer
- * @returns {void}
- */*`
+window.closeDrawer = function() {
+  try {
+    closeCartDrawer();
+  } catch (error) {
+    console.error('Error en closeDrawer:', error);
+  }
+};
+
+export default {
+  initCartDrawer,
+  openCartDrawer,
+  closeCartDrawer,
+  toggleCartDrawer,
+  addProductToDrawer,
+  removeFromDrawer,
+  updateQuantity,
+  increaseQuantity,
+  decreaseQuantity,
+  clearCart,
+  getCartItems,
+  getCartTotal,
+  getCartItemCount,
+  getCartProductCount,
+  getDrawerState,
+  getCartItem,
+  updateDrawerDisplay,
+  updateCartBadge
+};
