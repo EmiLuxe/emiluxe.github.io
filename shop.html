@@ -271,21 +271,21 @@
     window.selectSearchResult = function(productId) {
       const product = allProductsData.find(p => p.id === productId);
       if (product) {
-        addToCart(product, 1);
+        const { openSizeModal } = await import('./js/size-selector-modal.js');
+        openSizeModal(product);
         addToRecentSearches(product.name);
         clearSearch();
-        showNotification(`${product.name} agregado al carrito 🛒`, 'success');
       }
     }
 
-    // Add product to cart
+    // Add product to cart ✨ MODIFICADO ✨
     window.addProductToCart = async function(productId) {
       try {
         const product = allProductsData.find(p => p.id === productId);
 
         if (product) {
-          addToCart(product, 1);
-          showNotification(`${product.name} agregado al carrito 🛒`, 'success');
+          const { openSizeModal } = await import('./js/size-selector-modal.js');
+          openSizeModal(product);
         } else {
           showNotification('Producto no encontrado', 'error');
         }
