@@ -8,6 +8,20 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* ✨ FIX: Asegurar que los checkboxes sean clickeables */
+    input[type="checkbox"] {
+      cursor: pointer;
+      accent-color: #FF6B9D;
+      width: 18px;
+      height: 18px;
+      margin: 0;
+    }
+    
+    label input[type="checkbox"] {
+      pointer-events: auto;
+    }
+  </style>
 </head>
 <body>
   <!-- NAVBAR -->
@@ -96,23 +110,23 @@
                   </select>
                 </div>
 
-                <!-- TALLAS ✨ NUEVO ✨ -->
+                <!-- TALLAS ✨ ARREGLADO ✨ -->
                 <div class="form-group">
                   <label>👕 Tallas Disponibles</label>
-                  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
-                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
                       <input type="checkbox" id="sizeS" value="S"> S
                     </label>
-                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
                       <input type="checkbox" id="sizeM" value="M"> M
                     </label>
-                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
                       <input type="checkbox" id="sizeL" value="L"> L
                     </label>
-                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
                       <input type="checkbox" id="sizeXL" value="XL"> XL
                     </label>
-                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
                       <input type="checkbox" id="sizeUnique" value="UNIQUE"> Talla Única
                     </label>
                   </div>
@@ -120,21 +134,21 @@
 
                 <!-- STOCK ✨ NUEVO ✨ -->
                 <div class="form-group">
-                  <label for="productStock">📦 Stock (dejar vac��o si no aplica)</label>
+                  <label for="productStock">📦 Stock (dejar vacío si no aplica)</label>
                   <input type="number" id="productStock" placeholder="Ej: 10" min="0">
                 </div>
 
-                <!-- BADGES/ETIQUETAS ✨ NUEVO ✨ -->
+                <!-- BADGES/ETIQUETAS ✨ ARREGLADO ✨ -->
                 <div class="form-group">
                   <label>🏷️ Etiquetas</label>
-                  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem;">
-                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.8rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
                       <input type="checkbox" id="badgeBestseller" value="bestseller"> 🔥 Más Vendido
                     </label>
-                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
                       <input type="checkbox" id="badgeOffer" value="offer"> 💝 Oferta
                     </label>
-                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
                       <input type="checkbox" id="badgeNew" value="new"> ✨ Nuevo
                     </label>
                   </div>
@@ -165,7 +179,7 @@
                 <div class="form-group">
                   <label for="editProductId">🔍 Buscar por ID</label>
                   <input type="text" id="editProductId" placeholder="ID del producto">
-                  <button type="button" onclick="searchProductToEdit()" style="margin-top: 0.5rem; width: 100%; padding: 0.7rem; background: #ff7fa0; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Buscar</button>
+                  <button type="button" onclick="searchProductToEdit()" style="margin-top: 0.5rem; width: 100%; padding: 0.7rem; background: #ff7fa0; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">🔍 Buscar</button>
                 </div>
 
                 <div id="editProductFields" style="display: none;">
@@ -194,23 +208,23 @@
                     </select>
                   </div>
 
-                  <!-- EDITAR TALLAS ✨ NUEVO ✨ -->
+                  <!-- EDITAR TALLAS ✨ ARREGLADO ✨ -->
                   <div class="form-group">
                     <label>👕 Tallas Disponibles</label>
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
-                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem;">
+                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
                         <input type="checkbox" id="editSizeS" value="S"> S
                       </label>
-                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
                         <input type="checkbox" id="editSizeM" value="M"> M
                       </label>
-                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
                         <input type="checkbox" id="editSizeL" value="L"> L
                       </label>
-                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
                         <input type="checkbox" id="editSizeXL" value="XL"> XL
                       </label>
-                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
                         <input type="checkbox" id="editSizeUnique" value="UNIQUE"> Talla Única
                       </label>
                     </div>
@@ -222,17 +236,17 @@
                     <input type="number" id="editProductStock" placeholder="Ej: 10" min="0">
                   </div>
 
-                  <!-- EDITAR BADGES ✨ NUEVO ✨ -->
+                  <!-- EDITAR BADGES ✨ ARREGLADO ✨ -->
                   <div class="form-group">
                     <label>🏷️ Etiquetas</label>
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem;">
-                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.8rem;">
+                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
                         <input type="checkbox" id="editBadgeBestseller" value="bestseller"> 🔥 Más Vendido
                       </label>
-                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
                         <input type="checkbox" id="editBadgeOffer" value="offer"> 💝 Oferta
                       </label>
-                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400;">
+                      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 400; cursor: pointer;">
                         <input type="checkbox" id="editBadgeNew" value="new"> ✨ Nuevo
                       </label>
                     </div>
@@ -263,7 +277,7 @@
                 <div class="form-group">
                   <label for="deleteProductId">🔍 ID del Producto a Eliminar</label>
                   <input type="text" id="deleteProductId" placeholder="ID del producto">
-                  <button type="button" onclick="searchProductToDelete()" style="margin-top: 0.5rem; width: 100%; padding: 0.7rem; background: #ff7fa0; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Buscar</button>
+                  <button type="button" onclick="searchProductToDelete()" style="margin-top: 0.5rem; width: 100%; padding: 0.7rem; background: #ff7fa0; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">🔍 Buscar</button>
                 </div>
 
                 <div id="deleteProductInfo" style="display: none;">
@@ -363,7 +377,6 @@
 
     // Check admin authentication
     document.addEventListener('DOMContentLoaded', async () => {
-      // Evitar ejecución múltiple
       if (isInitialized) return;
       isInitialized = true;
 
@@ -379,7 +392,6 @@
       await loadOrders();
     });
 
-    // Switch between panels
     window.switchPanel = function(panel) {
       const productsPanel = document.getElementById('productsPanel');
       const ordersPanel = document.getElementById('ordersPanel');
@@ -399,7 +411,6 @@
       }
     }
 
-    // Switch between modes
     window.switchMode = function(mode) {
       currentMode = mode;
       const buttons = document.querySelectorAll('.admin-mode-btn');
@@ -423,7 +434,6 @@
       }
     }
 
-    // Load products
     window.loadProducts = async function() {
       try {
         const products = await getAllProducts();
@@ -453,10 +463,8 @@
       }
     }
 
-    // Load orders
     window.loadOrders = async function() {
       try {
-        // Intentar cargar de Firebase primero
         let orders = [];
         try {
           orders = await getAllOrders();
@@ -467,7 +475,6 @@
 
         const ordersTableBody = document.getElementById('ordersTableBody');
 
-        // Update stats
         document.getElementById('totalOrdersCount').textContent = orders.length;
         document.getElementById('pendingOrdersCount').textContent = orders.filter(o => o.status === 'Pendiente de Confirmación').length;
         document.getElementById('confirmedOrdersCount').textContent = orders.filter(o => o.status === 'Confirmada').length;
@@ -487,7 +494,7 @@
             <td style="color: ${order.status === 'Entregada' ? '#4caf50' : '#ff7fa0'}; font-weight: 600;">${order.status}</td>
             <td>${order.date}</td>
             <td>
-              <button type="button" class="btn-edit" onclick="downloadOrderCertificate('${order.orderId}', '${order.customerName}', '${order.phoneNumber}', '${order.deliveryAddress}', '${order.preferredTime}', '${order.total}', '${JSON.stringify(order.items).replace(/'/g, "&#39;")}')">📄 Comprobante</button>
+              <button type="button" class="btn-edit" onclick="downloadOrderCertificate('${order.orderId}', '${order.customerName}', '${order.phoneNumber}', '${order.deliveryAddress}', '${order.preferredTime}', '${order.total}', '${JSON.stringify(order.items).replace(/'/g, '&#39;')}')">📥 Descargar</button>
               <button type="button" class="btn-delete" onclick="sendToWhatsApp('${order.phoneNumber}', '${order.orderId}')">💬 Enviar</button>
             </td>
           </tr>
@@ -497,7 +504,6 @@
       }
     }
 
-    // Add product ✨ MODIFICADO ✨
     window.addProduct = async function() {
       const name = document.getElementById('productName').value.trim();
       const description = document.getElementById('productDescription').value.trim();
@@ -505,7 +511,6 @@
       const category = document.getElementById('productCategory').value;
       const image = document.getElementById('productImageURL').value.trim();
 
-      // Obtener tallas seleccionadas
       const sizes = [];
       if (document.getElementById('sizeS').checked) sizes.push('S');
       if (document.getElementById('sizeM').checked) sizes.push('M');
@@ -513,12 +518,10 @@
       if (document.getElementById('sizeXL').checked) sizes.push('XL');
       if (document.getElementById('sizeUnique').checked) sizes.push('UNIQUE');
 
-      // Obtener stock
       const stock = document.getElementById('productStock').value 
         ? parseInt(document.getElementById('productStock').value) 
         : null;
 
-      // Obtener badges
       const badges = [];
       if (document.getElementById('badgeBestseller').checked) badges.push('bestseller');
       if (document.getElementById('badgeOffer').checked) badges.push('offer');
@@ -550,13 +553,11 @@
       }
     }
 
-    // Reset form
     window.resetProductForm = function() {
       document.getElementById('productForm').reset();
       document.getElementById('productImagePreview').innerHTML = '<div class="admin-image-preview-empty">Aquí aparecerá la imagen</div>';
     }
 
-    // Preview image
     window.previewProductImage = function() {
       const imageURL = document.getElementById('productImageURL').value.trim();
       const preview = document.getElementById('productImagePreview');
@@ -566,16 +567,14 @@
         return;
       }
 
-      preview.innerHTML = `<img src="${imageURL}" alt="preview" style="max-width: 100%; max-height: 300px; border-radius: 10px;" onerror="this.parentElement.innerHTML='<div class=\"admin-image-preview-empty\">Error al cargar la imagen</div>'">`;
+      preview.innerHTML = `<img src="${imageURL}" alt="preview" style="max-width: 100%; max-height: 300px; border-radius: 10px;" onerror="this.parentElement.innerHTML='<div class=\"admin-image-preview-empty\">Error cargando imagen</div>'">`;
     }
 
-    // Edit product click
     window.editProductClick = async function(productId) {
       switchMode('edit');
       await searchProductToEdit(productId);
     }
 
-    // Search product to edit ✨ MODIFICADO ✨
     window.searchProductToEdit = async function(productId = null) {
       const searchId = productId || document.getElementById('editProductId').value.trim();
       if (!searchId) {
@@ -598,17 +597,14 @@
       document.getElementById('editProductCategory').value = product.category;
       document.getElementById('editProductImageURL').value = product.image;
 
-      // Establecer tallas
       document.getElementById('editSizeS').checked = product.sizes && product.sizes.includes('S');
       document.getElementById('editSizeM').checked = product.sizes && product.sizes.includes('M');
       document.getElementById('editSizeL').checked = product.sizes && product.sizes.includes('L');
       document.getElementById('editSizeXL').checked = product.sizes && product.sizes.includes('XL');
       document.getElementById('editSizeUnique').checked = product.sizes && product.sizes.includes('UNIQUE');
 
-      // Establecer stock
       document.getElementById('editProductStock').value = product.stock || '';
 
-      // Establecer badges
       document.getElementById('editBadgeBestseller').checked = product.badges && product.badges.includes('bestseller');
       document.getElementById('editBadgeOffer').checked = product.badges && product.badges.includes('offer');
       document.getElementById('editBadgeNew').checked = product.badges && product.badges.includes('new');
@@ -616,10 +612,9 @@
       document.getElementById('editProductFields').style.display = 'block';
 
       const preview = document.getElementById('editProductImagePreview');
-      preview.innerHTML = `<img src="${product.image}" alt="${product.name}" style="max-width: 100%; max-height: 300px; border-radius: 10px;" onerror="this.parentElement.innerHTML='<div class=\"admin-image-preview-empty\">Error</div>'">`;
+      preview.innerHTML = `<img src="${product.image}" alt="${product.name}" style="max-width: 100%; max-height: 300px; border-radius: 10px;" onerror="this.parentElement.innerHTML='<div class=\"admin-image-preview-empty\">Error cargando imagen</div>'">`;
     }
 
-    // Update product ✨ MODIFICADO ✨
     window.updateProduct = async function() {
       if (!editingProductId) {
         showNotification('❌ Selecciona un producto primero', 'error');
@@ -632,7 +627,6 @@
       const category = document.getElementById('editProductCategory').value;
       const image = document.getElementById('editProductImageURL').value.trim();
 
-      // Obtener tallas seleccionadas
       const sizes = [];
       if (document.getElementById('editSizeS').checked) sizes.push('S');
       if (document.getElementById('editSizeM').checked) sizes.push('M');
@@ -640,12 +634,10 @@
       if (document.getElementById('editSizeXL').checked) sizes.push('XL');
       if (document.getElementById('editSizeUnique').checked) sizes.push('UNIQUE');
 
-      // Obtener stock
       const stock = document.getElementById('editProductStock').value 
         ? parseInt(document.getElementById('editProductStock').value) 
         : null;
 
-      // Obtener badges
       const badges = [];
       if (document.getElementById('editBadgeBestseller').checked) badges.push('bestseller');
       if (document.getElementById('editBadgeOffer').checked) badges.push('offer');
@@ -677,14 +669,12 @@
       }
     }
 
-    // Cancel edit
     window.cancelEditProduct = function() {
       editingProductId = null;
       document.getElementById('editProductFields').style.display = 'none';
       document.getElementById('editProductId').value = '';
     }
 
-    // Preview edit image
     window.previewEditProductImage = function() {
       const imageURL = document.getElementById('editProductImageURL').value.trim();
       const preview = document.getElementById('editProductImagePreview');
@@ -694,16 +684,14 @@
         return;
       }
 
-      preview.innerHTML = `<img src="${imageURL}" alt="preview" style="max-width: 100%; max-height: 300px; border-radius: 10px;" onerror="this.parentElement.innerHTML='<div class=\"admin-image-preview-empty\">Error al cargar la imagen</div>'">`;
+      preview.innerHTML = `<img src="${imageURL}" alt="preview" style="max-width: 100%; max-height: 300px; border-radius: 10px;" onerror="this.parentElement.innerHTML='<div class=\"admin-image-preview-empty\">Error cargando imagen</div>'">`;
     }
 
-    // Delete product click
     window.deleteProductClick = async function(productId) {
       switchMode('delete');
       await searchProductToDelete(productId);
     }
 
-    // Search product to delete
     window.searchProductToDelete = async function(productId = null) {
       const searchId = productId || document.getElementById('deleteProductId').value.trim();
       if (!searchId) {
@@ -724,7 +712,6 @@
       document.getElementById('deleteProductInfo').style.display = 'block';
     }
 
-    // Confirm delete
     window.confirmDeleteProduct = async function() {
       if (!deletingProductId) {
         showNotification('❌ Error interno', 'error');
@@ -742,14 +729,12 @@
       }
     }
 
-    // Cancel delete
     window.cancelDeleteProduct = function() {
       deletingProductId = null;
       document.getElementById('deleteProductInfo').style.display = 'none';
       document.getElementById('deleteProductId').value = '';
     }
 
-    // Download order certificate
     window.downloadOrderCertificate = function(orderId, customerName, phoneNumber, address, preferredTime, total, itemsJSON) {
       try {
         const items = JSON.parse(itemsJSON.replace(/&#39;/g, "'"));
@@ -772,14 +757,12 @@
       }
     }
 
-    // Send to WhatsApp
     window.sendToWhatsApp = function(phoneNumber, orderId) {
       const message = `🎀 ¡Hola! Tu orden #${orderId} ha sido procesada. Te contactaremos pronto para confirmar detalles. ¡Gracias por tu compra!`;
       const encodedMessage = encodeURIComponent(message);
       window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
     }
 
-    // Logout
     window.logoutAdmin = function() {
       if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
         localStorage.removeItem('adminUser');
