@@ -21,10 +21,10 @@
       <li><a href="shop.html">Tienda</a></li>
     </ul>
     <div class="navbar-icons">
-      <a href="cart.html" style="position: relative;">
+      <button onclick="window.openDrawer()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; position: relative;">
         🛒
         <span class="cart-badge">0</span>
-      </a>
+      </button>
       <a href="login.html">👤</a>
     </div>
   </nav>
@@ -33,7 +33,23 @@
   <section class="products-section">
     <h1>Nuestra Tienda</h1>
 
-    <!-- FILTER CONTROLS -->
+    <!-- BÚSQUEDA EN TIEMPO REAL ✨ NUEVA ✨ -->
+    <div class="search-container">
+      <div class="search-wrapper">
+        <span class="search-icon">🔍</span>
+        <input 
+          type="text" 
+          id="searchInput" 
+          class="search-input" 
+          placeholder="Busca por nombre..." 
+          onkeyup="window.handleSearch(event)"
+        >
+        <button class="search-clear-btn" onclick="window.clearSearch()">✕</button>
+        <div class="search-results" id="searchResults"></div>
+      </div>
+    </div>
+
+    <!-- FILTER CONTROLS (MEJORADO) ✨ ACTUALIZADO ✨ -->
     <div class="filter-controls">
       <button class="filter-btn active" onclick="filterProducts('pijamas')">Pijamas</button>
       <button class="filter-btn" onclick="filterProducts('lenceria')">Lencería</button>
@@ -52,6 +68,35 @@
     </div>
   </section>
 
+  <!-- CARRITO DRAWER (MODAL LATERAL) ✨ NUEVO ✨ -->
+  <div id="cartDrawerOverlay"></div>
+  <div id="cartDrawer">
+    <div class="cart-drawer-header">
+      <h2>Tu Carrito</h2>
+      <button class="cart-drawer-close" onclick="window.closeDrawer()">✕</button>
+    </div>
+
+    <div id="cartDrawerEmpty" class="show">
+      <div class="empty-icon">🛒</div>
+      <h3>Carrito Vacío</h3>
+      <p>Agrega productos para comenzar</p>
+      <a href="shop.html">Continuar Comprando</a>
+    </div>
+
+    <div id="cartDrawerItems"></div>
+
+    <div class="cart-drawer-footer">
+      <div id="cartDrawerTotal"></div>
+      <button id="cartDrawerCheckoutBtn" onclick="window.goToCheckout()" style="display: none;">
+        Ir a Checkout
+      </button>
+    </div>
+  </div>
+
+  <!-- QUICK BUY MODAL ✨ NUEVO ✨ -->
+  <div id="quickBuyModal"></div>
+  <div id="quickBuyCustomerModal"></div>
+
   <!-- BOTÓN WHATSAPP FLOTANTE -->
   <div class="whatsapp-button" onclick="openWhatsApp()">
     <span class="whatsapp-icon">💬</span>
@@ -67,8 +112,10 @@
   <script src="js/main.js"></script>
   <script type="module">
     import { getAllProducts } from './js/products.js';
+    import { search, addToRecentSearches } from './js/search.js';
 
     let currentFilter = 'pijamas';
+    let allProductsData = [];
 
     // Render products on page load
     document.addEventListener('DOMContentLoaded', async () => {
@@ -92,6 +139,7 @@
 
       try {
         const allProducts = await getAllProducts();
+        allProductsData = allProducts;
 
         // Filtrar por categoría actual
         productsToDisplay = allProducts.filter(p => 
@@ -105,22 +153,43 @@
           return;
         }
 
-        productsGrid.innerHTML = productsToDisplay.map(product => `
-          <div class="product-card">
-            <img src="${product.image}" alt="${product.name}" class="product-image" onerror="this.src='assets/images/placeholder.png'">
-            <div class="product-info">
-              <p class="product-category">${product.category}</p>
-              <h3 class="product-name">${product.name}</h3>
-              <p class="product-description">${product.description}</p>
-              <div class="product-footer">
-                <span class="product-price">${formatPrice(product.price)}</span>
-                <button class="add-to-cart-btn" onclick="addProductToCart('${product.id}')">
-                  Agregar
-                </button>
+        productsGrid.innerHTML = productsToDisplay.map(product => {
+          const badgeHTML = product.badges && product.badges.length > 0 
+            ? `<div class="product-badge">${product.badges[0]}</div>` 
+            : '';
+          
+          const stockText = product.stock && product.stock <= 3 
+            ? `<p class="product-stock-text">⚡ Stock bajo</p>` 
+            : '';
+
+          return `
+            <div class="product-card">
+              ${badgeHTML}
+              <img 
+                src="${product.image}" 
+                alt="${product.name}" 
+                class="product-image" 
+                onerror="this.src='assets/images/placeholder.png'"
+                loading="lazy"
+              >
+              <div class="product-info">
+                <p class="product-category">${product.category}</p>
+                <h3 class="product-name">${product.name}</h3>
+                <p class="product-description">${product.description}</p>
+                ${stockText}
+                <div class="product-footer">
+                  <span class="product-price">${formatPrice(product.price)}</span>
+                  <button class="add-to-cart-btn" onclick="addProductToCart('${product.id}')">
+                    Agregar
+                  </button>
+                  <button class="quick-buy-btn-small" onclick="window.quickBuyClick('${product.id}')" title="Compra rápida">
+                    ⚡
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        `).join('');
+          `;
+        }).join('');
       } catch (error) {
         console.error('Error renderizando productos:', error);
         loadingSpinner.style.display = 'none';
@@ -154,11 +223,65 @@
       });
     }
 
+    // Búsqueda en tiempo real ✨ NUEVA ✨
+    window.handleSearch = function(event) {
+      const searchTerm = event.target.value;
+      const clearBtn = document.querySelector('.search-clear-btn');
+      const searchResults = document.getElementById('searchResults');
+
+      if (searchTerm.length === 0) {
+        searchResults.classList.remove('show');
+        clearBtn.classList.remove('show');
+        return;
+      }
+
+      clearBtn.classList.add('show');
+
+      const results = search(searchTerm);
+      
+      if (results.length === 0) {
+        searchResults.innerHTML = `
+          <div class="search-empty">
+            <div class="search-empty-icon">🔍</div>
+            <p class="search-empty-text">No encontramos resultados</p>
+          </div>
+        `;
+      } else {
+        searchResults.innerHTML = results.map(product => `
+          <div class="search-result-item" onclick="window.selectSearchResult('${product.id}')">
+            <img src="${product.image}" alt="${product.name}" class="search-result-image" onerror="this.src='assets/images/placeholder.png'">
+            <div class="search-result-info">
+              <p class="search-result-name">${product.name}</p>
+              <p class="search-result-category">${product.category}</p>
+            </div>
+            <span class="search-result-price">${formatPrice(product.price)}</span>
+          </div>
+        `).join('');
+      }
+
+      searchResults.classList.add('show');
+    }
+
+    window.clearSearch = function() {
+      document.getElementById('searchInput').value = '';
+      document.querySelector('.search-clear-btn').classList.remove('show');
+      document.getElementById('searchResults').classList.remove('show');
+    }
+
+    window.selectSearchResult = function(productId) {
+      const product = allProductsData.find(p => p.id === productId);
+      if (product) {
+        addToCart(product, 1);
+        addToRecentSearches(product.name);
+        clearSearch();
+        showNotification(`${product.name} agregado al carrito 🛒`, 'success');
+      }
+    }
+
     // Add product to cart
     window.addProductToCart = async function(productId) {
       try {
-        const allProducts = await getAllProducts();
-        const product = allProducts.find(p => p.id === productId);
+        const product = allProductsData.find(p => p.id === productId);
 
         if (product) {
           addToCart(product, 1);
@@ -172,9 +295,28 @@
       }
     }
 
+    // Quick buy
+    window.quickBuyClick = async function(productId) {
+      try {
+        const { openQuickBuyModal } = await import('./js/quick-buy.js');
+        const product = allProductsData.find(p => p.id === productId);
+        if (product) {
+          openQuickBuyModal(product);
+        }
+      } catch (error) {
+        console.error('Error en quick buy:', error);
+        showNotification('Error al abrir compra rápida', 'error');
+      }
+    }
+
+    // Go to checkout
+    window.goToCheckout = function() {
+      window.location.href = 'checkout.html';
+    }
+
     // Abrir WhatsApp
     window.openWhatsApp = function() {
-      const phoneNumber = '573164321234'; // ⚠️ REEMPLAZA CON TU NÚMERO
+      const phoneNumber = '573117965474'; //
       const message = encodeURIComponent('Hola EmiLuxe, tengo una consulta 💕');
       window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
     }
