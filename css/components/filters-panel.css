@@ -1,0 +1,471 @@
+/* ========================================
+   EMILUXE - FILTERS PANEL STYLES
+   ======================================== */
+
+/* ========================================
+   CONTENEDOR PRINCIPAL DE FILTROS
+   ======================================== */
+
+.filters-container {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.filters-sidebar {
+  background: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 8px;
+  height: fit-content;
+  border: 1px solid #f0f0f0;
+}
+
+.filters-content {
+  flex: 1;
+}
+
+/* ========================================
+   TÍTULO Y CONTROLES
+   ======================================== */
+
+.filters-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #FF6B9D;
+}
+
+.filters-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.filters-clear-btn {
+  background: none;
+  border: 1px solid #FF6B9D;
+  color: #FF6B9D;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.filters-clear-btn:hover {
+  background: #FFE5E5;
+}
+
+.filters-clear-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ========================================
+   GRUPO DE FILTRO
+   ======================================== */
+
+.filter-group {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.filter-group:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.filter-group-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.filter-group-title:hover {
+  color: #FF6B9D;
+}
+
+.filter-toggle-icon {
+  font-size: 0.8rem;
+  transition: transform 0.3s ease;
+}
+
+.filter-toggle-icon.open {
+  transform: rotate(180deg);
+}
+
+.filter-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* ========================================
+   OPCIONES DE FILTRO
+   ======================================== */
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+}
+
+.filter-option:hover {
+  background: #f0f0f0;
+}
+
+.filter-option input[type="checkbox"],
+.filter-option input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #FF6B9D;
+}
+
+.filter-option label {
+  flex: 1;
+  font-size: 0.9rem;
+  color: #666;
+  cursor: pointer;
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.filter-option input:checked + label {
+  color: #FF6B9D;
+  font-weight: 500;
+}
+
+.filter-count {
+  font-size: 0.8rem;
+  color: #999;
+}
+
+/* ========================================
+   FILTRO DE PRECIO
+   ======================================== */
+
+.price-filter-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.price-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.price-input {
+  padding: 0.6rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-family: 'Poppins', sans-serif;
+}
+
+.price-input:focus {
+  outline: none;
+  border-color: #FF6B9D;
+  box-shadow: 0 0 0 3px rgba(255, 107, 157, 0.1);
+}
+
+.price-range-slider {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.price-range-slider input[type="range"] {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(
+    to right,
+    #FF6B9D 0%,
+    #FF6B9D var(--value),
+    #e0e0e0 var(--value),
+    #e0e0e0 100%
+  );
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.price-range-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #FF6B9D;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(255, 107, 157, 0.3);
+}
+
+.price-range-slider input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #FF6B9D;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 6px rgba(255, 107, 157, 0.3);
+}
+
+/* ========================================
+   FILTRO DE TALLAS
+   ======================================== */
+
+.sizes-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+.size-filter-btn {
+  padding: 0.75rem;
+  border: 2px solid #e0e0e0;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #666;
+  transition: all 0.2s ease;
+  font-family: 'Poppins', sans-serif;
+}
+
+.size-filter-btn:hover {
+  border-color: #FF6B9D;
+  color: #FF6B9D;
+}
+
+.size-filter-btn.active {
+  background: #FF6B9D;
+  border-color: #FF6B9D;
+  color: white;
+  box-shadow: 0 2px 8px rgba(255, 107, 157, 0.3);
+}
+
+/* ========================================
+   FILTRO DE ORDENAMIENTO
+   ======================================== */
+
+.sort-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sort-option {
+  padding: 0.75rem;
+  border: 1px solid #e0e0e0;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #666;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.sort-option:hover {
+  background: #f5f5f5;
+  border-color: #FF6B9D;
+  color: #FF6B9D;
+}
+
+.sort-option.active {
+  background: #FFE5E5;
+  border-color: #FF6B9D;
+  color: #FF6B9D;
+  font-weight: 600;
+}
+
+/* ========================================
+   BOTONES DE CONTROL
+   ======================================== */
+
+.filters-apply-btn {
+  width: 100%;
+  padding: 0.8rem;
+  background: linear-gradient(135deg, #FF6B9D 0%, #E63A7F 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+  box-shadow: 0 4px 12px rgba(255, 107, 157, 0.3);
+}
+
+.filters-apply-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 107, 157, 0.4);
+}
+
+.filters-apply-btn:active {
+  transform: translateY(0);
+}
+
+/* ========================================
+   ETIQUETA DE FILTRO ACTIVO
+   ======================================== */
+
+.active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.filter-badge {
+  background: #FFE5E5;
+  color: #FF6B9D;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid #FFB8D8;
+}
+
+.filter-badge-remove {
+  background: none;
+  border: none;
+  color: #FF6B9D;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.filter-badge-remove:hover {
+  color: #E63A7F;
+}
+
+/* ========================================
+   CONTADORES DE RESULTADOS
+   ======================================== */
+
+.filters-results-count {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: #f5f5f5;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.filters-results-count strong {
+  color: #FF6B9D;
+  font-weight: 600;
+}
+
+/* ========================================
+   RESPONSIVO
+   ======================================== */
+
+@media (max-width: 1024px) {
+  .filters-container {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .filters-sidebar {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .filters-container {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+
+  .filters-sidebar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .filter-group {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
+  .sizes-filter-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .filters-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0.75rem;
+  }
+
+  .filter-group {
+    padding: 0;
+  }
+
+  .filter-options {
+    max-height: 200px;
+  }
+
+  .sizes-filter-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.4rem;
+  }
+
+  .size-filter-btn {
+    padding: 0.6rem;
+    font-size: 0.85rem;
+  }
+
+  .filters-apply-btn {
+    margin-top: 0.75rem;
+    padding: 0.7rem;
+  }
+
+  .price-inputs {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .price-input {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+}
