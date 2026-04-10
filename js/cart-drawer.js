@@ -106,7 +106,7 @@ function setupDrawerEventListeners() {
 // ========================================
 
 /**
- * Abrir carrito drawer - ✨ ARREGLADO CON DEBUGGING ✨
+ * Abrir carrito drawer - ✨ DEFINITIVO CON ESTILOS INLINE ✨
  * @returns {void}
  */
 export function openCartDrawer() {
@@ -116,13 +116,11 @@ export function openCartDrawer() {
     isAnimating: drawerState.isAnimating
   });
   
-  // Si ya está abierto y no animando, simplemente retorna
   if (drawerState.isOpen && !drawerState.isAnimating) {
     console.log('ℹ️ Drawer ya está abierto');
     return;
   }
 
-  // Si está animando, esperar
   if (drawerState.isAnimating) {
     console.warn('⏳ Drawer está animando, esperando...');
     return;
@@ -142,9 +140,15 @@ export function openCartDrawer() {
     drawer.classList.add('open');
     overlay.classList.add('visible');
     
-    // Log de verificación
+    // ✨ AGREGAR ESTILOS INLINE PARA FORZAR
+    drawer.style.right = '0';
+    drawer.style.zIndex = '1000';
+    overlay.style.zIndex = '999';
+    overlay.style.display = 'block';
+    
     console.log('✓ Clase "open" en drawer:', drawer.classList.contains('open'));
     console.log('✓ Clase "visible" en overlay:', overlay.classList.contains('visible'));
+    console.log('✓ Drawer style.right:', drawer.style.right);
     console.log('✓ Drawer abierto');
 
     setTimeout(() => {
@@ -153,15 +157,13 @@ export function openCartDrawer() {
     }, 300);
   } else {
     console.error('❌ Drawer o overlay no encontrados');
-    console.error('drawer:', drawer);
-    console.error('overlay:', overlay);
     drawerState.isAnimating = false;
     drawerState.isOpen = false;
   }
 }
 
 /**
- * Cerrar carrito drawer
+ * Cerrar carrito drawer - ✨ DEFINITIVO CON ESTILOS INLINE ✨
  * @returns {void}
  */
 export function closeCartDrawer() {
@@ -176,6 +178,10 @@ export function closeCartDrawer() {
   if (drawer && overlay) {
     drawer.classList.remove('open');
     overlay.classList.remove('visible');
+    
+    // ✨ REMOVER ESTILOS INLINE
+    drawer.style.right = '-450px';
+    overlay.style.display = 'none';
 
     setTimeout(() => {
       drawerState.isAnimating = false;
