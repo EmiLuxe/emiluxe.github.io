@@ -32,13 +32,24 @@ let sizeModalState = {
  * @returns {void}
  */
 export function openSizeModal(product) {
-  // Si el producto no requiere talla, agregar directo
+  // ✨ ARREGLADO: Si hay solo UNA talla (cualquiera), mostrar modal informativo
+  if (product.sizes && product.sizes.length === 1) {
+    // Solo una talla - mostrar modal informativo
+    sizeModalState.currentProduct = product;
+    sizeModalState.selectedSize = product.sizes[0];
+    sizeModalState.isOpen = true;
+    renderSizeModal(product);
+    return;
+  }
+
+  // Si no tiene tallas, agregar directo
   if (!requiresSizeSelection(product)) {
     addProductToDrawer(product, null, 1);
     showNotification(`${product.name} agregado al carrito 🛒`, 'success');
     return;
   }
 
+  // Múltiples tallas - mostrar selector
   sizeModalState.currentProduct = product;
   sizeModalState.selectedSize = null;
   sizeModalState.isOpen = true;
@@ -97,17 +108,21 @@ function renderSizeModal(product) {
  */
 function createSizeModalHTML(product) {
   const sizes = product.sizes || [];
-  const hasUnique = sizes.includes('UNIQUE');
-  const isOnlyUnique = sizes.length === 1 && hasUnique;
+  
+  // ✨ ARREGLADO: Si solo hay UNA talla (cualquiera que sea), mostrar mensaje
+  const isOnlyOneSize = sizes.length === 1;
+  const onlySize = sizes[0];
 
   let sizeButtonsHTML = '';
 
-  if (isOnlyUnique) {
-    // Solo talla única - mostrar mensaje informativo
+  if (isOnlyOneSize) {
+    // Solo una talla - mostrar mensaje informativo
+    const sizeLabel = SIZE_OPTIONS.find(opt => opt.value === onlySize)?.label || onlySize;
+    
     sizeButtonsHTML = `
       <div class="size-info-message">
         <div class="size-info-icon">ℹ️</div>
-        <p>Este producto solo está disponible en <strong>Talla Única</strong></p>
+        <p>Este producto solo está disponible en <strong>${sizeLabel}</strong></p>
       </div>
     `;
   } else {
@@ -155,7 +170,7 @@ function createSizeModalHTML(product) {
           type="button" 
           class="size-modal-add-btn" 
           onclick="window.confirmSizeSelection()"
-          ${isOnlyUnique ? '' : 'disabled'}
+          ${isOnlyOneSize ? '' : 'disabled'}
           id="sizeConfirmBtn"
         >
           Agregar al Carrito
@@ -212,17 +227,21 @@ export function confirmSizeSelection() {
     return;
   }
 
-  // Si es talla única, usar UNIQUE
-  const sizeToAdd = requiresSizeSelection(product) ? selectedSize : 'UNIQUE';
+  // ✨ ARREGLADO: Si solo hay una talla, usarla automáticamente
+  let sizeToAdd = selectedSize;
+  
+  if (!sizeToAdd && product.sizes && product.sizes.length === 1) {
+    sizeToAdd = product.sizes[0];
+  }
 
-  if (requiresSizeSelection(product) && !selectedSize) {
+  if (requiresSizeSelection(product) && !sizeToAdd) {
     showNotification('Por favor selecciona una talla', 'error');
     return;
   }
 
   try {
     // Agregar al drawer del carrito
-    addProductToDrawer(product, sizeToAdd, 1);
+    addProductToDrawer(product, sizeToAdd || null, 1);
     
     showNotification(`${product.name} agregado al carrito 🛒`, 'success');
     closeSizeModal();
