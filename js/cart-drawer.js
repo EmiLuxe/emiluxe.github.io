@@ -106,7 +106,7 @@ function setupDrawerEventListeners() {
 // ========================================
 
 /**
- * Abrir carrito drawer - ✨ SOLUCIÓN DEFINITIVA ✨
+ * Abrir carrito drawer - ✨ SOLUCIÓN FINAL ✨
  * @returns {void}
  */
 export function openCartDrawer() {
@@ -129,21 +129,21 @@ export function openCartDrawer() {
   const overlay = document.getElementById('cartDrawerOverlay');
 
   if (drawer && overlay) {
-    // ✨ FORZAR REFLOW para que CSS se aplique
-    drawer.classList.remove('open');
-    overlay.classList.remove('visible');
+    console.log('✓ Aplicando estilos...');
     
-    // Esperar un frame
-    requestAnimationFrame(() => {
-      drawer.classList.add('open');
-      overlay.classList.add('visible');
-      
-      // Forzar estilos inline FUERTES
-      drawer.style.cssText = 'right: 0 !important; z-index: 1000 !important; transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;';
-      overlay.style.cssText = 'display: block !important; z-index: 999 !important; opacity: 1 !important; background: rgba(0, 0, 0, 0.5) !important;';
-      
-      console.log('✓ Drawer abierto con estilos forzados');
-    });
+    // Aplicar estilos DIRECTAMENTE sin requestAnimationFrame
+    drawer.style.right = '0';
+    drawer.style.zIndex = '1000';
+    drawer.classList.add('open');
+    
+    overlay.style.display = 'block';
+    overlay.style.zIndex = '999';
+    overlay.style.opacity = '1';
+    overlay.classList.add('visible');
+    
+    console.log('✓ Drawer style.right:', drawer.style.right);
+    console.log('✓ Drawer class:', drawer.className);
+    console.log('✓ Drawer abierto');
 
     setTimeout(() => {
       drawerState.isAnimating = false;
@@ -157,7 +157,7 @@ export function openCartDrawer() {
 }
 
 /**
- * Cerrar carrito drawer - ✨ SOLUCIÓN DEFINITIVA ✨
+ * Cerrar carrito drawer - ✨ SOLUCIÓN FINAL ✨
  * @returns {void}
  */
 export function closeCartDrawer() {
@@ -170,13 +170,10 @@ export function closeCartDrawer() {
   const overlay = document.getElementById('cartDrawerOverlay');
 
   if (drawer && overlay) {
-    requestAnimationFrame(() => {
-      drawer.classList.remove('open');
-      overlay.classList.remove('visible');
-      
-      drawer.style.cssText = 'right: -450px !important; z-index: 1000 !important;';
-      overlay.style.cssText = 'display: none !important;';
-    });
+    drawer.style.right = '-450px';
+    overlay.style.display = 'none';
+    drawer.classList.remove('open');
+    overlay.classList.remove('visible');
 
     setTimeout(() => {
       drawerState.isAnimating = false;
@@ -597,36 +594,4 @@ window.openDrawer = function() {
 /**
  * Cerrar drawer
  * @returns {void}
- */
-window.closeDrawer = function() {
-  try {
-    closeCartDrawer();
-  } catch (error) {
-    console.error('Error en closeDrawer:', error);
-  }
-};
-
-// ========================================
-// EXPORT DEFAULT
-// ========================================
-
-export default {
-  initCartDrawer,
-  openCartDrawer,
-  closeCartDrawer,
-  toggleCartDrawer,
-  addProductToDrawer,
-  removeFromDrawer,
-  updateQuantity,
-  increaseQuantity,
-  decreaseQuantity,
-  clearCart,
-  getCartItems,
-  getCartTotal,
-  getCartItemCount,
-  getCartProductCount,
-  getDrawerState,
-  getCartItem,
-  updateDrawerDisplay,
-  updateCartBadge
-};
+ */*`
