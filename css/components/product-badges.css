@@ -1,0 +1,384 @@
+/* ========================================
+   EMILUXE - PRODUCT BADGES STYLES
+   ======================================== */
+
+/* ========================================
+   CONTENEDOR DE BADGE
+   ======================================== */
+
+.product-badge {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  z-index: 10;
+  display: inline-block;
+  animation: slideInDown 0.4s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+}
+
+/* ========================================
+   TIPOS DE BADGES
+   ======================================== */
+
+/* BESTSELLER */
+.product-badge.bestseller {
+  background: linear-gradient(135deg, #FFE5E5 0%, #FFD4E0 100%);
+  color: #FF6B9D;
+  border: 1px solid #FFB8D8;
+}
+
+.product-badge.bestseller::before {
+  content: "🔥 ";
+  margin-right: 0.25rem;
+}
+
+/* OFFER */
+.product-badge.offer {
+  background: linear-gradient(135deg, #FFE5E5 0%, #FFD4E0 100%);
+  color: #FF6B9D;
+  border: 1px solid #FFB8D8;
+}
+
+.product-badge.offer::before {
+  content: "💝 ";
+  margin-right: 0.25rem;
+}
+
+/* NEW */
+.product-badge.new {
+  background: linear-gradient(135deg, #F3E8FF 0%, #E9D5FF 100%);
+  color: #8B5CF6;
+  border: 1px solid #D8B4FE;
+}
+
+.product-badge.new::before {
+  content: "✨ ";
+  margin-right: 0.25rem;
+}
+
+/* LOW STOCK */
+.product-badge.low-stock {
+  background: linear-gradient(135deg, #FFEDD5 0%, #FED7AA 100%);
+  color: #EA580C;
+  border: 1px solid #FDBA74;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.product-badge.low-stock::before {
+  content: "⚡ ";
+  margin-right: 0.25rem;
+}
+
+/* ========================================
+   VARIANTES DE BADGE
+   ======================================== */
+
+.badge-small {
+  padding: 0.4rem 0.7rem;
+  font-size: 0.75rem;
+}
+
+.badge-large {
+  padding: 0.6rem 1.1rem;
+  font-size: 0.85rem;
+}
+
+.badge-compact {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.7rem;
+}
+
+/* ========================================
+   BADGE SECUNDARIO (Stock bajo)
+   ======================================== */
+
+.product-stock-text {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  color: #EA580C;
+  font-weight: 500;
+  animation: slideInLeft 0.4s ease 0.2s both;
+}
+
+.product-stock-text.critical {
+  color: #DC2626;
+  font-weight: 600;
+}
+
+.product-stock-text.warning {
+  color: #F59E0B;
+}
+
+/* ========================================
+   BADGE EN CARD DE PRODUCTO
+   ======================================== */
+
+.product-card {
+  position: relative;
+}
+
+.product-card .product-badge {
+  top: 0.75rem;
+  left: 0.75rem;
+}
+
+/* ========================================
+   BADGE EN BESTSELLERS
+   ======================================== */
+
+.bestseller-card {
+  position: relative;
+}
+
+.bestseller-badge {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  background: linear-gradient(135deg, #FFE5E5 0%, #FFD4E0 100%);
+  color: #FF6B9D;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  z-index: 10;
+  border: 1px solid #FFB8D8;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ========================================
+   ANIMACIONES DE BADGE
+   ======================================== */
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* ========================================
+   ESTADO "AGOTADO"
+   ======================================== */
+
+.product-card.out-of-stock {
+  opacity: 0.6;
+}
+
+.product-card.out-of-stock .product-image {
+  filter: grayscale(100%);
+  opacity: 0.7;
+}
+
+.product-card.out-of-stock .add-to-cart-btn {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.product-card.out-of-stock::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+/* ========================================
+   BADGE EN CARRITO
+   ======================================== */
+
+.cart-item-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  background: #FFE5E5;
+  color: #FF6B9D;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-left: 0.5rem;
+}
+
+/* ========================================
+   MÚLTIPLES BADGES
+   ======================================== */
+
+.product-badges-stack {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  z-index: 10;
+}
+
+.product-badges-stack .product-badge {
+  position: static;
+  animation: slideInDown 0.4s ease;
+}
+
+.product-badges-stack .product-badge:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.product-badges-stack .product-badge:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+/* ========================================
+   INFORMACIÓN DE TALLAS
+   ======================================== */
+
+.product-sizes {
+  margin: 0.5rem 0;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.product-sizes strong {
+  color: #333;
+  font-weight: 600;
+}
+
+/* ========================================
+   TOOLTIP DE BADGE
+   ======================================== */
+
+.badge-tooltip {
+  position: relative;
+}
+
+.badge-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 20;
+  margin-bottom: 0.5rem;
+}
+
+.badge-tooltip:hover::after {
+  opacity: 1;
+}
+
+/* ========================================
+   BADGE EN LISTA
+   ======================================== */
+
+.badge-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+
+.badge-list .product-badge {
+  position: static;
+}
+
+/* ========================================
+   RESPONSIVO
+   ======================================== */
+
+@media (max-width: 768px) {
+  .product-badge {
+    top: 0.5rem;
+    left: 0.5rem;
+    padding: 0.4rem 0.7rem;
+    font-size: 0.75rem;
+  }
+
+  .badge-large {
+    padding: 0.5rem 0.9rem;
+    font-size: 0.8rem;
+  }
+
+  .product-stock-text {
+    font-size: 0.8rem;
+  }
+
+  .product-sizes {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .product-badge {
+    top: 0.4rem;
+    left: 0.4rem;
+    padding: 0.35rem 0.6rem;
+    font-size: 0.7rem;
+  }
+
+  .badge-compact {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.65rem;
+  }
+
+  .product-stock-text {
+    font-size: 0.75rem;
+    margin: 0.35rem 0 0;
+  }
+
+  .product-sizes {
+    font-size: 0.75rem;
+    margin: 0.35rem 0;
+  }
+
+  .product-badges-stack {
+    gap: 0.3rem;
+  }
+}
