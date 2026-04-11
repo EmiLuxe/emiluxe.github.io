@@ -96,20 +96,9 @@ export function openCartDrawer() {
   const overlay = document.getElementById('cartDrawerOverlay');
 
   if (drawer && overlay) {
-    // ✅ FORZAR ESTILOS INLINE DIRECTOS
-    drawer.style.right = '0px';
-    drawer.style.display = 'flex';
-    drawer.style.zIndex = '1000';
-    
-    overlay.style.display = 'block';
-    overlay.style.zIndex = '999';
-    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-    overlay.style.opacity = '1';
-    overlay.style.pointerEvents = 'auto';
-    
+    // ✅ NO CAMBIES ESTILOS - main.js ya lo hizo
     drawer.classList.add('open');
     overlay.classList.add('visible');
-    
     console.log('✓ Drawer abierto');
   } else {
     console.error('❌ Drawer o overlay no encontrados');
@@ -126,14 +115,8 @@ export function closeCartDrawer() {
   const overlay = document.getElementById('cartDrawerOverlay');
 
   if (drawer && overlay) {
-    drawer.style.right = '-450px';
-    overlay.style.display = 'none';
-    overlay.style.opacity = '0';
-    overlay.style.pointerEvents = 'none';
-    
     drawer.classList.remove('open');
     overlay.classList.remove('visible');
-    
     console.log('✓ Drawer cerrado');
   }
 }
