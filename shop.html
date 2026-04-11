@@ -21,10 +21,10 @@
       <li><a href="shop.html">Tienda</a></li>
     </ul>
     <div class="navbar-icons">
-      <button id="cartButton" onclick="window.openDrawer(); event.stopPropagation();" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; position: relative;">
+      <a href="cart.html" style="position: relative;">
         🛒
         <span class="cart-badge">0</span>
-      </button>
+      </a>
       <a href="login.html">👤</a>
     </div>
   </nav>
@@ -51,31 +51,6 @@
       <!-- Products will be loaded here by JavaScript -->
     </div>
   </section>
-
-  <!-- CARRITO DRAWER (MODAL LATERAL) -->
-  <div id="cartDrawerOverlay"></div>
-  <div id="cartDrawer">
-    <div class="cart-drawer-header">
-      <h2>Tu Carrito</h2>
-      <button class="cart-drawer-close" onclick="window.closeDrawer()">✕</button>
-    </div>
-
-    <div id="cartDrawerEmpty" class="show">
-      <div class="empty-icon">🛒</div>
-      <h3>Carrito Vacío</h3>
-      <p>Agrega productos para comenzar</p>
-      <a href="shop.html">Continuar Comprando</a>
-    </div>
-
-    <div id="cartDrawerItems"></div>
-
-    <div class="cart-drawer-footer">
-      <div id="cartDrawerTotal"></div>
-      <button id="cartDrawerCheckoutBtn" onclick="window.goToCheckout()" style="display: none;">
-        Ir a Checkout
-      </button>
-    </div>
-  </div>
 
   <!-- BOTÓN WHATSAPP FLOTANTE -->
   <div class="whatsapp-button" onclick="openWhatsApp()">
@@ -106,6 +81,7 @@
       }
       
       await renderProducts();
+      updateCartBadge();
     });
 
     // Render products grid
@@ -145,7 +121,7 @@
                 src="${product.image}" 
                 alt="${product.name}" 
                 class="product-image" 
-                onerror="this.src='https://via.placeholder.com/400x500?text=Sin+Imagen'"
+                onerror="this.src='assets/images/placeholder.png'"
                 loading="lazy"
               >
               <div class="product-info">
@@ -202,10 +178,9 @@
         const product = allProductsData.find(p => p.id === productId);
 
         if (product) {
-          addToCart(product, 1);
+          const { openSizeModal } = await import('./js/size-selector-modal.js');
+          openSizeModal(product);
           showNotification(`${product.name} agregado al carrito 🛒`, 'success');
-          // Abrir el drawer al agregar
-          window.openDrawer();
         } else {
           showNotification('Producto no encontrado', 'error');
         }
@@ -213,11 +188,6 @@
         console.error('Error agregando producto:', error);
         showNotification('Error al agregar producto', 'error');
       }
-    }
-
-    // Go to checkout
-    window.goToCheckout = function() {
-      window.location.href = 'checkout.html';
     }
 
     // Abrir WhatsApp
