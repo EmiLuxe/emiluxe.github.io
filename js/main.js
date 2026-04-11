@@ -13,12 +13,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupCategoryLinks();
   
   // Inicializar módulos nuevos ✨ NUEVO ✨
-  try {
-    const { initCartDrawer } = await import('./cart-drawer.js');
-    initCartDrawer();
-  } catch (error) {
-    console.warn('Cart Drawer no disponible en esta página');
-  }
 
   try {
     const { initSearch } = await import('./search.js');
