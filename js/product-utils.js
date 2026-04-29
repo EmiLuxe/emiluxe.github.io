@@ -62,6 +62,20 @@ export const BADGE_CONFIG = {
 // ========================================
 
 /**
+ * Formatear precio en pesos colombianos
+ * @param {number} price - Precio a formatear
+ * @returns {string} Precio formateado
+ */
+export function formatPrice(price) {
+  return new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(price);
+}
+
+/**
  * Validar si un producto tiene talla
  * @param {Object} product - Producto a validar
  * @returns {boolean}
@@ -330,6 +344,7 @@ export default {
   SIZE_OPTIONS,
   BADGE_TYPES,
   BADGE_CONFIG,
+  formatPrice,
   hasSize,
   isUniqueSizeProduct,
   getAvailableSizes,
