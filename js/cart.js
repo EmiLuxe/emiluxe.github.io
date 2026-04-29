@@ -1,9 +1,10 @@
 // ========================================
-// EMILUXE - CART SYSTEM ✨ MODIFICADO ✨
+// EMILUXE - CART SYSTEM (SINCRONIZADO)
 // ========================================
+// Compatible con cart-drawer.js - Usa la misma clave de localStorage
 
-// Cart key for localStorage
-const CART_KEY = 'emiluxe_cart';
+// Cart key for localStorage (MISMO QUE CART-DRAWER.JS)
+const CART_KEY = 'emiluxeCart';
 
 // Initialize cart from localStorage
 function initCart() {
@@ -20,20 +21,19 @@ function getCart() {
   return JSON.parse(localStorage.getItem(CART_KEY)) || [];
 }
 
-// Add product to cart ✨ MODIFICADO ✨
+// Add product to cart
 function addToCart(product, quantity = 1, selectedSize = null) {
   let cart = getCart();
   
   // Crear ID único incluyendo talla si existe
   const cartItemId = selectedSize ? `${product.id}_${selectedSize}` : product.id;
-  const existingItem = cart.find(item => (item.cartItemId || item.id) === cartItemId);
+  const existingItem = cart.find(item => item.id === product.id && item.size === selectedSize);
 
   if (existingItem) {
     existingItem.quantity += quantity;
   } else {
     cart.push({
       id: product.id,
-      cartItemId: cartItemId,
       name: product.name,
       price: product.price,
       image: product.image,
@@ -48,19 +48,34 @@ function addToCart(product, quantity = 1, selectedSize = null) {
   return cart;
 }
 
-// Remove product from cart ✨ MODIFICADO ✨
+// Remove product from cart
 function removeFromCart(cartItemId) {
   let cart = getCart();
-  cart = cart.filter(item => (item.cartItemId || item.id) !== cartItemId);
+  
+  // Manejar tanto ID simple como ID con talla
+  if (cartItemId.includes('_')) {
+    const [productId, size] = cartItemId.split('_');
+    cart = cart.filter(item => !(item.id === productId && item.size === size));
+  } else {
+    cart = cart.filter(item => item.id !== cartItemId);
+  }
+  
   localStorage.setItem(CART_KEY, JSON.stringify(cart));
   updateCartBadge();
   return cart;
 }
 
-// Update product quantity ✨ MODIFICADO ✨
+// Update product quantity
 function updateQuantity(cartItemId, quantity) {
   let cart = getCart();
-  const item = cart.find(item => (item.cartItemId || item.id) === cartItemId);
+  
+  let item;
+  if (cartItemId.includes('_')) {
+    const [productId, size] = cartItemId.split('_');
+    item = cart.find(i => i.id === productId && i.size === size);
+  } else {
+    item = cart.find(i => i.id === cartItemId);
+  }
 
   if (item) {
     if (quantity <= 0) {
@@ -102,6 +117,22 @@ function updateCartBadge() {
   }
 }
 
+// Formatear precio
+function formatPrice(price) {
+  return new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(price);
+}
+
+// Mostrar notificación
+function showNotification(message, type = 'info') {
+  // Implementar notificación si no existe en main.js
+  console.log(`[${type.toUpperCase()}] ${message}`);
+}
+
 // Initialize cart badge on page load
 document.addEventListener('DOMContentLoaded', () => {
   updateCartBadge();
@@ -118,6 +149,7 @@ if (typeof module !== 'undefined' && module.exports) {
     getCartCount,
     clearCart,
     updateCartBadge,
+    formatPrice,
     initCart
   };
 }
