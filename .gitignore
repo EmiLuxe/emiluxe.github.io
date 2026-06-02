@@ -11,6 +11,8 @@ node_modules
 dist
 public/data
 dist-ssr
+.env
+.env.local
 *.local
 
 # Editor
