@@ -4,7 +4,7 @@ import {
   formatCOP, showToast, showView, openModal, closeModal, confirmDialog
 } from './utils.js';
 import {
-  getTurnoAbierto, iniciarTurno, finalizarTurno, calcTurnoTotalFromCuentas
+  getTurnoAbierto, iniciarTurno, finalizarTurno, calcTurnoTotalFromCuentas, subscribeTurnoAbierto
 } from './turno.js';
 import {
   subscribeCuentas, crearCuenta, agregarProducto, editarProducto,
@@ -25,17 +25,48 @@ const state = {
 };
 
 let unsubCuentas = null;
+let unsubTurnoAbierto = null;
 
-async function init() {
+function init() {
   registerSW();
   bindEvents();
-  const turno = await getTurnoAbierto();
+  unsubTurnoAbierto = subscribeTurnoAbierto(handleTurnoSync);
+}
+
+function handleTurnoSync(turno) {
   document.getElementById('loading').classList.remove('active');
+  updateStartScreen(!!turno);
+
   if (turno) {
     openTurno(turno);
-  } else {
+    return;
+  }
+
+  const hadTurno = !!state.turno;
+  resetTurnoLocal();
+
+  const activeView = document.querySelector('.view.active')?.id;
+  if (hadTurno && activeView !== 'view-desempeno') {
+    showView('view-start');
+  } else if (activeView === 'loading' || activeView === 'view-turno' || activeView === 'view-cuenta') {
     showView('view-start');
   }
+}
+
+function resetTurnoLocal() {
+  if (unsubCuentas) {
+    unsubCuentas();
+    unsubCuentas = null;
+  }
+  state.turno = null;
+  state.cuentas = [];
+  state.cuentaActual = null;
+  document.getElementById('btn-iniciar-turno').disabled = false;
+}
+
+function updateStartScreen(turnoActivo) {
+  document.getElementById('btn-iniciar-turno').classList.toggle('hidden', turnoActivo);
+  document.getElementById('start-turno-msg').classList.toggle('hidden', !turnoActivo);
 }
 
 function registerSW() {
@@ -106,6 +137,12 @@ async function onIniciarTurno() {
   const btn = document.getElementById('btn-iniciar-turno');
   btn.disabled = true;
   try {
+    const existing = await getTurnoAbierto();
+    if (existing) {
+      openTurno(existing);
+      showToast('Turno ya activo', 'info');
+      return;
+    }
     const turno = await iniciarTurno();
     openTurno(turno);
     showToast('Turno iniciado', 'success');
@@ -116,21 +153,36 @@ async function onIniciarTurno() {
 }
 
 function openTurno(turno) {
+  if (turno.status === 'finalizado') {
+    resetTurnoLocal();
+    showView('view-start');
+    return;
+  }
+
+  const isNewTurno = !state.turno || state.turno.id !== turno.id;
   state.turno = turno;
-  if (unsubCuentas) unsubCuentas();
-  unsubCuentas = subscribeCuentas(turno.id, (cuentas) => {
-    state.cuentas = cuentas;
-    renderCuentasList();
-    updateTurnoTotal();
-    if (state.cuentaActual) {
-      const updated = cuentas.find((c) => c.id === state.cuentaActual.id);
-      if (updated) {
-        state.cuentaActual = updated;
-        renderProductosList();
+  updateStartScreen(true);
+
+  if (isNewTurno) {
+    if (unsubCuentas) unsubCuentas();
+    unsubCuentas = subscribeCuentas(turno.id, (cuentas) => {
+      state.cuentas = cuentas;
+      renderCuentasList();
+      updateTurnoTotal();
+      if (state.cuentaActual) {
+        const updated = cuentas.find((c) => c.id === state.cuentaActual.id);
+        if (updated) {
+          state.cuentaActual = updated;
+          renderProductosList();
+        }
       }
-    }
-  });
-  showView('view-turno');
+    });
+  }
+
+  const activeView = document.querySelector('.view.active')?.id;
+  if (activeView === 'loading' || activeView === 'view-start' || activeView === 'view-turno') {
+    showView('view-turno');
+  }
 }
 
 function updateTurnoTotal() {
@@ -423,12 +475,7 @@ async function onFinalizarTurno() {
   if (!ok) return;
   try {
     await finalizarTurno(state.turno.id, state.cuentas);
-    if (unsubCuentas) { unsubCuentas(); unsubCuentas = null; }
-    state.turno = null;
-    state.cuentas = [];
     showToast('Turno finalizado', 'success');
-    showView('view-start');
-    document.getElementById('btn-iniciar-turno').disabled = false;
   } catch (err) { showToast(err.message, 'error'); }
 }
 

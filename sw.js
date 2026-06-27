@@ -1,4 +1,4 @@
-const CACHE = 'bar-facturacion-v1';
+const CACHE = 'bar-facturacion-v2';
 const ASSETS = [
   './',
   './index.html',

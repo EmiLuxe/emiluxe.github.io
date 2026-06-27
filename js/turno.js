@@ -1,5 +1,5 @@
 import {
-  db, collection, doc, addDoc, updateDoc, getDoc, getDocs, query, where, onSnapshot, serverTimestamp, Timestamp
+  db, collection, doc, addDoc, updateDoc, deleteDoc, getDoc, getDocs, query, where, onSnapshot, serverTimestamp, Timestamp
 } from './firebase-init.js';
 import { aggregateProductStats } from './products.js';
 import { nowDateStr, nowTimeStr, formatDuration } from './utils.js';
@@ -12,6 +12,19 @@ export async function getTurnoAbierto() {
   if (snap.empty) return null;
   const d = snap.docs[0];
   return { id: d.id, ...d.data() };
+}
+
+export function subscribeTurnoAbierto(callback) {
+  const q = query(collection(db, TURNOS), where('status', '==', 'abierto'));
+  return onSnapshot(q, (snap) => {
+    if (snap.empty) {
+      callback(null);
+      return;
+    }
+    const docs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    docs.sort((a, b) => (a.fechaInicio?.seconds || 0) - (b.fechaInicio?.seconds || 0));
+    callback(docs[0]);
+  });
 }
 
 export async function iniciarTurno() {
@@ -33,6 +46,21 @@ export async function iniciarTurno() {
   };
 
   const ref = await addDoc(collection(db, TURNOS), data);
+
+  const abiertos = await getDocs(query(collection(db, TURNOS), where('status', '==', 'abierto')));
+  if (abiertos.docs.length > 1) {
+    const sorted = abiertos.docs.sort(
+      (a, b) => (a.data().fechaInicio?.seconds || 0) - (b.data().fechaInicio?.seconds || 0)
+    );
+    const principal = sorted[0];
+    for (let i = 1; i < sorted.length; i++) {
+      await deleteDoc(doc(db, TURNOS, sorted[i].id));
+    }
+    if (principal.id !== ref.id) {
+      return { id: principal.id, ...principal.data() };
+    }
+  }
+
   return { id: ref.id, ...data };
 }
 
