@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0a0f">
+  <meta name="description" content="Facturación Bar">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="css/styles.css">
+  <title>Facturación Bar</title>
+</head>
+<body>
+  <div id="app">
+    <div id="loading" class="view active">
+      <div class="loader"></div>
+    </div>
+
+    <div id="view-start" class="view">
+      <div class="start-screen">
+        <div class="logo">BAR</div>
+        <p class="start-sub">Facturación</p>
+        <button id="btn-iniciar-turno" class="btn btn-primary btn-xl">INICIAR TURNO</button>
+        <button id="btn-desempeno-start" class="btn btn-ghost">DESEMPEÑO</button>
+      </div>
+    </div>
+
+    <div id="view-turno" class="view">
+      <header class="header">
+        <div class="header-top">
+          <h1>Turno</h1>
+          <div class="header-actions">
+            <button id="btn-desempeno" class="btn btn-icon" aria-label="Desempeño">📊</button>
+            <button id="btn-finalizar-turno" class="btn btn-icon btn-danger-icon" aria-label="Finalizar turno">⏹</button>
+          </div>
+        </div>
+        <div class="turno-total">
+          <span class="label">Total vendido</span>
+          <span id="turno-total-vendido" class="amount">$0</span>
+        </div>
+        <div class="search-wrap">
+          <input type="search" id="search-cuentas" placeholder="Buscar cuenta..." autocomplete="off">
+        </div>
+      </header>
+      <main id="cuentas-list" class="cuentas-list"></main>
+      <button id="btn-nueva-cuenta" class="fab">+</button>
+    </div>
+
+    <div id="view-cuenta" class="view">
+      <header class="header compact">
+        <button id="btn-back-cuenta" class="btn btn-icon">←</button>
+        <div class="header-info">
+          <h1 id="cuenta-nombre-display">Cuenta</h1>
+          <span id="cuenta-estado-badge" class="badge"></span>
+        </div>
+        <button id="btn-cerrar-cuenta" class="btn btn-secondary btn-sm">Cerrar</button>
+      </header>
+      <div class="cuenta-total-bar">
+        <span>Total</span>
+        <span id="cuenta-total-display" class="amount">$0</span>
+      </div>
+      <main id="productos-list" class="productos-list"></main>
+      <button id="btn-agregar-producto" class="fab">+</button>
+    </div>
+
+    <div id="view-desempeno" class="view">
+      <header class="header compact">
+        <button id="btn-back-desempeno" class="btn btn-icon">←</button>
+        <h1>DESEMPEÑO</h1>
+      </header>
+      <div class="stats-controls">
+        <div class="period-tabs">
+          <button class="period-tab active" data-period="daily">Diario</button>
+          <button class="period-tab" data-period="weekly">Semanal</button>
+          <button class="period-tab" data-period="monthly">Mensual</button>
+          <button class="period-tab" data-period="yearly">Anual</button>
+        </div>
+        <div class="date-picker-wrap">
+          <label for="stats-date">Fecha específica</label>
+          <input type="date" id="stats-date">
+        </div>
+      </div>
+      <main id="stats-content" class="stats-content"></main>
+    </div>
+  </div>
+
+  <div id="modal-overlay" class="modal-overlay hidden">
+    <div id="modal-nueva-cuenta" class="modal hidden">
+      <h2>Nueva cuenta</h2>
+      <input type="text" id="input-nombre-cuenta" placeholder="Nombre (Mesa 5, Juan...)" maxlength="50" autocomplete="off">
+      <div class="modal-actions">
+        <button class="btn btn-ghost modal-cancel">Cancelar</button>
+        <button id="btn-confirmar-cuenta" class="btn btn-primary">Crear</button>
+      </div>
+    </div>
+
+    <div id="modal-producto" class="modal hidden">
+      <h2 id="modal-producto-title">Agregar producto</h2>
+      <div id="producto-selector" class="producto-selector"></div>
+      <div id="coctel-options" class="coctel-options hidden">
+        <div class="option-group">
+          <label>Tamaño</label>
+          <div class="btn-group">
+            <button class="btn btn-toggle active" data-size="pequeno">Pequeño $13.000</button>
+            <button class="btn btn-toggle" data-size="grande">Grande $16.000</button>
+          </div>
+        </div>
+        <div class="option-group additions">
+          <label class="checkbox-label">
+            <input type="checkbox" id="chk-gomas"> Gomas (+$2.000)
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="chk-shot"> Shot (+$3.000)
+          </label>
+        </div>
+      </div>
+      <div class="option-group">
+        <label>Cantidad</label>
+        <div class="qty-control">
+          <button id="qty-minus" class="btn btn-icon">−</button>
+          <span id="qty-value">1</span>
+          <button id="qty-plus" class="btn btn-icon">+</button>
+        </div>
+      </div>
+      <div class="producto-preview">
+        <span id="producto-preview-price" class="amount">$0</span>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost modal-cancel">Cancelar</button>
+        <button id="btn-confirmar-producto" class="btn btn-primary">Agregar</button>
+      </div>
+    </div>
+
+    <div id="modal-pago" class="modal hidden">
+      <h2>¿Ya pagó?</h2>
+      <div class="pago-options">
+        <button class="btn btn-warning btn-lg pago-btn" data-pago="pendiente">Pendiente</button>
+        <button class="btn btn-success btn-lg pago-btn" data-pago="efectivo">Efectivo</button>
+        <button class="btn btn-info btn-lg pago-btn" data-pago="transferencia">Transferencia</button>
+      </div>
+    </div>
+
+    <div id="modal-confirm" class="modal hidden">
+      <h2 id="confirm-title">Confirmar</h2>
+      <p id="confirm-message"></p>
+      <div class="modal-actions">
+        <button class="btn btn-ghost modal-cancel">Cancelar</button>
+        <button id="btn-confirm-action" class="btn btn-primary">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
