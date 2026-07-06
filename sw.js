@@ -35,10 +35,14 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
   const url = new URL(e.request.url);
+  
+  // Permite que Firebase y Google se carguen desde la red
   if (url.origin.includes('googleapis.com') || url.origin.includes('gstatic.com')) {
     e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
     return;
   }
+  
+  // Todos los demás archivos: primero intenta caché, luego red
   e.respondWith(
     caches.match(e.request).then((cached) =>
       cached || fetch(e.request).then((res) => {
@@ -48,6 +52,6 @@ self.addEventListener('fetch', (e) => {
         }
         return res;
       })
-    )
+    ).catch(() => caches.match(e.request))
   );
 });
