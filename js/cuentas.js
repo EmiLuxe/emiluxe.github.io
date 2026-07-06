@@ -1,5 +1,5 @@
 import {
-  db, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, serverTimestamp
+  db, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, serverTimestamp, getDoc
 } from './firebase-init.js';
 import { calcCuentaTotal, nowDateStr, nowTimeStr, uuid, recalcProductoLine } from './utils.js';
 
@@ -90,6 +90,21 @@ export async function cerrarCuenta(turnoId, cuentaId, opcion) {
   });
 }
 
+/**
+ * Elimina una cuenta del turno.
+ * - Verifica que exista la cuenta.
+ * - Previene la eliminación si la cuenta está en estado 'pagada'.
+ */
 export async function deleteCuenta(turnoId, cuentaId) {
-  await deleteDoc(doc(db, 'turnos', turnoId, 'cuentas', cuentaId));
+  const ref = doc(db, 'turnos', turnoId, 'cuentas', cuentaId);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) {
+    throw new Error('Cuenta no encontrada');
+  }
+  const data = snap.data();
+  if (data.estado === 'pagada') {
+    throw new Error('No se puede eliminar una cuenta pagada');
+  }
+  await deleteDoc(ref);
+  return { id: cuentaId };
 }
