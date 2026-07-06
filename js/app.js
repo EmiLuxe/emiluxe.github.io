@@ -180,7 +180,8 @@ function openTurno(turno) {
   }
 
   const activeView = document.querySelector('.view.active')?.id;
-  if (activeView === 'loading' || activeView === 'view-start' || activeView === 'view-turno') {
+  // Opción B: asegurar que si no hay vista activa, la vista de turno se activa
+  if (!activeView || activeView === 'loading' || activeView === 'view-start' || activeView === 'view-turno') {
     showView('view-turno');
   }
 }
