@@ -4,13 +4,14 @@ import {
   formatCOP, showToast, showView, openModal, closeModal, confirmDialog
 } from './utils.js';
 import {
-  getTurnoAbierto, iniciarTurno, finalizarTurno, calcTurnoTotalFromCuentas, subscribeTurnoAbierto
+  getTurnoAbierto, iniciarTurno, finalizarTurno, calcTurnoTotalFromCuentas, subscribeTurnoAbierto, getAllTurnosFinalizados
 } from './turno.js';
 import {
   subscribeCuentas, crearCuenta, agregarProducto, editarProducto,
-  eliminarProducto, cambiarCantidad, cerrarCuenta
+  eliminarProducto, cambiarCantidad, cerrarCuenta, deleteCuenta
 } from './cuentas.js';
 import { getStats, getStatsByDate, renderStatsUI, renderDateStatsUI, destroyCharts } from './stats.js';
+import { db, collection, doc, getDocs, deleteDoc } from './firebase-init.js';
 
 const state = {
   turno: null,
@@ -31,6 +32,7 @@ function init() {
   registerSW();
   bindEvents();
   unsubTurnoAbierto = subscribeTurnoAbierto(handleTurnoSync);
+  bindStatsActionsIfPresent();
 }
 
 function handleTurnoSync(turno) {
@@ -455,6 +457,29 @@ async function onPago(opcion) {
   closeModal();
   const cuenta = state.cuentaActual;
   if (!cuenta) return;
+
+  // Nueva opción: eliminar cuenta
+  if (opcion === 'eliminar') {
+    if (cuenta.estado === 'pagada') {
+      showToast('No se puede eliminar una cuenta pagada', 'error');
+      return;
+    }
+    const ok = await confirmDialog('Eliminar cuenta', '¿Eliminar esta cuenta permanentemente? Esta acción no se puede deshacer.');
+    if (!ok) return;
+    try {
+      await deleteCuenta(state.turno.id, cuenta.id);
+      // actualizar estado local
+      state.cuentas = state.cuentas.filter((c) => c.id !== cuenta.id);
+      state.cuentaActual = null;
+      showToast('Cuenta eliminada', 'success');
+      showView('view-turno');
+    } catch (err) {
+      showToast(err.message || 'Error al eliminar cuenta', 'error');
+    }
+    return;
+  }
+
+  // Comportamiento previo: cerrar cuenta con metodo de pago
   try {
     await cerrarCuenta(state.turno.id, cuenta.id, opcion);
     if (opcion === 'pendiente') {
@@ -492,6 +517,8 @@ async function loadStats() {
   try {
     const data = await getStats(state.statsPeriod, new Date());
     renderStatsUI(container, data);
+    // si existen botones en DOM para exportar/borrar, adjuntamos listeners dinámicamente
+    bindStatsActionsIfPresent();
   } catch (err) {
     container.innerHTML = `<div class="empty-state">${escapeHtml(err.message)}</div>`;
   }
@@ -503,6 +530,7 @@ async function loadStatsByDate(dateStr) {
   try {
     const result = await getStatsByDate(dateStr);
     renderDateStatsUI(container, result);
+    bindStatsActionsIfPresent();
   } catch (err) {
     container.innerHTML = `<div class="empty-state">${escapeHtml(err.message)}</div>`;
   }
@@ -513,5 +541,111 @@ function escapeHtml(str) {
   d.textContent = str;
   return d.innerHTML;
 }
+
+/* -----------------------
+   Funciones auxiliares para export / borrado de turnos
+   - Estas funciones usan las utilidades de firestore ya exportadas en firebase-init.js.
+   - Los listeners para botones se adjuntan solo si los elementos existen en DOM.
+   ----------------------- */
+
+async function deleteTurnoById(turnoId) {
+  if (!turnoId) throw new Error('turnoId requerido');
+  // confirmar antes de llamar esta función desde la UI
+  // borrar todas las cuentas del turno
+  const cuentasSnap = await getDocs(collection(db, 'turnos', turnoId, 'cuentas'));
+  for (const d of cuentasSnap.docs) {
+    await deleteDoc(doc(db, 'turnos', turnoId, 'cuentas', d.id));
+  }
+  // borrar el documento de turno
+  await deleteDoc(doc(db, 'turnos', turnoId));
+}
+
+function objectArrayToCsv(rows, columns) {
+  // columns = array de keys en el orden deseado
+  const header = columns.join(',');
+  const lines = rows.map((r) => columns.map((k) => {
+    const v = r[k] == null ? '' : String(r[k]).replace(/"/g, '""');
+    return `"${v}"`;
+  }).join(','));
+  return [header, ...lines].join('\r\n');
+}
+
+function downloadText(filename, content) {
+  const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+async function exportAllTurnosCsv() {
+  try {
+    const turns = await getAllTurnosFinalizados(); // viene de turno.js
+    if (!turns || !turns.length) {
+      showToast('No hay turnos para exportar', 'info');
+      return;
+    }
+    // mapear campos relevantes
+    const rows = turns.map((t) => ({
+      id: t.id,
+      fecha: t.fecha || '',
+      horaInicio: t.horaInicio || '',
+      horaFin: t.horaFin || '',
+      ventasTotales: t.ventasTotales || 0,
+      totalEfectivo: t.totalEfectivo || 0,
+      totalTransferencia: t.totalTransferencia || 0,
+      cantidadCuentas: t.cantidadCuentas || 0
+    }));
+    const cols = ['id', 'fecha', 'horaInicio', 'horaFin', 'ventasTotales', 'totalEfectivo', 'totalTransferencia', 'cantidadCuentas'];
+    const csv = objectArrayToCsv(rows, cols);
+    downloadText('turnos_export.csv', csv);
+    showToast('CSV generado', 'success');
+  } catch (err) {
+    showToast(err.message || 'Error al exportar CSV', 'error');
+  }
+}
+
+/* Bind dinámico para acciones en sección Desempeño (si los botones existen) */
+function bindStatsActionsIfPresent() {
+  const statsContainer = document.getElementById('stats-content');
+  if (!statsContainer) return;
+
+  // exportar CSV global: elemento con id="btn-export-turnos-csv"
+  const exportBtn = document.getElementById('btn-export-turnos-csv');
+  if (exportBtn && !exportBtn._bound) {
+    exportBtn.addEventListener('click', exportAllTurnosCsv);
+    exportBtn._bound = true;
+  }
+
+  // delegación: si en la lista de turnos cada fila tiene class "turno-row" y data-id,
+  // y un botón con class "btn-delete-turn", el click lo maneja aquí.
+  if (!statsContainer._deleteBound) {
+    statsContainer.addEventListener('click', async (e) => {
+      const btn = e.target.closest('.btn-delete-turn');
+      if (!btn) return;
+      const turnoId = btn.dataset.turnoId;
+      if (!turnoId) return;
+      const ok = await confirmDialog('Borrar turno', '¿Borrar este turno y todas sus cuentas? Esta acción no se puede deshacer.');
+      if (!ok) return;
+      try {
+        await deleteTurnoById(turnoId);
+        showToast('Turno eliminado', 'success');
+        // recargar estadísticas/listado
+        loadStats();
+      } catch (err) {
+        showToast(err.message || 'Error al borrar turno', 'error');
+      }
+    });
+    statsContainer._deleteBound = true;
+  }
+}
+
+/* -----------------------
+   Fin utilitarios export/delete
+   ----------------------- */
 
 init();
