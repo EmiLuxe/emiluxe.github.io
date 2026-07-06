@@ -1,4 +1,4 @@
-const CACHE = 'bar-facturacion-v2';
+const CACHE = 'bar-facturacion-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -12,6 +12,7 @@ const ASSETS = [
   './js/turno.js',
   './js/cuentas.js',
   './js/stats.js',
+  './js/lib/chart.min.js',
   './icons/icon.svg',
   './icons/icon-192.png',
   './icons/icon-512.png'
@@ -34,7 +35,7 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
   const url = new URL(e.request.url);
-  if (url.origin.includes('googleapis.com') || url.origin.includes('gstatic.com') || url.origin.includes('cdn.jsdelivr.net')) {
+  if (url.origin.includes('googleapis.com') || url.origin.includes('gstatic.com')) {
     e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
     return;
   }
