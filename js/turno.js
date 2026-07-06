@@ -142,6 +142,21 @@ export async function finalizarTurno(turnoId, cuentas) {
   });
 }
 
+/**
+ * Borra un turno completo: todas sus cuentas en la subcolección y luego el documento del turno.
+ * Uso: llamar desde la UI tras confirmación.
+ */
+export async function deleteTurno(turnoId) {
+  if (!turnoId) throw new Error('turnoId requerido');
+  // borrar cuentas en la subcolección 'cuentas'
+  const cuentasSnap = await getDocs(query(collection(db, TURNOS, turnoId, 'cuentas')));
+  for (const d of cuentasSnap.docs) {
+    await deleteDoc(doc(db, TURNOS, turnoId, 'cuentas', d.id));
+  }
+  // borrar documento principal del turno
+  await deleteDoc(doc(db, TURNOS, turnoId));
+}
+
 export function calcTurnoTotalFromCuentas(cuentas) {
   return cuentas
     .filter((c) => c.estado === 'pagada')
