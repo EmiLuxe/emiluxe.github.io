@@ -1,561 +1,130 @@
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  --bg: #0a0a0f;
-  --bg-card: #14141f;
-  --bg-elevated: #1c1c2a;
-  --text: #f0f0f5;
-  --text-muted: #8888a0;
-  --accent: #6366f1;
-  --accent-hover: #818cf8;
-  --success: #22c55e;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --info: #3b82f6;
-  --pending: #f59e0b;
-  --pending-bg: rgba(245, 158, 11, 0.12);
-  --paid: #22c55e;
-  --paid-bg: rgba(34, 197, 94, 0.08);
-  --radius: 14px;
-  --radius-sm: 10px;
-  --shadow: 0 4px 24px rgba(0,0,0,0.4);
-  --transition: 0.2s ease;
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
+export function formatCOP(amount) {
+  const n = Math.round(Number(amount) || 0);
+  return '$' + n.toLocaleString('es-CO');
 }
 
-html, body {
-  height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  -webkit-tap-highlight-color: transparent;
-  overscroll-behavior: none;
+export function nowDateStr() {
+  const d = new Date();
+  return d.toISOString().slice(0, 10);
 }
 
-#app {
-  min-height: 100dvh;
-  max-width: 480px;
-  margin: 0 auto;
-  position: relative;
+export function nowTimeStr() {
+  const d = new Date();
+  return d.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
-.view {
-  display: none;
-  min-height: 100dvh;
-  flex-direction: column;
-  animation: fadeIn 0.25s ease;
-}
-.view.active { display: flex; }
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+export function uuid() {
+  return crypto.randomUUID ? crypto.randomUUID() : 'id-' + Date.now() + '-' + Math.random().toString(36).slice(2);
 }
 
-.loader {
-  width: 40px; height: 40px;
-  border: 3px solid var(--bg-elevated);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-  margin: auto;
-}
-.loader-inline {
-  width: 32px; height: 32px;
-  border: 3px solid var(--bg-elevated);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-  margin: 40px auto;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-#loading {
-  display: none;
-  align-items: center;
-  justify-content: center;
-}
-#loading.active { display: flex; }
-
-.start-screen {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  gap: 16px;
-}
-.logo {
-  font-size: 3rem;
-  font-weight: 800;
-  letter-spacing: 0.3em;
-  background: linear-gradient(135deg, var(--accent), #ec4899);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.start-sub { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 32px; }
-.start-msg {
-  color: var(--accent-hover);
-  font-size: 1rem;
-  text-align: center;
-  margin-bottom: 16px;
-  animation: pulse 1.5s ease infinite;
-}
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+export function calcCuentaTotal(productos) {
+  return (productos || []).reduce((sum, p) => sum + (p.precioTotal || 0), 0);
 }
 
-.header {
-  padding: 16px 16px 12px;
-  background: var(--bg);
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-}
-.header.compact {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.header.compact h1 { font-size: 1.1rem; flex: 1; }
-.header-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-.header-top h1 { font-size: 1.4rem; font-weight: 700; }
-.header-actions { display: flex; gap: 8px; }
-.header-info { flex: 1; min-width: 0; }
-.header-info h1 { font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-.turno-total {
-  background: var(--bg-card);
-  border-radius: var(--radius);
-  padding: 14px 18px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-.turno-total .label { color: var(--text-muted); font-size: 0.85rem; }
-.amount { font-size: 1.3rem; font-weight: 700; color: var(--accent-hover); }
-
-.search-wrap input {
-  width: 100%;
-  padding: 12px 16px;
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: var(--radius-sm);
-  background: var(--bg-card);
-  color: var(--text);
-  font-size: 1rem;
-  outline: none;
-  transition: border var(--transition);
-}
-.search-wrap input:focus { border-color: var(--accent); }
-
-.cuentas-list, .productos-list, .stats-content {
-  flex: 1;
-  padding: 12px 16px 100px;
-  overflow-y: auto;
+export function recalcProductoLine(item) {
+  const qty = Math.max(1, item.cantidad || 1);
+  item.cantidad = qty;
+  item.precioTotal = (item.precioUnitario || 0) * qty;
+  return item;
 }
 
-.cuenta-card {
-  background: var(--bg-card);
-  border-radius: var(--radius);
-  padding: 16px;
-  margin-bottom: 10px;
-  cursor: pointer;
-  transition: transform var(--transition), box-shadow var(--transition);
-  border: 1px solid transparent;
-}
-.cuenta-card:active { transform: scale(0.98); }
-.cuenta-card.pending {
-  border-color: rgba(245, 158, 11, 0.4);
-  background: var(--pending-bg);
-  box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.15);
-}
-.cuenta-card.paid {
-  opacity: 0.75;
-  border-color: rgba(34, 197, 94, 0.15);
-}
-.cuenta-card-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-.cuenta-name { font-size: 1.1rem; font-weight: 600; }
-.cuenta-total { font-weight: 700; color: var(--accent-hover); }
-.cuenta-card-bottom {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.cuenta-time { color: var(--text-muted); font-size: 0.85rem; }
-
-.badge {
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 20px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-.badge-pending { background: rgba(245,158,11,0.2); color: var(--pending); }
-.badge-paid { background: rgba(34,197,94,0.15); color: var(--paid); }
-
-.cuenta-total-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 18px;
-  background: var(--bg-elevated);
-  font-weight: 600;
+export function formatDuration(ms) {
+  const totalMin = Math.floor(ms / 60000);
+  const h = Math.floor(totalMin / 60);
+  const m = totalMin % 60;
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m`;
 }
 
-.producto-item {
-  background: var(--bg-card);
-  border-radius: var(--radius-sm);
-  padding: 14px;
-  margin-bottom: 8px;
-}
-.producto-info {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-.producto-name { font-weight: 500; font-size: 0.95rem; }
-.producto-price { color: var(--accent-hover); font-weight: 600; }
-.producto-actions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.qty-display, .qty-readonly {
-  min-width: 28px;
-  text-align: center;
-  font-weight: 600;
+export function startOfDay(date) {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  return d;
 }
 
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  border-radius: var(--radius-sm);
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition);
-  font-family: inherit;
-  color: var(--text);
-}
-.btn:active { transform: scale(0.96); }
-.btn-primary {
-  background: var(--accent);
-  color: #fff;
-  padding: 14px 28px;
-}
-.btn-primary:hover { background: var(--accent-hover); }
-.btn-secondary {
-  background: var(--bg-elevated);
-  padding: 8px 16px;
-  font-size: 0.85rem;
-}
-.btn-ghost {
-  background: transparent;
-  color: var(--text-muted);
-  padding: 12px 20px;
-}
-.btn-success { background: var(--success); color: #fff; }
-.btn-warning { background: var(--warning); color: #000; }
-.btn-info { background: var(--info); color: #fff; }
-.btn-danger-icon { color: var(--danger); }
-.btn-xl {
-  width: 100%;
-  max-width: 320px;
-  padding: 20px 32px;
-  font-size: 1.2rem;
-  letter-spacing: 0.08em;
-  border-radius: var(--radius);
-}
-.btn-lg { width: 100%; padding: 16px; font-size: 1.05rem; margin-bottom: 10px; border-radius: var(--radius-sm); }
-.btn-sm { padding: 6px 10px; font-size: 0.8rem; }
-.btn-icon {
-  background: var(--bg-elevated);
-  width: 44px; height: 44px;
-  font-size: 1.2rem;
-  border-radius: 12px;
-}
-.btn-toggle {
-  flex: 1;
-  padding: 12px 8px;
-  background: var(--bg-elevated);
-  font-size: 0.8rem;
-}
-.btn-toggle.active {
-  background: var(--accent);
-  color: #fff;
+export function endOfDay(date) {
+  const d = new Date(date);
+  d.setHours(23, 59, 59, 999);
+  return d;
 }
 
-.fab {
-  position: fixed;
-  bottom: calc(24px + var(--safe-bottom));
-  right: calc(50% - 220px);
-  max-right: 24px;
-  width: 60px; height: 60px;
-  border-radius: 50%;
-  background: var(--accent);
-  color: #fff;
-  font-size: 2rem;
-  border: none;
-  cursor: pointer;
-  box-shadow: var(--shadow);
-  z-index: 20;
-  transition: transform var(--transition);
-  line-height: 1;
-}
-@media (max-width: 480px) {
-  .fab { right: 24px; }
-}
-.fab:active { transform: scale(0.92); }
-.fab.hidden { display: none; }
-
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.7);
-  z-index: 100;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  backdrop-filter: blur(4px);
-  animation: fadeIn 0.2s ease;
-}
-.modal-overlay.hidden { display: none; }
-.modal {
-  background: var(--bg-card);
-  border-radius: 20px 20px 0 0;
-  padding: 24px 20px calc(24px + var(--safe-bottom));
-  width: 100%;
-  max-width: 480px;
-  max-height: 90dvh;
-  overflow-y: auto;
-  animation: slideUp 0.3s ease;
-}
-.modal.hidden { display: none; }
-@keyframes slideUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
-}
-.modal h2 { margin-bottom: 16px; font-size: 1.2rem; }
-.modal input[type="text"] {
-  width: 100%;
-  padding: 14px 16px;
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: var(--radius-sm);
-  background: var(--bg-elevated);
-  color: var(--text);
-  font-size: 1.1rem;
-  margin-bottom: 16px;
-  outline: none;
-}
-.modal-actions {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-  margin-top: 16px;
+export function startOfWeek(date) {
+  const d = startOfDay(date);
+  const day = d.getDay();
+  const diff = day === 0 ? 6 : day - 1;
+  d.setDate(d.getDate() - diff);
+  return d;
 }
 
-.product-section { margin-bottom: 16px; }
-.product-section h4 {
-  color: var(--text-muted);
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-bottom: 8px;
-}
-.product-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-.product-btn {
-  background: var(--bg-elevated);
-  border: 2px solid transparent;
-  border-radius: var(--radius-sm);
-  padding: 12px 10px;
-  color: var(--text);
-  font-size: 0.85rem;
-  font-weight: 500;
-  cursor: pointer;
-  text-align: center;
-  transition: all var(--transition);
-  font-family: inherit;
-}
-.product-btn.selected { border-color: var(--accent); background: rgba(99,102,241,0.15); }
-.product-price-tag { display: block; font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
-
-.option-group { margin-bottom: 14px; }
-.option-group label { display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 0.85rem; }
-.btn-group { display: flex; gap: 8px; }
-.additions { display: flex; flex-direction: column; gap: 10px; }
-.checkbox-label {
-  display: flex !important;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  color: var(--text) !important;
-  font-size: 0.95rem !important;
-}
-.checkbox-label input { width: 20px; height: 20px; accent-color: var(--accent); }
-
-.qty-control {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-.qty-control span { font-size: 1.4rem; font-weight: 700; min-width: 32px; text-align: center; }
-
-.producto-preview {
-  text-align: center;
-  padding: 16px;
-  background: var(--bg-elevated);
-  border-radius: var(--radius-sm);
-  margin-top: 8px;
+export function endOfWeek(date) {
+  const d = startOfWeek(date);
+  d.setDate(d.getDate() + 6);
+  return endOfDay(d);
 }
 
-.pago-options { display: flex; flex-direction: column; gap: 4px; }
-
-.empty-state {
-  text-align: center;
-  color: var(--text-muted);
-  padding: 48px 24px;
-  font-size: 0.95rem;
+export function startOfMonth(date) {
+  const d = startOfDay(date);
+  d.setDate(1);
+  return d;
 }
 
-.toast {
-  position: fixed;
-  bottom: calc(80px + var(--safe-bottom));
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--bg-elevated);
-  color: var(--text);
-  padding: 12px 24px;
-  border-radius: 30px;
-  font-size: 0.9rem;
-  z-index: 200;
-  box-shadow: var(--shadow);
-  transition: opacity 0.3s ease;
-  max-width: 90%;
-  text-align: center;
-}
-.toast.hidden { opacity: 0; pointer-events: none; }
-.toast.show { opacity: 1; }
-.toast.success { border: 1px solid var(--success); }
-.toast.error { border: 1px solid var(--danger); }
-.toast.info { border: 1px solid var(--info); }
-
-.stats-controls {
-  padding: 12px 16px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-}
-.period-tabs {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 12px;
-  overflow-x: auto;
-}
-.period-tab {
-  flex: 1;
-  min-width: 0;
-  padding: 10px 6px;
-  background: var(--bg-elevated);
-  border: none;
-  border-radius: var(--radius-sm);
-  color: var(--text-muted);
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
-  white-space: nowrap;
-  transition: all var(--transition);
-}
-.period-tab.active { background: var(--accent); color: #fff; }
-
-.date-picker-wrap label {
-  display: block;
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  margin-bottom: 6px;
-}
-.date-picker-wrap input {
-  width: 100%;
-  padding: 12px;
-  background: var(--bg-card);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: var(--radius-sm);
-  color: var(--text);
-  font-size: 1rem;
-  color-scheme: dark;
+export function endOfMonth(date) {
+  const d = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
+  return d;
 }
 
-.stats-period-label {
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  margin-bottom: 16px;
-  text-transform: capitalize;
-}
-.stats-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-.stat-card {
-  background: var(--bg-card);
-  border-radius: var(--radius-sm);
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.stat-card.highlight { grid-column: span 2; }
-.stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
-.stat-value { font-size: 1.1rem; font-weight: 700; }
-.stat-value.stat-sm { font-size: 0.95rem; }
-.stat-sub { font-size: 0.8rem; color: var(--text-muted); }
-.cmp { font-size: 0.7rem; margin-top: 2px; }
-.cmp.up { color: var(--success); }
-.cmp.down { color: var(--danger); }
-
-.chart-card {
-  background: var(--bg-card);
-  border-radius: var(--radius);
-  padding: 16px;
-  margin-bottom: 16px;
-}
-.chart-card h3 {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  margin-bottom: 12px;
-}
-.chart-card canvas { height: 220px !important; }
-
-.turnos-historial { margin-top: 8px; }
-.turnos-historial h3 { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 10px; }
-.turno-hist-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  font-size: 0.85rem;
+export function startOfYear(date) {
+  return new Date(date.getFullYear(), 0, 1, 0, 0, 0, 0);
 }
 
-.hidden { display: none !important; }
+export function endOfYear(date) {
+  return new Date(date.getFullYear(), 11, 31, 23, 59, 59, 999);
+}
+
+export function showToast(msg, type = 'info') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + type;
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => { el.className = 'toast hidden'; }, 2800);
+}
+
+export function showView(id) {
+  document.querySelectorAll('.view').forEach((v) => v.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+}
+
+export function openModal(name) {
+  document.getElementById('modal-overlay').classList.remove('hidden');
+  document.querySelectorAll('.modal').forEach((m) => m.classList.add('hidden'));
+  const modal = document.getElementById('modal-' + name);
+  if (modal) modal.classList.remove('hidden');
+}
+
+export function closeModal() {
+  document.getElementById('modal-overlay').classList.add('hidden');
+  document.querySelectorAll('.modal').forEach((m) => m.classList.add('hidden'));
+}
+
+export function confirmDialog(title, message) {
+  return new Promise((resolve) => {
+    document.getElementById('confirm-title').textContent = title;
+    document.getElementById('confirm-message').textContent = message;
+    openModal('confirm');
+    const btn = document.getElementById('btn-confirm-action');
+    const handler = () => {
+      btn.removeEventListener('click', handler);
+      closeModal();
+      resolve(true);
+    };
+    btn.addEventListener('click', handler);
+    const cancel = document.querySelector('#modal-confirm .modal-cancel');
+    const cancelHandler = () => {
+      cancel.removeEventListener('click', cancelHandler);
+      closeModal();
+      resolve(false);
+    };
+    cancel.addEventListener('click', cancelHandler);
+  });
+}
