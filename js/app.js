@@ -1,7 +1,8 @@
 import './firebase-init.js';
 import { COCTELES, PRODUCTOS, calcularPrecioCoctel, productoDisplayName } from './products.js';
 import {
-  formatCOP, showToast, showView, openModal, closeModal, confirmDialog
+  formatCOP, showToast, showView, openModal, closeModal, confirmDialog,
+  calcCuentaTotal, recalcProductoLine, uuid
 } from './utils.js';
 import {
   getTurnoAbierto, iniciarTurno, finalizarTurno, calcTurnoTotalFromCuentas,
@@ -9,7 +10,7 @@ import {
 } from './turno.js';
 import {
   subscribeCuentas, crearCuenta, agregarProducto, editarProducto,
-  eliminarProducto, cambiarCantidad, cerrarCuenta, deleteCuenta
+  eliminarProducto, cambiarCantidad, cerrarCuenta, deleteCuenta, updateCuenta
 } from './cuentas.js';
 import { getStats, getStatsByDate, renderStatsUI, renderDateStatsUI, destroyCharts } from './stats.js';
 import { db, collection, doc, getDocs, deleteDoc } from './firebase-init.js';
@@ -330,8 +331,8 @@ function renderProductosList() {
         <span class="producto-name">${escapeHtml(productoDisplayName(p))}</span>
         <span class="producto-price">${formatCOP(p.precioTotal)}</span>
       </div>
-      ${!isLocked ? `
-      <div class="producto-actions">
+      ${!isLocked ?
+      `<div class="producto-actions">
         <button class="btn btn-icon btn-sm qty-btn" data-action="minus" data-id="${p.id}">−</button>
         <span class="qty-display">${p.cantidad}</span>
         <button class="btn btn-icon btn-sm qty-btn" data-action="plus" data-id="${p.id}">+</button>
@@ -695,25 +696,46 @@ async function onConfirmarProducto() {
 
   if (!items.length) { showToast('Selecciona al menos un producto', 'error'); return; }
 
+  // Build all new product lines locally (single write)
+  const newLines = items.map((it) => {
+    const precioUnitario = recalcItemPrice(it);
+    const line = {
+      id: uuid(),
+      tipo: it.tipo,
+      productoId: it.id,
+      nombre: it.nombre,
+      size: it.size,
+      gomas: it.gomas,
+      shot: it.shot,
+      cantidad: it.cantidad,
+      precioUnitario,
+      precioTotal: precioUnitario * it.cantidad
+    };
+    return recalcProductoLine(line);
+  });
+
+  // Compose final productos once
+  const productosActuales = Array.isArray(cuenta.productos) ? cuenta.productos : [];
+  const finalProductos = [...productosActuales, ...newLines];
+  const finalTotal = calcCuentaTotal(finalProductos);
+
+  // Close modal immediately for better UX
+  closeModal();
+  showToast('Guardando productos...', 'info');
+
   try {
-    for (const it of items) {
-      const precioUnitario = recalcItemPrice(it);
-      const item = {
-        tipo: it.tipo,
-        productoId: it.id,
-        nombre: it.nombre,
-        size: it.size,
-        gomas: it.gomas,
-        shot: it.shot,
-        cantidad: it.cantidad,
-        precioUnitario,
-        precioTotal: precioUnitario * it.cantidad
-      };
-      await agregarProducto(state.turno.id, cuenta.id, item, cuenta.productos);
-    }
-    closeModal();
+    // Single update to avoid lost updates and make it faster
+    await updateCuenta(state.turno.id, cuenta.id, {
+      productos: finalProductos,
+      total: finalTotal
+    });
+    showToast('Productos agregados', 'success');
+    // Firestore subscription will update UI
   } catch (err) {
+    console.error('Error guardando productos en lote:', err);
     showToast(err.message || 'Error agregando productos', 'error');
+    // Optionally reopen modal to retry
+    // openModal('producto');
   }
 }
 
