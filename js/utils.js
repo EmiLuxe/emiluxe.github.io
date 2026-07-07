@@ -83,6 +83,7 @@ export function endOfYear(date) {
 
 export function showToast(msg, type = 'info') {
   const el = document.getElementById('toast');
+  if (!el) return;
   el.textContent = msg;
   el.className = 'toast show ' + type;
   clearTimeout(el._timer);
@@ -96,21 +97,26 @@ export function showView(id) {
 }
 
 export function openModal(name) {
-  document.getElementById('modal-overlay').classList.remove('hidden');
+  const overlay = document.getElementById('modal-overlay');
+  if (!overlay) return;
+  overlay.classList.remove('hidden');
   document.querySelectorAll('.modal').forEach((m) => m.classList.add('hidden'));
   const modal = document.getElementById('modal-' + name);
   if (modal) modal.classList.remove('hidden');
 }
 
 export function closeModal() {
-  document.getElementById('modal-overlay').classList.add('hidden');
+  const overlay = document.getElementById('modal-overlay');
+  if (overlay) overlay.classList.add('hidden');
   document.querySelectorAll('.modal').forEach((m) => m.classList.add('hidden'));
 }
 
 export function confirmDialog(title, message) {
   return new Promise((resolve) => {
-    document.getElementById('confirm-title').textContent = title;
-    document.getElementById('confirm-message').textContent = message;
+    const titleEl = document.getElementById('confirm-title');
+    const msgEl = document.getElementById('confirm-message');
+    if (titleEl) titleEl.textContent = title;
+    if (msgEl) msgEl.textContent = message;
     openModal('confirm');
     const btn = document.getElementById('btn-confirm-action');
     const handler = () => {
@@ -118,13 +124,13 @@ export function confirmDialog(title, message) {
       closeModal();
       resolve(true);
     };
-    btn.addEventListener('click', handler);
+    if (btn) btn.addEventListener('click', handler);
     const cancel = document.querySelector('#modal-confirm .modal-cancel');
     const cancelHandler = () => {
-      cancel.removeEventListener('click', cancelHandler);
+      if (cancel) cancel.removeEventListener('click', cancelHandler);
       closeModal();
       resolve(false);
     };
-    cancel.addEventListener('click', cancelHandler);
+    if (cancel) cancel.addEventListener('click', cancelHandler);
   });
 }
