@@ -1,3 +1,5 @@
+/* ---------- css/styles.css - archivo completo (reemplazar todo) ---------- */
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -39,6 +41,7 @@ html, body {
   position: relative;
 }
 
+/* Views and animations */
 .view {
   display: none;
   min-height: 100dvh;
@@ -46,12 +49,12 @@ html, body {
   animation: fadeIn 0.25s ease;
 }
 .view.active { display: flex; }
-
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Loaders */
 .loader {
   width: 40px; height: 40px;
   border: 3px solid var(--bg-elevated);
@@ -77,6 +80,7 @@ html, body {
 }
 #loading.active { display: flex; }
 
+/* Start screen */
 .start-screen {
   flex: 1;
   display: flex;
@@ -108,6 +112,7 @@ html, body {
   50% { opacity: 0.5; }
 }
 
+/* Header */
 .header {
   padding: 16px 16px 12px;
   background: var(--bg);
@@ -133,6 +138,7 @@ html, body {
 .header-info { flex: 1; min-width: 0; }
 .header-info h1 { font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+/* Turno total */
 .turno-total {
   background: var(--bg-card);
   border-radius: var(--radius);
@@ -145,6 +151,7 @@ html, body {
 .turno-total .label { color: var(--text-muted); font-size: 0.85rem; }
 .amount { font-size: 1.3rem; font-weight: 700; color: var(--accent-hover); }
 
+/* Search */
 .search-wrap input {
   width: 100%;
   padding: 12px 16px;
@@ -158,12 +165,14 @@ html, body {
 }
 .search-wrap input:focus { border-color: var(--accent); }
 
+/* Main lists */
 .cuentas-list, .productos-list, .stats-content {
   flex: 1;
   padding: 12px 16px 100px;
   overflow-y: auto;
 }
 
+/* Cuenta card */
 .cuenta-card {
   background: var(--bg-card);
   border-radius: var(--radius);
@@ -198,6 +207,7 @@ html, body {
 }
 .cuenta-time { color: var(--text-muted); font-size: 0.85rem; }
 
+/* Badges */
 .badge {
   font-size: 0.75rem;
   font-weight: 600;
@@ -209,6 +219,7 @@ html, body {
 .badge-pending { background: rgba(245,158,11,0.2); color: var(--pending); }
 .badge-paid { background: rgba(34,197,94,0.15); color: var(--paid); }
 
+/* Cuenta total bar */
 .cuenta-total-bar {
   display: flex;
   justify-content: space-between;
@@ -218,6 +229,7 @@ html, body {
   font-weight: 600;
 }
 
+/* Productos list items in cuenta */
 .producto-item {
   background: var(--bg-card);
   border-radius: var(--radius-sm);
@@ -242,6 +254,7 @@ html, body {
   font-weight: 600;
 }
 
+/* Buttons */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -303,6 +316,7 @@ html, body {
   color: #fff;
 }
 
+/* FAB */
 .fab {
   position: fixed;
   bottom: calc(24px + var(--safe-bottom));
@@ -326,6 +340,7 @@ html, body {
 .fab:active { transform: scale(0.92); }
 .fab.hidden { display: none; }
 
+/* Modal */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -372,6 +387,7 @@ html, body {
   margin-top: 16px;
 }
 
+/* Product modal sections */
 .product-section { margin-bottom: 16px; }
 .product-section h4 {
   color: var(--text-muted);
@@ -442,6 +458,7 @@ html, body {
 }
 .checkbox-label input { width: 20px; height: 20px; accent-color: var(--accent); }
 
+/* qty-control (global) - may exist, we'll hide modal-specific instances later */
 .qty-control {
   display: flex;
   align-items: center;
@@ -488,6 +505,7 @@ html, body {
 .toast.error { border: 1px solid var(--danger); }
 .toast.info { border: 1px solid var(--info); }
 
+/* Stats area */
 .stats-controls {
   padding: 12px 16px;
   border-bottom: 1px solid rgba(255,255,255,0.06);
@@ -594,38 +612,40 @@ html, body {
 /* top border of selected section */
 .selected-products { margin-top: 18px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.03); }
 
-/* each selected-item: left info, right controls */
+/* Selected header left aligned */
+.selected-products h4 { text-align: left; margin-left: 0; color: var(--text); font-size: 1rem; font-weight: 700; margin-bottom: 10px; }
+
+/* Each selected-item uses a grid: left content / right controls (fixed) */
 #selected-list .selected-item {
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 1fr auto;
   gap: 12px;
-  justify-content: flex-start;
+  align-items: center;
   padding: 8px 0;
   border-bottom: 1px solid rgba(255,255,255,0.04);
   margin-bottom: 6px;
-  flex-wrap: nowrap;
+  width: 100%;
 }
 
-/* left info container (name, size row, additions) */
-#selected-list .selected-item > div:first-child {
-  flex: 1 1 auto;
+/* Left info container (name, size row, additions) */
+#selected-list .selected-item .selected-info {
   min-width: 0;
-  padding-right: 12px;
 }
 .selected-item .selected-name {
   font-weight: 700;
   font-size: 1rem;
   color: var(--text);
   margin-bottom: 6px;
+  text-align: left;
 }
 
-/* size buttons under name (inline, compact) */
-.size-row {
+/* Size buttons compact under name */
+.selected-item .size-row {
   display: inline-flex;
   gap: 6px;
   margin-top: 6px;
 }
-.size-btn {
+.selected-item .size-btn {
   padding: 6px 8px;
   border-radius: 8px;
   font-size: 0.85rem;
@@ -633,13 +653,13 @@ html, body {
   border: 1px solid rgba(255,255,255,0.03);
   color: var(--text);
 }
-.size-btn.active {
+.selected-item .size-btn.active {
   background: var(--accent);
   border-color: var(--accent);
   color: #fff;
 }
 
-/* additions (gomas/shot) under size row with larger hit area */
+/* Additions (gomas/shot) touch-friendly under size row */
 #selected-list .opt-label {
   display: inline-flex;
   align-items: center;
@@ -654,17 +674,16 @@ html, body {
   accent-color: var(--accent);
 }
 
-/* right controls: qty and price aligned to the right */
-#selected-list .selected-item > div:last-child {
+/* Right controls: qty +/- and price aligned to the right */
+#selected-list .selected-item .selected-controls {
   display: flex;
   align-items: center;
   gap: 10px;
-  flex: 0 0 auto;
   white-space: nowrap;
-  margin-left: auto;
+  justify-self: end;
 }
 
-/* qty +/- buttons: compact circles */
+/* Qty buttons */
 .selected-item .btn.qty-minus,
 .selected-item .btn.qty-plus {
   width: 36px;
@@ -687,7 +706,7 @@ html, body {
   margin: 0 6px;
 }
 
-/* price to the far right */
+/* Price in controls column */
 .selected-item .item-price {
   min-width: 72px;
   text-align: right;
@@ -696,36 +715,42 @@ html, body {
   margin-left: 6px;
 }
 
-/* product button focus assist */
+/* Focus style for product button */
 .product-btn:focus { outline: none; box-shadow: 0 0 0 4px rgba(99,102,241,0.06); }
 
-/* Hide the global bottom size/preview/additions since we use per-item controls */
+/* Hide the old global bottom size/preview/additions since we use per-item controls */
 #coctel-options,
 .producto-preview,
 .modal .additions { display: none !important; }
 
-/* Make product list denser on mobile */
+/* Hide modal-specific global qty control (if present inside modal) */
+.modal .qty-control,
+.modal #qty-minus,
+.modal #qty-plus,
+.modal #qty-value,
+.modal .cantidad,
+.modal .cantidad-section { display: none !important; }
+
+/* Make product list denser on mobile but keep controls column fixed */
 @media (max-width: 420px) {
   .product-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-  /* Selected item stacks vertically on very small screens */
   #selected-list .selected-item {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
   }
-  #selected-list .selected-item > div:last-child {
-    margin-left: 0;
-    justify-content: space-between;
-  }
+  #selected-list .selected-item .selected-controls { justify-self: end; }
 }
 
-/* Small polish: ensure product buttons have consistent padding and price separation */
+/* If extremely narrow, allow stacking to preserve touch targets */
+@media (max-width: 320px) {
+  #selected-list .selected-item { grid-template-columns: 1fr; }
+  #selected-list .selected-item .selected-controls { justify-self: start; margin-top: 8px; }
+}
+
+/* Small polish */
 .product-grid .product-btn { padding-left: 12px; padding-right: 16px; }
-
-/* subtle separation between consecutive selected items */
 #selected-list .selected-item + .selected-item { margin-top: 4px; }
-
-/* Accessibility: increase hit area for checkboxes in other parts of modal too */
 .modal input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--accent); }
 
 /* End of file */
