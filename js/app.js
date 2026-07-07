@@ -26,6 +26,9 @@ const state = {
   statsPeriod: 'daily'
 };
 
+// modalSelected: map key "tipo:id" -> item { tipo, id, nombre, cantidad, size, gomas, shot }
+let modalSelected = {};
+
 let unsubCuentas = null;
 let unsubTurnoAbierto = null;
 
@@ -91,7 +94,6 @@ function registerSW() {
   navigator.serviceWorker.register('./sw.js').then((reg) => {
     console.log('ServiceWorker registered', reg);
 
-    // If there's a waiting worker, tell it to skip waiting
     if (reg.waiting) {
       try { reg.waiting.postMessage({ type: 'SKIP_WAITING' }); } catch (e) {}
     }
@@ -106,7 +108,6 @@ function registerSW() {
       });
     });
 
-    // When a new SW takes control, reload so clients use fresh files
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       console.log('Service worker controller changed, reloading to activate new SW');
       window.location.reload();
@@ -117,7 +118,6 @@ function registerSW() {
 }
 
 function bindEvents() {
-  // helper to safely bind if element exists
   const on = (id, evt, fn) => {
     const el = document.getElementById(id);
     if (el) el.addEventListener(evt, fn);
@@ -125,8 +125,7 @@ function bindEvents() {
 
   on('btn-iniciar-turno', 'click', onIniciarTurno);
   on('btn-desempeno-start', 'click', () => openDesempeno());
-  // FIX: call the function, not return it
-  on('btn-desempeno', 'click', openDesempeno);
+  on('btn-desempeno', 'click', openDesempeno); // fixed
   on('btn-back-desempeno', 'click', () => {
     destroyCharts();
     if (state.turno) showView('view-turno');
@@ -395,26 +394,29 @@ async function onCrearCuenta() {
 /* -----------------------
    Modal productos: permitir multi-selección y qty por producto
    ----------------------- */
+
 function openProductoModal(editItem = null) {
   state.editingProducto = editItem;
   state.qty = editItem?.cantidad || 1;
   state.coctelSize = editItem?.size || 'pequeno';
   state.selectedProduct = editItem ? { tipo: editItem.tipo, id: editItem.productoId } : null;
 
+  // reset modalSelected unless we are editing (we will prefill below)
+  modalSelected = {};
+
   document.getElementById('modal-producto-title').textContent = editItem ? 'Editar producto' : 'Agregar producto';
   document.getElementById('btn-confirmar-producto').textContent = editItem ? 'Guardar' : 'Agregar';
 
   const selector = document.getElementById('producto-selector');
   if (!selector) return;
-  // HTML: cada producto tiene un botón y un input number (qty) deshabilitado por defecto
+
   selector.innerHTML = `
     <div class="product-section">
       <h4>Cocteles</h4>
       <div class="product-grid">
         ${COCTELES.map((c) => `
           <div class="product-grid-item">
-            <button class="product-btn ${editItem?.productoId === c.id ? 'selected' : ''}" data-tipo="coctel" data-id="${c.id}">${c.nombre}</button>
-            <input type="number" min="1" value="${editItem?.productoId === c.id ? (editItem.cantidad||1) : 1}" class="product-qty" style="width:56px;margin-left:6px" ${editItem?.productoId === c.id ? '' : 'disabled'} />
+            <button class="product-btn" data-tipo="coctel" data-id="${c.id}">${c.nombre}</button>
           </div>
         `).join('')}
       </div>
@@ -424,32 +426,64 @@ function openProductoModal(editItem = null) {
       <div class="product-grid">
         ${PRODUCTOS.map((p) => `
           <div class="product-grid-item">
-            <button class="product-btn ${editItem?.productoId === p.id ? 'selected' : ''}" data-tipo="producto" data-id="${p.id}">${p.nombre}<span class="product-price-tag">${formatCOP(p.precio)}</span></button>
-            <input type="number" min="1" value="${editItem?.productoId === p.id ? (editItem.cantidad||1) : 1}" class="product-qty" style="width:56px;margin-left:6px" ${editItem?.productoId === p.id ? '' : 'disabled'} />
+            <button class="product-btn" data-tipo="producto" data-id="${p.id}">${p.nombre}<span class="product-price-tag">${formatCOP(p.precio)}</span></button>
           </div>
         `).join('')}
       </div>
     </div>
+
+    <div id="selected-products" class="selected-products" style="margin-top:18px;">
+      <h4>Seleccionados</h4>
+      <div id="selected-list"></div>
+    </div>
   `;
 
-  // togglear selección (multi) y habilitar qty
+  // product button behavior: toggle selection and add/remove from modalSelected
   selector.querySelectorAll('.product-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
-      btn.classList.toggle('selected');
-      const qty = btn.parentElement.querySelector('.product-qty');
-      if (qty) qty.disabled = !btn.classList.contains('selected');
-      // set last selected as preview target
-      if (btn.classList.contains('selected')) {
-        state.selectedProduct = { tipo: btn.dataset.tipo, id: btn.dataset.id };
+      const tipo = btn.dataset.tipo;
+      const id = btn.dataset.id;
+      const key = `${tipo}:${id}`;
+      if (modalSelected[key]) {
+        delete modalSelected[key];
+        btn.classList.remove('selected');
       } else {
-        // if no selected left, clear preview target
-        const anySelected = selector.querySelector('.product-btn.selected');
-        state.selectedProduct = anySelected ? { tipo: anySelected.dataset.tipo, id: anySelected.dataset.id } : null;
+        const name = btn.textContent.trim();
+        const item = {
+          tipo,
+          id,
+          nombre: name,
+          cantidad: 1,
+          size: 'pequeno',
+          gomas: false,
+          shot: false
+        };
+        // set precioUnitario on demand in recalc
+        modalSelected[key] = item;
+        btn.classList.add('selected');
       }
-      toggleCoctelOptions(!!selector.querySelector('.product-btn.selected[data-tipo="coctel"]'));
+      renderSelectedList();
       updateProductoPreview();
     });
   });
+
+  // if editing a product, prefill modalSelected with that product (so user edits it)
+  if (editItem) {
+    const key = `${editItem.tipo}:${editItem.productoId}`;
+    modalSelected[key] = {
+      tipo: editItem.tipo,
+      id: editItem.productoId,
+      nombre: editItem.nombre,
+      cantidad: editItem.cantidad || 1,
+      size: editItem.size || 'pequeno',
+      gomas: !!editItem.gomas,
+      shot: !!editItem.shot
+    };
+    const btn = selector.querySelector(`.product-btn[data-id="${editItem.productoId}"]`);
+    if (btn) btn.classList.add('selected');
+    renderSelectedList();
+    updateProductoPreview();
+  }
 
   const coctelOpts = document.getElementById('coctel-options');
   const isCoctel = editItem?.tipo === 'coctel' || state.selectedProduct?.tipo === 'coctel';
@@ -481,78 +515,202 @@ function openProductoModal(editItem = null) {
   openModal('producto');
 }
 
+function recalcItemPrice(item) {
+  if (item.tipo === 'coctel') {
+    return calcularPrecioCoctel(item.size || 'pequeno', !!item.gomas, !!item.shot);
+  }
+  const prod = PRODUCTOS.find((p) => p.id === item.id);
+  return prod ? prod.precio : 0;
+}
+
+function renderSelectedList() {
+  const list = document.getElementById('selected-list');
+  if (!list) return;
+  const items = Object.values(modalSelected);
+  if (!items.length) {
+    list.innerHTML = '<div class="empty-state small">No hay productos seleccionados</div>';
+    return;
+  }
+
+  list.innerHTML = items.map((it) => {
+    const unit = recalcItemPrice(it);
+    const price = unit * (it.cantidad || 1);
+    const sizeHtml = it.tipo === 'coctel' ? `
+      <div class="size-row" style="margin-top:6px;">
+        <button class="size-btn ${it.size === 'pequeno' ? 'active' : ''}" data-key="${it.tipo}:${it.id}" data-size="pequeno">Pequeño</button>
+        <button class="size-btn ${it.size === 'grande' ? 'active' : ''}" data-key="${it.tipo}:${it.id}" data-size="grande">Grande</button>
+      </div>
+      <div style="margin-top:6px;">
+        <label style="margin-right:10px"><input type="checkbox" class="opt-gomas" data-key="${it.tipo}:${it.id}" ${it.gomas ? 'checked' : ''} /> Gomas</label>
+        <label><input type="checkbox" class="opt-shot" data-key="${it.tipo}:${it.id}" ${it.shot ? 'checked' : ''} /> Shot</label>
+      </div>
+    ` : '';
+
+    return `
+      <div class="selected-item" data-key="${it.tipo}:${it.id}" style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.03)">
+        <div style="flex:1">
+          <div style="font-weight:600">${escapeHtml(it.nombre)}</div>
+          ${sizeHtml}
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="btn qty-minus" data-key="${it.tipo}:${it.id}">−</button>
+          <div class="qty-value" data-key="${it.tipo}:${it.id}" style="min-width:20px;text-align:center">${it.cantidad}</div>
+          <button class="btn qty-plus" data-key="${it.tipo}:${it.id}">+</button>
+          <div style="min-width:90px;text-align:right">${formatCOP(price)}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // attach listeners
+  list.querySelectorAll('.qty-minus').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.key;
+      const it = modalSelected[key];
+      if (!it) return;
+      it.cantidad = Math.max(1, (it.cantidad || 1) - 1);
+      renderSelectedList();
+      updateProductoPreview();
+    });
+  });
+  list.querySelectorAll('.qty-plus').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.key;
+      const it = modalSelected[key];
+      if (!it) return;
+      it.cantidad = (it.cantidad || 1) + 1;
+      renderSelectedList();
+      updateProductoPreview();
+    });
+  });
+
+  list.querySelectorAll('.size-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.key;
+      const it = modalSelected[key];
+      if (!it) return;
+      it.size = btn.dataset.size;
+      renderSelectedList();
+      updateProductoPreview();
+    });
+  });
+
+  list.querySelectorAll('.opt-gomas').forEach((chk) => {
+    chk.addEventListener('change', () => {
+      const key = chk.dataset.key;
+      const it = modalSelected[key];
+      if (!it) return;
+      it.gomas = chk.checked;
+      renderSelectedList();
+      updateProductoPreview();
+    });
+  });
+  list.querySelectorAll('.opt-shot').forEach((chk) => {
+    chk.addEventListener('change', () => {
+      const key = chk.dataset.key;
+      const it = modalSelected[key];
+      if (!it) return;
+      it.shot = chk.checked;
+      renderSelectedList();
+      updateProductoPreview();
+    });
+  });
+
+  // sync product buttons visual state
+  const selector = document.getElementById('producto-selector');
+  if (selector) {
+    selector.querySelectorAll('.product-btn').forEach((b) => {
+      const key = `${b.dataset.tipo}:${b.dataset.id}`;
+      if (modalSelected[key]) b.classList.add('selected'); else b.classList.remove('selected');
+    });
+  }
+}
+
 function toggleCoctelOptions(show) {
   document.getElementById('coctel-options')?.classList.toggle('hidden', !show);
 }
 
 function updateProductoPreview() {
+  // preview total from modalSelected
+  const items = Object.values(modalSelected);
+  let total = 0;
+  if (items.length) {
+    for (const it of items) {
+      const unit = recalcItemPrice(it);
+      total += unit * (it.cantidad || 1);
+    }
+  } else {
+    // fallback to single-selection behavior
+    let unit = 0;
+    if (state.selectedProduct?.tipo === 'coctel') {
+      unit = calcularPrecioCoctel(
+        state.coctelSize,
+        document.getElementById('chk-gomas')?.checked,
+        document.getElementById('chk-shot')?.checked
+      );
+    } else if (state.selectedProduct?.tipo === 'producto') {
+      const p = PRODUCTOS.find((x) => x.id === state.selectedProduct.id);
+      unit = p?.precio || 0;
+    }
+    total = unit * state.qty;
+  }
+
+  const preview = document.getElementById('producto-preview-price');
+  if (preview) preview.textContent = formatCOP(total);
+
+  // update global qty display only when single-selection mode
   const qtyEl = document.getElementById('qty-value');
   if (qtyEl) qtyEl.textContent = state.qty;
-  let unit = 0;
-  if (state.selectedProduct?.tipo === 'coctel') {
-    unit = calcularPrecioCoctel(
-      state.coctelSize,
-      document.getElementById('chk-gomas')?.checked,
-      document.getElementById('chk-shot')?.checked
-    );
-  } else if (state.selectedProduct?.tipo === 'producto') {
-    const p = PRODUCTOS.find((x) => x.id === state.selectedProduct.id);
-    unit = p?.precio || 0;
-  }
-  const preview = document.getElementById('producto-preview-price');
-  if (preview) preview.textContent = formatCOP(unit * state.qty);
 }
 
-// onConfirmarProducto: procesa todos los productos seleccionados (multi) y llama agregarProducto para cada uno
+// onConfirmarProducto: add or edit
 async function onConfirmarProducto() {
-  const selector = document.getElementById('producto-selector');
-  if (!selector) return;
-  const selected = Array.from(selector.querySelectorAll('.product-btn.selected'));
-  if (!selected.length) { showToast('Selecciona al menos un producto', 'error'); return; }
-
   const cuenta = state.cuentaActual;
   if (!cuenta || cuenta.estado === 'pagada') return;
 
+  const items = Object.values(modalSelected);
+  if (state.editingProducto) {
+    // if editing, take first item from selection (user edits one product)
+    if (!items.length) { showToast('Selecciona al menos un producto para editar', 'error'); return; }
+    const it = items[0];
+    const updates = {
+      tipo: it.tipo,
+      productoId: it.id,
+      nombre: it.nombre,
+      size: it.size,
+      gomas: it.gomas,
+      shot: it.shot,
+      cantidad: it.cantidad,
+      precioUnitario: recalcItemPrice(it),
+      precioTotal: recalcItemPrice(it) * it.cantidad
+    };
+    try {
+      await editarProducto(state.turno.id, cuenta.id, state.editingProducto.id, updates, cuenta.productos);
+      closeModal();
+    } catch (err) {
+      showToast(err.message || 'Error editando producto', 'error');
+    }
+    return;
+  }
+
+  if (!items.length) { showToast('Selecciona al menos un producto', 'error'); return; }
+
   try {
-    for (const btn of selected) {
-      const tipo = btn.dataset.tipo;
-      const id = btn.dataset.id;
-      const qtyInput = btn.parentElement.querySelector('.product-qty');
-      const qty = qtyInput ? Math.max(1, parseInt(qtyInput.value, 10) || 1) : 1;
-
-      let item;
-      if (tipo === 'coctel') {
-        const coctel = COCTELES.find((c) => c.id === id);
-        const gomas = document.getElementById('chk-gomas')?.checked || false;
-        const shot = document.getElementById('chk-shot')?.checked || false;
-        const precioUnitario = calcularPrecioCoctel(state.coctelSize, gomas, shot);
-        item = {
-          tipo: 'coctel',
-          productoId: coctel.id,
-          nombre: coctel.nombre,
-          size: state.coctelSize,
-          gomas,
-          shot,
-          cantidad: qty,
-          precioUnitario,
-          precioTotal: precioUnitario * qty
-        };
-      } else {
-        const prod = PRODUCTOS.find((p) => p.id === id);
-        item = {
-          tipo: 'producto',
-          productoId: prod.id,
-          nombre: prod.nombre,
-          cantidad: qty,
-          precioUnitario: prod.precio,
-          precioTotal: prod.precio * qty
-        };
-      }
-
-      // llamar agregarProducto existente por cada item
+    for (const it of items) {
+      const precioUnitario = recalcItemPrice(it);
+      const item = {
+        tipo: it.tipo,
+        productoId: it.id,
+        nombre: it.nombre,
+        size: it.size,
+        gomas: it.gomas,
+        shot: it.shot,
+        cantidad: it.cantidad,
+        precioUnitario,
+        precioTotal: precioUnitario * it.cantidad
+      };
       await agregarProducto(state.turno.id, cuenta.id, item, cuenta.productos);
     }
-
     closeModal();
   } catch (err) {
     showToast(err.message || 'Error agregando productos', 'error');
@@ -651,10 +809,8 @@ function escapeHtml(str) {
    Funciones auxiliares para export / borrado de turnos
    ----------------------- */
 
-// keep a wrapper that calls the centralized deleteTurno (which must implement placeholder protection)
 async function deleteTurnoById(turnoId) {
   if (!turnoId) throw new Error('turnoId requerido');
-  // deleteTurno is imported from ./turno.js and should handle placeholder creation if needed
   await deleteTurno(turnoId);
 }
 
@@ -725,7 +881,6 @@ function bindStatsActionsIfPresent() {
       const ok = await confirmDialog('Borrar turno', '¿Borrar este turno y todas sus cuentas? Esta acción no se puede deshacer.');
       if (!ok) return;
       try {
-        // Calls deleteTurnoById wrapper which uses turno.deleteTurno (server-side logic responsibility)
         await deleteTurnoById(turnoId);
         showToast('Turno eliminado', 'success');
         loadStats();
