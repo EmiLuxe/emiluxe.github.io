@@ -69,7 +69,8 @@ export async function iniciarTurno() {
     totalTransferencia: 0,
     productosVendidos: {},
     coctelesVendidos: {},
-    createdAt: serverTimestamp()
+    createdAt: serverTimestamp(),
+    archived: false
   };
 
   const ref = await addDoc(collection(db, TURNOS), data);
@@ -126,6 +127,7 @@ export async function getAllTurnosFinalizados() {
   const snap = await getDocs(q);
   return snap.docs
     .map((d) => ({ id: d.id, ...d.data() }))
+    .filter((t) => t.archived !== true) // excluir archivados
     .sort((a, b) => (b.fechaInicio?.seconds || 0) - (a.fechaInicio?.seconds || 0));
 }
 
@@ -198,12 +200,54 @@ export async function finalizarTurno(turnoId, cuentas) {
 }
 
 /**
+ * Archiva un turno (soft-delete)
+ */
+export async function archiveTurno(turnoId) {
+  await updateDoc(doc(db, TURNOS, turnoId), {
+    archived: true,
+    archivedAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  });
+}
+
+/**
  * Borra un turno completo: todas sus cuentas en la subcolección y luego el documento del turno.
- * Uso: llamar desde la UI tras confirmación.
+ * Protección: si el turno a borrar es el ÚNICO documento en la colección 'turnos',
+ * primero crea un turno placeholder para que la colección nunca quede vacía.
  */
 export async function deleteTurno(turnoId) {
   if (!turnoId) throw new Error('turnoId requerido');
-  // borrar cuentas en la subcolección 'cuentas'
+
+  // 1) Comprobar cuántos turnos existen ahora
+  const allSnap = await getDocs(query(collection(db, TURNOS)));
+  // Si solo hay 1 (el que vamos a borrar), creamos un placeholder antes de borrar
+  if (allSnap.size <= 1) {
+    try {
+      const now = new Date();
+      const placeholder = {
+        status: 'finalizado',
+        fecha: nowDateStr(),
+        fechaInicio: Timestamp.fromDate(now),
+        horaInicio: nowTimeStr(),
+        ventasTotales: 0,
+        totalEfectivo: 0,
+        totalTransferencia: 0,
+        productosVendidos: {},
+        coctelesVendidos: {},
+        createdAt: serverTimestamp(),
+        archived: false
+      };
+      // crear placeholder turno
+      await addDoc(collection(db, TURNOS), placeholder);
+      console.warn('deleteTurno: created placeholder turno to avoid empty collection');
+    } catch (e) {
+      console.error('deleteTurno: failed to create placeholder turno', e);
+      // si no se puede crear placeholder, abortamos para no dejar la app sin turnos
+      throw new Error('No se pudo crear turno placeholder. Operación cancelada.');
+    }
+  }
+
+  // 2) borrar cuentas en la subcolección 'cuentas'
   const cuentasSnap = await getDocs(query(collection(db, TURNOS, turnoId, 'cuentas')));
   for (const d of cuentasSnap.docs) {
     try {
@@ -212,7 +256,7 @@ export async function deleteTurno(turnoId) {
       console.warn('deleteTurno: failed to delete cuenta', d.id, e);
     }
   }
-  // borrar documento principal del turno
+  // 3) borrar documento principal del turno
   await deleteDoc(doc(db, TURNOS, turnoId));
 }
 
