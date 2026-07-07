@@ -31,83 +31,134 @@ let unsubTurnoAbierto = null;
 function init() {
   registerSW();
   bindEvents();
-  unsubTurnoAbierto = subscribeTurnoAbierto(handleTurnoSync);
+  try {
+    unsubTurnoAbierto = subscribeTurnoAbierto(handleTurnoSync);
+  } catch (err) {
+    console.error('subscribeTurnoAbierto failed at init:', err);
+    // ensure UI isn't blocked
+    document.getElementById('loading')?.classList.remove('active');
+    showView('view-start');
+  }
   bindStatsActionsIfPresent();
 }
 
 function handleTurnoSync(turno) {
-  document.getElementById('loading').classList.remove('active');
-  updateStartScreen(!!turno);
+  try {
+    document.getElementById('loading')?.classList.remove('active');
+    updateStartScreen(!!turno);
 
-  if (turno) {
-    openTurno(turno);
-    return;
-  }
+    if (turno) {
+      openTurno(turno);
+      return;
+    }
 
-  const hadTurno = !!state.turno;
-  resetTurnoLocal();
+    const hadTurno = !!state.turno;
+    resetTurnoLocal();
 
-  const activeView = document.querySelector('.view.active')?.id;
-  if (hadTurno && activeView !== 'view-desempeno') {
-    showView('view-start');
-  } else if (activeView === 'loading' || activeView === 'view-turno' || activeView === 'view-cuenta') {
+    const activeView = document.querySelector('.view.active')?.id;
+    if (hadTurno && activeView !== 'view-desempeno') {
+      showView('view-start');
+    } else if (activeView === 'loading' || activeView === 'view-turno' || activeView === 'view-cuenta') {
+      showView('view-start');
+    }
+  } catch (err) {
+    console.error('handleTurnoSync error:', err);
+    document.getElementById('loading')?.classList.remove('active');
     showView('view-start');
   }
 }
 
 function resetTurnoLocal() {
   if (unsubCuentas) {
-    unsubCuentas();
+    try { unsubCuentas(); } catch (e) { /* ignore */ }
     unsubCuentas = null;
   }
   state.turno = null;
   state.cuentas = [];
   state.cuentaActual = null;
-  document.getElementById('btn-iniciar-turno').disabled = false;
+  const btn = document.getElementById('btn-iniciar-turno');
+  if (btn) btn.disabled = false;
 }
 
 function updateStartScreen(turnoActivo) {
-  document.getElementById('btn-iniciar-turno').classList.toggle('hidden', turnoActivo);
-  document.getElementById('start-turno-msg').classList.toggle('hidden', !turnoActivo);
+  document.getElementById('btn-iniciar-turno')?.classList.toggle('hidden', turnoActivo);
+  document.getElementById('start-turno-msg')?.classList.toggle('hidden', !turnoActivo);
 }
 
 function registerSW() {
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
-  }
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.register('./sw.js').then((reg) => {
+    console.log('ServiceWorker registered', reg);
+
+    // If there's a waiting worker, tell it to skip waiting
+    if (reg.waiting) {
+      try { reg.waiting.postMessage({ type: 'SKIP_WAITING' }); } catch (e) {}
+    }
+
+    reg.addEventListener('updatefound', () => {
+      const newWorker = reg.installing;
+      if (!newWorker) return;
+      newWorker.addEventListener('statechange', () => {
+        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+          try { newWorker.postMessage({ type: 'SKIP_WAITING' }); } catch (e) {}
+        }
+      });
+    });
+
+    // When a new SW takes control, reload so clients use fresh files
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      console.log('Service worker controller changed, reloading to activate new SW');
+      window.location.reload();
+    });
+  }).catch((err) => {
+    console.warn('ServiceWorker registration failed:', err);
+  });
 }
 
 function bindEvents() {
-  document.getElementById('btn-iniciar-turno').addEventListener('click', onIniciarTurno);
-  document.getElementById('btn-desempeno-start').addEventListener('click', () => openDesempeno());
-  document.getElementById('btn-desempeno').addEventListener('click', () => openDesempeno());
-  document.getElementById('btn-back-desempeno').addEventListener('click', () => {
+  // helper to safely bind if element exists
+  const on = (id, evt, fn) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener(evt, fn);
+  };
+
+  on('btn-iniciar-turno', 'click', onIniciarTurno);
+  on('btn-desempeno-start', 'click', () => openDesempeno());
+  on('btn-desempeno', 'click', () => openDesempeno);
+  on('btn-back-desempeno', 'click', () => {
     destroyCharts();
     if (state.turno) showView('view-turno');
     else showView('view-start');
   });
-  document.getElementById('btn-finalizar-turno').addEventListener('click', onFinalizarTurno);
-  document.getElementById('btn-nueva-cuenta').addEventListener('click', () => {
-    document.getElementById('input-nombre-cuenta').value = '';
+  on('btn-finalizar-turno', 'click', onFinalizarTurno);
+  on('btn-nueva-cuenta', 'click', () => {
+    const input = document.getElementById('input-nombre-cuenta');
+    if (input) input.value = '';
     openModal('nueva-cuenta');
-    setTimeout(() => document.getElementById('input-nombre-cuenta').focus(), 100);
+    setTimeout(() => document.getElementById('input-nombre-cuenta')?.focus(), 100);
   });
-  document.getElementById('btn-confirmar-cuenta').addEventListener('click', onCrearCuenta);
-  document.getElementById('search-cuentas').addEventListener('input', (e) => {
-    state.search = e.target.value.toLowerCase();
-    renderCuentasList();
-  });
-  document.getElementById('btn-back-cuenta').addEventListener('click', () => showView('view-turno'));
-  document.getElementById('btn-cerrar-cuenta').addEventListener('click', () => openModal('pago'));
-  document.getElementById('btn-agregar-producto').addEventListener('click', () => openProductoModal());
-  document.getElementById('btn-confirmar-producto').addEventListener('click', onConfirmarProducto);
-  document.getElementById('qty-minus').addEventListener('click', () => { if (state.qty > 1) { state.qty--; updateProductoPreview(); } });
-  document.getElementById('qty-plus').addEventListener('click', () => { state.qty++; updateProductoPreview(); });
+  on('btn-confirmar-cuenta', 'click', onCrearCuenta);
+
+  const search = document.getElementById('search-cuentas');
+  if (search) {
+    search.addEventListener('input', (e) => {
+      state.search = e.target.value.toLowerCase();
+      renderCuentasList();
+    });
+  }
+
+  on('btn-back-cuenta', 'click', () => showView('view-turno'));
+  on('btn-cerrar-cuenta', 'click', () => openModal('pago'));
+  on('btn-agregar-producto', 'click', () => openProductoModal());
+  on('btn-confirmar-producto', 'click', onConfirmarProducto);
+  on('qty-minus', 'click', () => { if (state.qty > 1) { state.qty--; updateProductoPreview(); } });
+  on('qty-plus', 'click', () => { state.qty++; updateProductoPreview(); });
 
   document.querySelectorAll('.modal-cancel').forEach((btn) => {
     btn.addEventListener('click', closeModal);
   });
-  document.getElementById('modal-overlay').addEventListener('click', (e) => {
+  const overlay = document.getElementById('modal-overlay');
+  if (overlay) overlay.addEventListener('click', (e) => {
     if (e.target.id === 'modal-overlay') closeModal();
   });
 
@@ -120,24 +171,27 @@ function bindEvents() {
       document.querySelectorAll('.period-tab').forEach((t) => t.classList.remove('active'));
       tab.classList.add('active');
       state.statsPeriod = tab.dataset.period;
-      document.getElementById('stats-date').value = '';
+      const sd = document.getElementById('stats-date');
+      if (sd) sd.value = '';
       loadStats();
     });
   });
 
-  document.getElementById('stats-date').addEventListener('change', (e) => {
+  const statsDate = document.getElementById('stats-date');
+  if (statsDate) statsDate.addEventListener('change', (e) => {
     if (e.target.value) loadStatsByDate(e.target.value);
     else loadStats();
   });
 
-  document.getElementById('input-nombre-cuenta').addEventListener('keydown', (e) => {
+  const inputNombre = document.getElementById('input-nombre-cuenta');
+  if (inputNombre) inputNombre.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') onCrearCuenta();
   });
 }
 
 async function onIniciarTurno() {
   const btn = document.getElementById('btn-iniciar-turno');
-  btn.disabled = true;
+  if (btn) btn.disabled = true;
   try {
     const existing = await getTurnoAbierto();
     if (existing) {
@@ -149,52 +203,61 @@ async function onIniciarTurno() {
     openTurno(turno);
     showToast('Turno iniciado', 'success');
   } catch (err) {
+    console.error('onIniciarTurno error:', err);
     showToast(err.message || 'Error al iniciar turno', 'error');
-    btn.disabled = false;
+    if (btn) btn.disabled = false;
   }
 }
 
 function openTurno(turno) {
-  if (turno.status === 'finalizado') {
-    resetTurnoLocal();
-    showView('view-start');
-    return;
-  }
+  try {
+    if (turno.status === 'finalizado') {
+      resetTurnoLocal();
+      showView('view-start');
+      return;
+    }
 
-  const isNewTurno = !state.turno || state.turno.id !== turno.id;
-  state.turno = turno;
-  updateStartScreen(true);
+    const isNewTurno = !state.turno || state.turno.id !== turno.id;
+    state.turno = turno;
+    updateStartScreen(true);
 
-  if (isNewTurno) {
-    if (unsubCuentas) unsubCuentas();
-    unsubCuentas = subscribeCuentas(turno.id, (cuentas) => {
-      state.cuentas = cuentas;
-      renderCuentasList();
-      updateTurnoTotal();
-      if (state.cuentaActual) {
-        const updated = cuentas.find((c) => c.id === state.cuentaActual.id);
-        if (updated) {
-          state.cuentaActual = updated;
-          renderProductosList();
-        }
+    if (isNewTurno) {
+      if (unsubCuentas) {
+        try { unsubCuentas(); } catch (e) {}
       }
-    });
-  }
+      unsubCuentas = subscribeCuentas(turno.id, (cuentas) => {
+        state.cuentas = cuentas;
+        renderCuentasList();
+        updateTurnoTotal();
+        if (state.cuentaActual) {
+          const updated = cuentas.find((c) => c.id === state.cuentaActual.id);
+          if (updated) {
+            state.cuentaActual = updated;
+            renderProductosList();
+          }
+        }
+      });
+    }
 
-  const activeView = document.querySelector('.view.active')?.id;
-  // Opción B: asegurar que si no hay vista activa, la vista de turno se activa
-  if (!activeView || activeView === 'loading' || activeView === 'view-start' || activeView === 'view-turno') {
-    showView('view-turno');
+    const activeView = document.querySelector('.view.active')?.id;
+    if (!activeView || activeView === 'loading' || activeView === 'view-start' || activeView === 'view-turno') {
+      showView('view-turno');
+    }
+  } catch (err) {
+    console.error('openTurno error:', err);
+    showView('view-start');
   }
 }
 
 function updateTurnoTotal() {
   const total = calcTurnoTotalFromCuentas(state.cuentas);
-  document.getElementById('turno-total-vendido').textContent = formatCOP(total);
+  const el = document.getElementById('turno-total-vendido');
+  if (el) el.textContent = formatCOP(total);
 }
 
 function renderCuentasList() {
   const container = document.getElementById('cuentas-list');
+  if (!container) return;
   let cuentas = state.cuentas;
   if (state.search) {
     cuentas = cuentas.filter((c) => c.nombre.toLowerCase().includes(state.search));
@@ -230,14 +293,17 @@ function openCuenta(id) {
   const cuenta = state.cuentas.find((c) => c.id === id);
   if (!cuenta) return;
   state.cuentaActual = cuenta;
-  document.getElementById('cuenta-nombre-display').textContent = cuenta.nombre;
+  const nombreEl = document.getElementById('cuenta-nombre-display');
+  if (nombreEl) nombreEl.textContent = cuenta.nombre;
   const badge = document.getElementById('cuenta-estado-badge');
-  badge.textContent = cuenta.estado === 'pendiente' ? 'Pendiente' : 'Pagada';
-  badge.className = 'badge ' + (cuenta.estado === 'pendiente' ? 'badge-pending' : 'badge-paid');
+  if (badge) {
+    badge.textContent = cuenta.estado === 'pendiente' ? 'Pendiente' : 'Pagada';
+    badge.className = 'badge ' + (cuenta.estado === 'pendiente' ? 'badge-pending' : 'badge-paid');
+  }
 
   const isLocked = cuenta.estado === 'pagada';
-  document.getElementById('btn-agregar-producto').classList.toggle('hidden', isLocked);
-  document.getElementById('btn-cerrar-cuenta').classList.toggle('hidden', isLocked);
+  document.getElementById('btn-agregar-producto')?.classList.toggle('hidden', isLocked);
+  document.getElementById('btn-cerrar-cuenta')?.classList.toggle('hidden', isLocked);
 
   renderProductosList();
   showView('view-cuenta');
@@ -246,8 +312,10 @@ function openCuenta(id) {
 function renderProductosList() {
   const cuenta = state.cuentaActual;
   if (!cuenta) return;
-  document.getElementById('cuenta-total-display').textContent = formatCOP(cuenta.total);
+  const totalEl = document.getElementById('cuenta-total-display');
+  if (totalEl) totalEl.textContent = formatCOP(cuenta.total);
   const container = document.getElementById('productos-list');
+  if (!container) return;
   const isLocked = cuenta.estado === 'pagada';
 
   if (!cuenta.productos?.length) {
@@ -301,7 +369,7 @@ function renderProductosList() {
 }
 
 async function onCrearCuenta() {
-  const nombre = document.getElementById('input-nombre-cuenta').value.trim();
+  const nombre = document.getElementById('input-nombre-cuenta')?.value.trim();
   if (!nombre) { showToast('Ingresa un nombre', 'error'); return; }
   try {
     const cuenta = await crearCuenta(state.turno.id, nombre);
@@ -332,6 +400,7 @@ function openProductoModal(editItem = null) {
   document.getElementById('btn-confirmar-producto').textContent = editItem ? 'Guardar' : 'Agregar';
 
   const selector = document.getElementById('producto-selector');
+  if (!selector) return;
   selector.innerHTML = `
     <div class="product-section">
       <h4>Cocteles</h4>
@@ -363,12 +432,14 @@ function openProductoModal(editItem = null) {
 
   const coctelOpts = document.getElementById('coctel-options');
   const isCoctel = editItem?.tipo === 'coctel' || state.selectedProduct?.tipo === 'coctel';
-  coctelOpts.classList.toggle('hidden', !isCoctel);
+  if (coctelOpts) coctelOpts.classList.toggle('hidden', !isCoctel);
 
-  document.getElementById('chk-gomas').checked = editItem?.gomas || false;
-  document.getElementById('chk-shot').checked = editItem?.shot || false;
+  const chkGomas = document.getElementById('chk-gomas');
+  const chkShot = document.getElementById('chk-shot');
+  if (chkGomas) chkGomas.checked = editItem?.gomas || false;
+  if (chkShot) chkShot.checked = editItem?.shot || false;
 
-  coctelOpts.querySelectorAll('[data-size]').forEach((btn) => {
+  coctelOpts?.querySelectorAll('[data-size]').forEach((btn) => {
     btn.classList.toggle('active', btn.dataset.size === state.coctelSize);
     btn.onclick = () => {
       coctelOpts.querySelectorAll('[data-size]').forEach((b) => b.classList.remove('active'));
@@ -378,8 +449,8 @@ function openProductoModal(editItem = null) {
     };
   });
 
-  document.getElementById('chk-gomas').onchange = updateProductoPreview;
-  document.getElementById('chk-shot').onchange = updateProductoPreview;
+  if (chkGomas) chkGomas.onchange = updateProductoPreview;
+  if (chkShot) chkShot.onchange = updateProductoPreview;
 
   if (editItem) {
     toggleCoctelOptions(editItem.tipo === 'coctel');
@@ -390,23 +461,25 @@ function openProductoModal(editItem = null) {
 }
 
 function toggleCoctelOptions(show) {
-  document.getElementById('coctel-options').classList.toggle('hidden', !show);
+  document.getElementById('coctel-options')?.classList.toggle('hidden', !show);
 }
 
 function updateProductoPreview() {
-  document.getElementById('qty-value').textContent = state.qty;
+  const qtyEl = document.getElementById('qty-value');
+  if (qtyEl) qtyEl.textContent = state.qty;
   let unit = 0;
   if (state.selectedProduct?.tipo === 'coctel') {
     unit = calcularPrecioCoctel(
       state.coctelSize,
-      document.getElementById('chk-gomas').checked,
-      document.getElementById('chk-shot').checked
+      document.getElementById('chk-gomas')?.checked,
+      document.getElementById('chk-shot')?.checked
     );
   } else if (state.selectedProduct?.tipo === 'producto') {
     const p = PRODUCTOS.find((x) => x.id === state.selectedProduct.id);
     unit = p?.precio || 0;
   }
-  document.getElementById('producto-preview-price').textContent = formatCOP(unit * state.qty);
+  const preview = document.getElementById('producto-preview-price');
+  if (preview) preview.textContent = formatCOP(unit * state.qty);
 }
 
 async function onConfirmarProducto() {
@@ -417,8 +490,8 @@ async function onConfirmarProducto() {
   let item;
   if (state.selectedProduct.tipo === 'coctel') {
     const coctel = COCTELES.find((c) => c.id === state.selectedProduct.id);
-    const gomas = document.getElementById('chk-gomas').checked;
-    const shot = document.getElementById('chk-shot').checked;
+    const gomas = document.getElementById('chk-gomas')?.checked;
+    const shot = document.getElementById('chk-shot')?.checked;
     const precioUnitario = calcularPrecioCoctel(state.coctelSize, gomas, shot);
     item = {
       tipo: 'coctel',
@@ -458,7 +531,6 @@ async function onPago(opcion) {
   const cuenta = state.cuentaActual;
   if (!cuenta) return;
 
-  // Nueva opción: eliminar cuenta
   if (opcion === 'eliminar') {
     if (cuenta.estado === 'pagada') {
       showToast('No se puede eliminar una cuenta pagada', 'error');
@@ -468,7 +540,6 @@ async function onPago(opcion) {
     if (!ok) return;
     try {
       await deleteCuenta(state.turno.id, cuenta.id);
-      // actualizar estado local
       state.cuentas = state.cuentas.filter((c) => c.id !== cuenta.id);
       state.cuentaActual = null;
       showToast('Cuenta eliminada', 'success');
@@ -479,7 +550,6 @@ async function onPago(opcion) {
     return;
   }
 
-  // Comportamiento previo: cerrar cuenta con metodo de pago
   try {
     await cerrarCuenta(state.turno.id, cuenta.id, opcion);
     if (opcion === 'pendiente') {
@@ -507,17 +577,18 @@ async function onFinalizarTurno() {
 
 async function openDesempeno() {
   showView('view-desempeno');
-  document.getElementById('stats-date').value = '';
+  const sd = document.getElementById('stats-date');
+  if (sd) sd.value = '';
   await loadStats();
 }
 
 async function loadStats() {
   const container = document.getElementById('stats-content');
+  if (!container) return;
   container.innerHTML = '<div class="loader-inline"></div>';
   try {
     const data = await getStats(state.statsPeriod, new Date());
     renderStatsUI(container, data);
-    // si existen botones en DOM para exportar/borrar, adjuntamos listeners dinámicamente
     bindStatsActionsIfPresent();
   } catch (err) {
     container.innerHTML = `<div class="empty-state">${escapeHtml(err.message)}</div>`;
@@ -526,6 +597,7 @@ async function loadStats() {
 
 async function loadStatsByDate(dateStr) {
   const container = document.getElementById('stats-content');
+  if (!container) return;
   container.innerHTML = '<div class="loader-inline"></div>';
   try {
     const result = await getStatsByDate(dateStr);
@@ -544,24 +616,18 @@ function escapeHtml(str) {
 
 /* -----------------------
    Funciones auxiliares para export / borrado de turnos
-   - Estas funciones usan las utilidades de firestore ya exportadas en firebase-init.js.
-   - Los listeners para botones se adjuntan solo si los elementos existen en DOM.
    ----------------------- */
 
 async function deleteTurnoById(turnoId) {
   if (!turnoId) throw new Error('turnoId requerido');
-  // confirmar antes de llamar esta función desde la UI
-  // borrar todas las cuentas del turno
   const cuentasSnap = await getDocs(collection(db, 'turnos', turnoId, 'cuentas'));
   for (const d of cuentasSnap.docs) {
     await deleteDoc(doc(db, 'turnos', turnoId, 'cuentas', d.id));
   }
-  // borrar el documento de turno
   await deleteDoc(doc(db, 'turnos', turnoId));
 }
 
 function objectArrayToCsv(rows, columns) {
-  // columns = array de keys en el orden deseado
   const header = columns.join(',');
   const lines = rows.map((r) => columns.map((k) => {
     const v = r[k] == null ? '' : String(r[k]).replace(/"/g, '""');
@@ -584,12 +650,11 @@ function downloadText(filename, content) {
 
 async function exportAllTurnosCsv() {
   try {
-    const turns = await getAllTurnosFinalizados(); // viene de turno.js
+    const turns = await getAllTurnosFinalizados();
     if (!turns || !turns.length) {
       showToast('No hay turnos para exportar', 'info');
       return;
     }
-    // mapear campos relevantes
     const rows = turns.map((t) => ({
       id: t.id,
       fecha: t.fecha || '',
@@ -614,15 +679,12 @@ function bindStatsActionsIfPresent() {
   const statsContainer = document.getElementById('stats-content');
   if (!statsContainer) return;
 
-  // exportar CSV global: elemento con id="btn-export-turnos-csv"
   const exportBtn = document.getElementById('btn-export-turnos-csv');
   if (exportBtn && !exportBtn._bound) {
     exportBtn.addEventListener('click', exportAllTurnosCsv);
     exportBtn._bound = true;
   }
 
-  // delegación: si en la lista de turnos cada fila tiene class "turno-row" y data-id,
-  // y un botón con class "btn-delete-turn", el click lo maneja aquí.
   if (!statsContainer._deleteBound) {
     statsContainer.addEventListener('click', async (e) => {
       const btn = e.target.closest('.btn-delete-turn');
@@ -634,7 +696,6 @@ function bindStatsActionsIfPresent() {
       try {
         await deleteTurnoById(turnoId);
         showToast('Turno eliminado', 'success');
-        // recargar estadísticas/listado
         loadStats();
       } catch (err) {
         showToast(err.message || 'Error al borrar turno', 'error');
