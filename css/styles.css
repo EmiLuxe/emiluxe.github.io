@@ -644,6 +644,7 @@ html, body {
   display: inline-flex;
   gap: 6px;
   margin-top: 6px;
+  margin-bottom: 4px;
 }
 .selected-item .size-btn {
   padding: 6px 8px;
@@ -659,18 +660,19 @@ html, body {
   color: #fff;
 }
 
-/* Additions (gomas/shot) touch-friendly under size row */
+/* Additions (gomas/shot) touch-friendly under size row, smaller so both fit same line */
 #selected-list .opt-label {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-size: 0.95rem;
+  gap: 6px;               /* reduced gap */
+  font-size: 0.92rem;     /* slightly smaller text to save space */
   color: var(--text-muted);
-  margin-top: 8px;
+  margin-top: 6px;
+  white-space: nowrap;    /* prefer same line */
 }
 #selected-list .opt-label input[type="checkbox"] {
-  width: 26px;
-  height: 26px;
+  width: 18px;            /* reduced size */
+  height: 18px;
   accent-color: var(--accent);
 }
 
