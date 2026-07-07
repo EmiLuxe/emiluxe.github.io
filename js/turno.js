@@ -14,17 +14,44 @@ export async function getTurnoAbierto() {
   return { id: d.id, ...d.data() };
 }
 
+/**
+ * subscribeTurnoAbierto(callback)
+ * - callback recibe: turno object o null
+ * - maneja errores de onSnapshot para no romper la inicialización de la UI
+ * - devuelve la función unsubscribe (o un noop si falla al subscribir)
+ */
 export function subscribeTurnoAbierto(callback) {
   const q = query(collection(db, TURNOS), where('status', '==', 'abierto'));
-  return onSnapshot(q, (snap) => {
-    if (snap.empty) {
-      callback(null);
-      return;
-    }
-    const docs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-    docs.sort((a, b) => (a.fechaInicio?.seconds || 0) - (b.fechaInicio?.seconds || 0));
-    callback(docs[0]);
-  });
+  try {
+    const unsubscribe = onSnapshot(
+      q,
+      (snap) => {
+        try {
+          if (snap.empty) {
+            callback(null);
+            return;
+          }
+          const docs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+          docs.sort((a, b) => (a.fechaInicio?.seconds || 0) - (b.fechaInicio?.seconds || 0));
+          callback(docs[0]);
+        } catch (innerErr) {
+          console.error('subscribeTurnoAbierto - processing snapshot error:', innerErr);
+          callback(null);
+        }
+      },
+      (err) => {
+        console.error('subscribeTurnoAbierto - onSnapshot error:', err);
+        // No dejar la UI bloqueada: avisamos al consumidor con null
+        try { callback(null); } catch (e) { /* swallow */ }
+      }
+    );
+    return unsubscribe;
+  } catch (err) {
+    console.error('subscribeTurnoAbierto - subscribe failed:', err);
+    // Fallback: devolver noop unsubscribe y liberar UI
+    setTimeout(() => { try { callback(null); } catch (e) {} }, 0);
+    return () => {};
+  }
 }
 
 export async function iniciarTurno() {
@@ -47,6 +74,7 @@ export async function iniciarTurno() {
 
   const ref = await addDoc(collection(db, TURNOS), data);
 
+  // Asegurarnos de que solo quede un turno abierto (limpieza si hay duplicados)
   const abiertos = await getDocs(query(collection(db, TURNOS), where('status', '==', 'abierto')));
   if (abiertos.docs.length > 1) {
     const sorted = abiertos.docs.sort(
@@ -54,7 +82,11 @@ export async function iniciarTurno() {
     );
     const principal = sorted[0];
     for (let i = 1; i < sorted.length; i++) {
-      await deleteDoc(doc(db, TURNOS, sorted[i].id));
+      try {
+        await deleteDoc(doc(db, TURNOS, sorted[i].id));
+      } catch (e) {
+        console.warn('iniciarTurno: failed to delete duplicate turno', sorted[i].id, e);
+      }
     }
     if (principal.id !== ref.id) {
       return { id: principal.id, ...principal.data() };
@@ -64,10 +96,29 @@ export async function iniciarTurno() {
   return { id: ref.id, ...data };
 }
 
+/**
+ * subscribeTurno(turnoId, callback)
+ * Observa cambios en un turno específico. Devuelve unsubscribe.
+ */
 export function subscribeTurno(turnoId, callback) {
-  return onSnapshot(doc(db, TURNOS, turnoId), (snap) => {
-    if (snap.exists()) callback({ id: snap.id, ...snap.data() });
-  });
+  try {
+    const unsubscribe = onSnapshot(
+      doc(db, TURNOS, turnoId),
+      (snap) => {
+        if (snap.exists()) callback({ id: snap.id, ...snap.data() });
+        else callback(null);
+      },
+      (err) => {
+        console.error('subscribeTurno - onSnapshot error:', err);
+        try { callback(null); } catch (e) {}
+      }
+    );
+    return unsubscribe;
+  } catch (err) {
+    console.error('subscribeTurno - subscribe failed:', err);
+    setTimeout(() => { try { callback(null); } catch (e) {} }, 0);
+    return () => {};
+  }
 }
 
 export async function getAllTurnosFinalizados() {
@@ -108,9 +159,13 @@ export async function finalizarTurno(turnoId, cuentas) {
 
   const turnoRef = doc(db, TURNOS, turnoId);
   let fechaInicio = new Date();
-  const turnoDoc = await getDoc(turnoRef);
-  if (turnoDoc.exists() && turnoDoc.data().fechaInicio) {
-    fechaInicio = turnoDoc.data().fechaInicio.toDate();
+  try {
+    const turnoDoc = await getDoc(turnoRef);
+    if (turnoDoc.exists() && turnoDoc.data().fechaInicio) {
+      fechaInicio = turnoDoc.data().fechaInicio.toDate();
+    }
+  } catch (e) {
+    console.warn('finalizarTurno: failed to read turno.fechaInicio', e);
   }
 
   const now = new Date();
@@ -151,7 +206,11 @@ export async function deleteTurno(turnoId) {
   // borrar cuentas en la subcolección 'cuentas'
   const cuentasSnap = await getDocs(query(collection(db, TURNOS, turnoId, 'cuentas')));
   for (const d of cuentasSnap.docs) {
-    await deleteDoc(doc(db, TURNOS, turnoId, 'cuentas', d.id));
+    try {
+      await deleteDoc(doc(db, TURNOS, turnoId, 'cuentas', d.id));
+    } catch (e) {
+      console.warn('deleteTurno: failed to delete cuenta', d.id, e);
+    }
   }
   // borrar documento principal del turno
   await deleteDoc(doc(db, TURNOS, turnoId));
